@@ -22,41 +22,59 @@ int get_msb_pos(uint32 u)
     {       
         counter +=1; 
         u2 = u2>>counter;       
-        std::cout << to_string(u2) +"|";
-        std::cout << to_string(counter) << endl;
+        //std::cout << to_string(u2) +"|";
+        //std::cout << to_string(counter) << endl;
 
     }
     return counter;
 }
 
-uint32 md5(uint32 input)
-{    
-    //init block
-    uint32 block[16]; // 16*32=512 bit block
-    int msb_pos = 0;
+
+uint32 shifting_word(uint32 input)
+{
+    
+    int msb_pos =get_msb_pos(input);
     int wordlen = 31;
-    msb_pos = get_msb_pos(input);//get input len (act. used)
-    std::cout << "msbpos :" + to_string(msb_pos)<< endl;
-    std::cout << "input  :" + to_string(input)<< endl;
+
+
+    //std::cout << "msbpos :" + to_string(msb_pos)<< endl;
+    //std::cout << "input  :" + to_string(input)<< endl;
 
     input = input<<1;   //shift left with 1
     input +=1;          //set last bit 1 by adding 1
-    std::cout << "input  after shifting 1:" + to_string(input)<< endl;
+    //std::cout << "input  after shifting 1:" + to_string(input)<< endl;
 
-    std::cout << "to shift  :" + to_string(wordlen- (msb_pos +1))<< endl;
+    //std::cout << "to shift  :" + to_string(wordlen- (msb_pos +1))<< endl;
     input = input<< wordlen-(msb_pos +1); // fill max len with 0
     
-    std::cout << "check:" +to_string(input )<< endl;
-    std::cout << "check:" +to_string(input >>(wordlen- (msb_pos )))<< endl;
-
-
-  
-
-#
-
-
+    //std::cout << "check:" +to_string(input )<< endl;
+    //std::cout << "check:" +to_string(input >>(wordlen- (msb_pos )))<< endl;
 
     return input; //output
+}
+
+
+
+uint32* md5( int input [])
+{
+    uint32 output[16];
+
+    if((sizeof(input)/sizeof(*input)) != 16)
+    {
+        std::cout << "Wrong input size!" << endl;
+        return output;
+    }
+
+    int msg_end;
+    int pos_mbs = get_msb_pos(input[msg_end]);  // 0000000001001
+                                                //          ^  ^  => 9
+                                                //    pos(msb)    => 3
+    input[msg_end] = shifting_word(input[msg_end]);
+
+
+
+
+return output;
 }
 
 
@@ -65,7 +83,11 @@ int main()
 {
     string val = "abc";
     //uint32 t = 18446744073709551615;
-    md5(5);
+    //#todo put vals in block
+    int blocks_len = (val.length()/512);
+    
+    int block[16]; //16*32 =512
+    md5(block);
     //std::cout << md5(5);
     return 0;
 }
