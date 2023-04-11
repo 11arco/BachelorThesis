@@ -1,4 +1,6 @@
-structure for procedure and thesis :
+Hash-Functions
+
+structure:
 	MD5		Theoretically		giving background (MD4)
 						explain what MD5 does
 						how
