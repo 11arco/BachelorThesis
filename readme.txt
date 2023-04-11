@@ -1,5 +1,3 @@
-#todo readme
-
 structure for procedure and thesis :
 	MD5		Theoretically		giving background (MD4)
 						explain what MD5 does
@@ -26,3 +24,5 @@ ______________________________________________________________________________
 						SHA1
 
 			Comparision
+
+#todo readme
