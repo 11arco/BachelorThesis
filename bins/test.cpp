@@ -9,7 +9,7 @@ typedef unsigned int uint32; //actually 32 bit uint
 
 
 
-
+//MD5 implementation
 int md5comporess()
 {
     return 5;
@@ -100,12 +100,17 @@ uint32* md5( uint32 input [])
 
     return process(input);
 
-
-
-
 return output;
 }
 
+//MD5 attack implementation
+
+int* attack_md5()
+{
+
+
+
+}
 
 
 int main()
