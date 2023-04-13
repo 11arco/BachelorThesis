@@ -4,6 +4,12 @@
 #include <bitset>
 #include <cstdint>
 
+#include <climits>
+#include <sstream>
+#include <string.h>
+
+#include <bitset>
+
 using namespace std;
 typedef unsigned int uint32; //actually 32 bit uint 
 
@@ -54,39 +60,95 @@ uint32 shifting_word(uint32 input)
     return input; //output
 }
 
-uint32* pad(uint32* msg)
+string pad(string msg)
 {
-if((sizeof(msg)/sizeof(*msg)) != 16) //check len of 
-{
-    cout << "msg len not 16" << endl;
-}
+    cout << msg +"|";
+    cout << msg.length() << endl;
+    
 
-    int msg_end = (sizeof(msg)/sizeof(*msg));
-    int pos_mbs = get_msb_pos(msg[msg_end]);  // 0000000001001
+    char l []= {msg.length()};
+
+    bitset<64> x(msg.length());
+    cout <<  "msg len as bit: ";
+    cout <<  x << '\n';
+
+    int offset = 8 - get_msb_pos(msg.length()+1);
+
+
+
+    
+    char zero =0; //8bit
+    char one = 1<<7; //8bit
+    msg = msg + one;
+
+    while (msg.length() % 64 != 56) //8bit * 64 = 512 bit
+    {
+
+        msg = msg + zero;
+        cout << msg +"|";
+        cout << msg.length() << endl;
+    }
+    
+
+
+    msg = msg + x;
+
+
+
+    cout << "final:" + msg +"|";
+    cout << msg.length() << endl;
+ //   char len = cast msg_len4;
+
+
+    //int pos_mbs = get_msb_pos(msg[msg_end]);  // 0000000001001
                                                 //          ^  ^  => 9
                                                 //    pos(msb)    => 3
-    msg[msg_end] = shifting_word(msg[msg_end]);
+   // msg[msg_end] = shifting_word(msg[msg_end]);
 
 
     return msg;
 }
 
-uint32* partition( uint32 msg [])//#todo
+
+
+uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo   
 {
-    const int N = 1; // N blocks  each block contains 32bit uint
-    uint32 blocks[N][16];
-    return 0;
+    return ihv;
 }
 
-uint32* md5_compress(uint32* ihv, uint32 block [])//#todo   
-{
-    return 0;
-}
-
-uint32* process( uint32 msg[]) //#todo
+uint32* process( uint32 msg[], int size) //#todo
 {
     uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ; //(67452301,EFCDAB89,98BADCFE,10325476);
-    uint32 block [16];
+    uint32* ihvN;
+    const int N = size * 32; //N is the size of the massage 
+    uint32 block [16];// N blocks each block contains 32bit uint 16 * 32 = 512
+    uint32 block_pos;
+
+
+        block_pos = 0;
+        for(int j = 0; j < 16; j++)
+        {
+            block[j] = msg[block_pos +j];
+        }
+
+
+        ihvN = md5_compress(ihv,block);
+
+
+    for (int i = 1; i < N + 1; i++) //partitioning
+    {
+        block_pos = i * 32;
+        for(int j = 0; j < 16; j++)
+        {
+            block[j] = msg[block_pos +j];
+        }
+
+
+        ihvN = md5_compress(ihvN,block);
+    }
+    
+    return 0;
+    
     
     return md5_compress(ihv,block);
 }
@@ -94,11 +156,11 @@ uint32* process( uint32 msg[]) //#todo
 uint32* md5( uint32 input [])
 {
     uint32 output[16];
+    int size;
+    //input = pad(input);
+    // input = partition(input);
 
-    input = pad(input);
-    input = partition(input);
-
-    return process(input);
+    return process(input, size);
 
 return output;
 }
@@ -115,6 +177,10 @@ int* attack_md5()
 
 int main()
 {
+    // input is string
+    // string is char*
+    // char ist 8 bit
+
     string val = "abc";
     //uint32 t = 18446744073709551615;
     //#todo put vals in block
@@ -123,5 +189,22 @@ int main()
     int block[16]; //16*32 =512
     //md5(block);
     //std::cout << md5(5);
+    // cout << "abc"<< endl;
+    string test = "abc";
+    
+    //char test2;
+    //test2 =1<<7;
+    //test = test + test2;
+
+
+    cout << (test);
+
+    cout << pad(test)<< endl;
+
+
+    char a = 2;
+    bitset<8> x(a);
+    cout << x << '\n';
+
     return 0;
 }

@@ -44,6 +44,14 @@
         "xstddef": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "sstream": "cpp",
+        "array": "cpp",
+        "vector": "cpp",
+        "list": "cpp",
+        "random": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp",
+        "algorithm": "cpp"
     }
 }
