@@ -15,12 +15,6 @@ typedef unsigned int uint32; //actually 32 bit uint
 
 
 
-//MD5 implementation
-int md5comporess()
-{
-    return 5;
-}
-
 int get_msb_pos(uint32 u)
 {
     int counter =0;
@@ -35,6 +29,14 @@ int get_msb_pos(uint32 u)
     }
     return counter;
 }
+
+
+//MD5 implementation
+int md5comporess()
+{
+    return 5;
+}
+
 
 
 uint32 shifting_word(uint32 input)
@@ -65,13 +67,11 @@ string pad(string msg)
     cout << msg +"|";
     cout << msg.length() << endl;
     
-
-    char l []= {msg.length()};
-
-    bitset<64> x(msg.length());
+    uint64_t l = msg.length();
+    string le = ""+l;
+    bitset<64> x(l);
     cout <<  "msg len as bit: ";
     cout <<  x << '\n';
-
     int offset = 8 - get_msb_pos(msg.length()+1);
 
 
@@ -89,14 +89,16 @@ string pad(string msg)
         cout << msg.length() << endl;
     }
     
+    //int msb_l = get_msb_pos(l);
 
 
-    msg = msg + x;
+    msg = msg + le; // #todo !!!!
 
 
 
     cout << "final:" + msg +"|";
     cout << msg.length() << endl;
+    cout << bitset<64> (msg.length()) << endl;
  //   char len = cast msg_len4;
 
 
@@ -190,7 +192,7 @@ int main()
     //md5(block);
     //std::cout << md5(5);
     // cout << "abc"<< endl;
-    string test = "abc";
+    string test = "abcdefghij";
     
     //char test2;
     //test2 =1<<7;
@@ -202,9 +204,6 @@ int main()
     cout << pad(test)<< endl;
 
 
-    char a = 2;
-    bitset<8> x(a);
-    cout << x << '\n';
 
     return 0;
 }
