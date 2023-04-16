@@ -72,7 +72,7 @@ string pad(string msg)
 
     
     int l = msg.length();
-    int offset = 1+(l / (2^32)) ;
+    int offset = 1+(l / (pow(2,32))) ;
     bitset<64> x(l);
     string length_for_adding = "";
     length_for_adding = l;
@@ -97,7 +97,7 @@ string pad(string msg)
     char one = 1 << 7; //8bit
     msg = msg + one;
 
-    while (msg.length() % 64 != 64 - offset) //8bit * 64 = 512 bit
+    while (msg.length() % 16 != 16 - offset) //8bit * 64 = 512 bit // 16 *32 = 512
     {
         msg = msg + zero;
         cout << msg +"|";
@@ -192,7 +192,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 d = ihv [3];
 
     uint32 F = 0;
-    uint32 T = 0;
+    uint32 T_ = 0;
     uint32 R = 0;
     int AC = 0;
 
@@ -202,17 +202,18 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     {
         AC = ceil(pow(2,32) * abs(sin( t + 1)));
         //cout << t << endl;
-        F = f_t( Q[t] ,Q[t-1] ,Q[t-2] ,t );
-        T = F + Q [t-3] + AC + W( block, t);
-        R = RC(t) << t;
+        F = f_t( Q[t], Q[t-1], Q[t-2], t);
+        cout << W(block,t)<<endl;
+        T_ = F + Q [t-3] + AC + W( block, t);
+        R = RC(t) << T_;
         Q[t+1] = Q[t] + R;
 
     }
  
     ihv[0] = a + Q[61];
-    ihv[0] = b + Q[64];
-    ihv[0] = c + Q[63];
-    ihv[0] = d + Q[62];
+    ihv[1] = b + Q[64];
+    ihv[2] = c + Q[63];
+    ihv[3] = d + Q[62];
 
     
     return ihv;
@@ -248,15 +249,16 @@ string process( string input) //#todo
         ihvN = md5_compress(ihv,msg_block);
 
 
-    for (int h = 1; h <= size; h++) 
+    for (int h = 1; h*16 < size - 16; h++) 
     {   
         print_step(h);
-        for(int j = 0; j < 16; j++)
-        {
-            msg_block[j] = padded_input[h + j];
-
+        cout << padded_input.length();
+        for(int j = 0; j < 16; j++ )
+        {   
+            msg_block[j] = padded_input.at(j+(h*16)  );
+            
         }
-
+        //cout << msg_block << endl;
 
         ihvN = md5_compress(ihvN,msg_block);
 
@@ -293,7 +295,7 @@ int main()
     // string is char*
     // char ist 8 bit
 
-    string val = "abc";//len 50
+    string val = "ab";//len 50
     string large = val + val + val + val + val; // len 250
     string xl = large + large + large + large + large; // len 1250
     string xxl = xl + xl + xl + xl + xl; // 6.250
