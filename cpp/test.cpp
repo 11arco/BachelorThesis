@@ -160,46 +160,33 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
 }
 uint32 W ( uint32 m [16], int t) // m is the actual massage block
 { 
-    int pos;
+    int pos=-1;
     if (t < 16) pos = t ;
-    else if (t < 32) pos = (1+(5*t)) % 16;
-    else if (t < 48) pos = (5+(3*t)) % 16;
-    else if (t < 64) pos = (7*t) % 16;
+    else if (t < 32){ 
+        pos = (1+(5*t)) % 16;
+    }
+    else if (t < 48){ 
+        pos = (5+(3*t)) % 16;
+    }
+    else if (t < 64){ 
+        pos = (7*t) % 16;
+    }
+
     //cout << t;
     //cout << "-pos" + to_string(pos) + " ";
-    return m[pos]; // something went wrong
+    if (pos == -1) cout << "something went wrong:" + to_string(t)<< endl;
+    return m[pos]; 
 
 }
 
 uint32 RC (int t) // only 0 if somethin went wrong
 {
     uint32 arr[] = {7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21};
+    //cout << "RC: " + to_string(t) + " | " + to_string( arr[t] ) << endl;
 
     return arr[t];
 }
 
-uint32 Q_(int t){
-    switch (t)
-    {
-    case 0:
-        return 0x67452301 ;
-        break;
-    case -1:
-        return 0xEFCDAB89 ;
-        break;
-    case -2:
-        return 0x98BADCFE ;
-        break;
-    case -3:
-        return 0x10325476 ;
-        break;
-    
-    default:
-        break;
-    }
-    cout << "Q has worng parameter t. It should be in {0,-1,-2,-3}, but is " + to_string(t) <<endl;
-    return 0;
-}
 
 uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo   
 {
@@ -212,12 +199,12 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     //x << std::hex << ihv[3];
     cout << x.str() << endl;
 
-    uint32 F = 0;
-    uint32 T_ = 0;
-    uint32 R = 0;
-    uint32 AC = 0;
+    uint32 F;
+    uint32 T_;
+    uint32 R;
+    uint32 AC;
 
-    uint32 Q[65] = {0x67452301}; //Q[x] 
+    uint32 Q[65] = {b};
 //    cout << "Q[0]: " + to_string(Q[0]) + " - " + " b: " + to_string(b) << endl;
 //    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
 //    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
@@ -225,15 +212,34 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 
     for ( int t = 0; t < 64; t++)   
     {
-        
-       // cout <<"Q_t:" + to_string(Q[t]) + "|" ;
+    // x << std::hex << Q[t];
+    // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
 
-        if (t < 3)
+    //cout <<"Q_t:" + to_string(Q[t]) + "|" ;
+
+        if (t == 0){
+            AC = floor(pow(2,32) * abs(sin( t + 1)));
+            F = f_t( Q[t], c, d, t);
+            //cout << to_string(W(block,t)) << endl;
+            T_ = F + a + AC + W( block, t);
+            R = T_ << RC(t) ;
+            Q[t+1] = Q[t] + R;
+        }
+        else if (t == 1)
         {
             AC = floor(pow(2,32) * abs(sin( t + 1)));
-            F = f_t( Q_(t), Q_(t-1), Q_(t-2), t);
+            F = f_t( Q[t], Q[t-1], c, t);
             //cout << W(block,t) << endl;
-            T_ = F + Q_(t-3) + AC + W( block, t);
+            T_ = F + d + AC + W( block, t);
+            R = T_ << RC(t) ;
+            Q[t+1] = Q[t] + R;
+        }
+        else if (t == 2)
+        {
+            AC = floor(pow(2,32) * abs(sin( t + 1)));
+            F = f_t( Q[t], Q[t-1], Q[t-2], t);
+            //cout << "beep" << endl;
+            T_ = F + c + AC + W( block, t);
             R = T_ << RC(t) ;
             Q[t+1] = Q[t] + R;
         }
@@ -241,11 +247,14 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
         {
             AC = floor(pow(2,32) * abs(sin( t + 1)));
             F = f_t( Q[t], Q[t-1], Q[t-2], t);
-            //cout << W(block,t) << endl;
             T_ = F + Q [t-3] + AC + W( block, t);
             R = T_ << RC(t) ;
+            cout << to_string(T_) + " | " + to_string(R) << endl;;
+
+
             Q[t+1] = Q[t] + R;
         }
+        
     }
  
     ihv[0] = a + Q[61];
@@ -289,6 +298,7 @@ string process( string input) //#todo
 
             shift = ((3 - i)*8);
             msg_block[j] = padded_input.at((j * 4) + i) << shift;
+
         }
       //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
     
