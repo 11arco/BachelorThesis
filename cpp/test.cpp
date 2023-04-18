@@ -72,16 +72,12 @@ uint32 shifting_word(uint32 input)
 string pad(string msg)
 {
 
-    
     int l = msg.length();
-    int offset = 1+(l / (pow(2,32))) ;
     bitset<32> x(l);
     string length_for_adding = "";
     length_for_adding = l;
 
     cout << length_for_adding.length() <<endl;
-    cout << "offset :"  <<endl;
-    cout << offset << endl;
 
     cout << "input: " + msg  << endl;
     cout << "length:" ;
@@ -94,9 +90,11 @@ string pad(string msg)
     
     char zero = 0; //8bit
     char one = 1 << 7; //8bit
+        cout << bitset<8> (one) << endl;
+
     msg = msg + one;
 
-    while (msg.length() % 16 != 16 - offset) //8bit * 64 = 512 bit // 16 *32 = 512
+    while (msg.length() % 64 != 63) //8bit * 64 = 512 bit // 16 *32 = 512
     {
        // cout<< "msg.length-offset: " + to_string(msg.length()) + "-" + to_string(offset) + " " << endl;;
         msg = msg + zero;
@@ -114,6 +112,7 @@ string pad(string msg)
     cout << "final:" + msg +"|";
     cout << msg.length() << endl;
     cout << bitset<64> (msg.at(msg.length() -1)) << endl;
+
     cout << ""  << endl;
  //   char len = cast msg_len4;
 
@@ -128,7 +127,7 @@ string pad(string msg)
 }
 
 
-uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t ) // Q_x actually means Q-t-x. t is the round. If returns 0 something went wrong.
+uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t ) 
 { 
     
     if (t < 16)
@@ -146,7 +145,8 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t ) // Q_x actually means Q-t-x. t 
     else if (t < 48)
     {  
     //    cout << "Case 2 : " ; 
-    //    cout << t << endl;
+    //    cout << (X ^ Y ^ Z) << endl;
+
         return (X ^ Y ^ Z);
     }
     else if (t < 64)
@@ -162,8 +162,8 @@ uint32 W ( uint32 m [16], int t) // m is the actual massage block
 { 
     int pos;
     if (t < 16) pos = t ;
-    else if (t < 32) pos = (1+5*t) % 16;
-    else if (t < 48) pos = (5+3*t) % 16;
+    else if (t < 32) pos = (1+(5*t)) % 16;
+    else if (t < 48) pos = (5+(3*t)) % 16;
     else if (t < 64) pos = (7*t) % 16;
     //cout << t;
     //cout << "-pos" + to_string(pos) + " ";
@@ -187,7 +187,8 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 d = ihv [3];
 
     stringstream x;
-
+    //x << std::hex << ihv[3];
+    cout << x.str() << endl;
 
     uint32 F = 0;
     uint32 T_ = 0;
@@ -196,6 +197,11 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 
     uint32 Q[65] = {b,c,d,a}; //Q[x] 
 
+//    cout << "Q[0]: " + to_string(Q[0]) + " - " + " b: " + to_string(b) << endl;
+//    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
+//    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
+//    cout << "Q[3]: " + to_string(Q[3]) + " - " + " a: " + to_string(a) << endl;
+
     for ( int t = 0; t < 64; t++)   
     {
         
@@ -203,9 +209,9 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 
         AC = floor(pow(2,32) * abs(sin( t + 1)));
         F = f_t( Q[t], Q[t-1], Q[t-2], t);
-        cout << W(block,t) << endl;
+        //cout << W(block,t) << endl;
         T_ = F + Q [t-3] + AC + W( block, t);
-        R = RC(t) << T_;
+        R = T_ << RC(t) ;
         Q[t+1] = Q[t] + R;
 
     }
@@ -237,17 +243,21 @@ string process( string input) //#todo
     stringstream b;
     stringstream c;
     stringstream d;
+    int shift = 0;
 
     uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ; //(67452301,EFCDAB89,98BADCFE,10325476);
     uint32* ihvN;
     uint32 msg_block [16];// N blocks each block contains 32bit uint 16 * 32 = 512
-    uint32 block_pos = 0;
 
     cout << "calculating first block" << endl;
 
     for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
     {
-        msg_block[j] = padded_input.at(j);
+        for (int i = 0; i < 4; i++){
+
+            shift = ((3 - i)*8);
+            msg_block[j] = padded_input.at((j * 4) + i) << shift;
+        }
       //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
     
     }
@@ -256,15 +266,23 @@ string process( string input) //#todo
         ihvN = md5_compress(ihv,msg_block);
 
 
-    for (int h = 1; h*16 < size ; h++) 
+
+
+
+    for (int h = 1; h*64 < size ; h++) 
     {   
         print_step(h);
-        for(int j = 0; j < 16; j++ )
-        {   
-            msg_block[j] = padded_input.at(j+(h*16)  );
-            
+      
+        for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
+        {
+            for (int i = 0; i < 4; i++){
+
+                shift = ((3 - i)*8);
+                msg_block[j] = padded_input.at((j * 4) + i) << shift;
+            }
+        //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
+        
         }
-        //cout << msg_block << endl;
 
         ihvN = md5_compress(ihvN,msg_block);
 
