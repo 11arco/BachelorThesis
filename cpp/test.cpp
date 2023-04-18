@@ -178,6 +178,28 @@ uint32 RC (int t) // only 0 if somethin went wrong
     return arr[t];
 }
 
+uint32 Q_(int t){
+    switch (t)
+    {
+    case 0:
+        return 0x67452301 ;
+        break;
+    case -1:
+        return 0xEFCDAB89 ;
+        break;
+    case -2:
+        return 0x98BADCFE ;
+        break;
+    case -3:
+        return 0x10325476 ;
+        break;
+    
+    default:
+        break;
+    }
+    cout << "Q has worng parameter t. It should be in {0,-1,-2,-3}, but is " + to_string(t) <<endl;
+    return 0;
+}
 
 uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo   
 {
@@ -195,8 +217,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 R = 0;
     uint32 AC = 0;
 
-    uint32 Q[65] = {b,c,d,a}; //Q[x] 
-
+    uint32 Q[65] = {0x67452301}; //Q[x] 
 //    cout << "Q[0]: " + to_string(Q[0]) + " - " + " b: " + to_string(b) << endl;
 //    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
 //    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
@@ -207,13 +228,24 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
         
        // cout <<"Q_t:" + to_string(Q[t]) + "|" ;
 
-        AC = floor(pow(2,32) * abs(sin( t + 1)));
-        F = f_t( Q[t], Q[t-1], Q[t-2], t);
-        //cout << W(block,t) << endl;
-        T_ = F + Q [t-3] + AC + W( block, t);
-        R = T_ << RC(t) ;
-        Q[t+1] = Q[t] + R;
-
+        if (t < 3)
+        {
+            AC = floor(pow(2,32) * abs(sin( t + 1)));
+            F = f_t( Q_(t), Q_(t-1), Q_(t-2), t);
+            //cout << W(block,t) << endl;
+            T_ = F + Q_(t-3) + AC + W( block, t);
+            R = T_ << RC(t) ;
+            Q[t+1] = Q[t] + R;
+        }
+        else
+        {
+            AC = floor(pow(2,32) * abs(sin( t + 1)));
+            F = f_t( Q[t], Q[t-1], Q[t-2], t);
+            //cout << W(block,t) << endl;
+            T_ = F + Q [t-3] + AC + W( block, t);
+            R = T_ << RC(t) ;
+            Q[t+1] = Q[t] + R;
+        }
     }
  
     ihv[0] = a + Q[61];

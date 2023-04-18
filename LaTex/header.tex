@@ -1,11 +1,13 @@
 % header.tex
-\documentclass[a4paper,11pt,twoside,ngerman,color]{book}
+\documentclass[a4paper,12pt,twoside,USenglish,color]{article}
 \usepackage[a4paper,left=3.5cm,right=2.5cm,bottom=3.5cm,top=3cm]{geometry}
 
-\usepackage[german,english]{babel}
+\usepackage[english,ngerman]{babel}
 
 \usepackage[pdftex]{graphicx,color}
-\usepackage{amsmath,amssymb,subfigure}
+\usepackage{amsmath,amssymb}
+
+\usepackage{ulem}
 
 
 % Theorem-Umgebungen
@@ -16,15 +18,17 @@
 \usepackage[T1]{fontenc}
 
 % Algorithmen
-\usepackage[plain,chapter]{algorithm}
+\usepackage[plain]{algorithm}
 \usepackage{algorithmic}
 
 \usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
 
 
 % Bibtex deutsch
 \usepackage{bibgerm}
-
+ 
 % URLs
 \usepackage{url}
 
@@ -33,6 +37,15 @@
 % Gliederung einstellen
 %\setcounter{secnumdepth}{5}
 %\setcounter{tocdepth}{5}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\usepackage{etoolbox}
+\makeatletter
+
+\usepackage{wrapfig}
+\usepackage{subfigure}
+
 
 % Theorem-Optionen %
 \theoremseparator{.}
@@ -110,8 +123,8 @@
  \clearpage{\pagestyle{empty}\cleardoublepage}
 }
 
-% Keine einzelnen Zeilen beim Anfang eines Abschnitts (Schusterjungen)
+% Keine einzelnen Zeilen beim Anfang eines Abschnitts
 \clubpenalty = 10000
-% Keine einzelnen Zeilen am Ende eines Abschnitts (Hurenkinder)
+% Keine einzelnen Zeilen am Ende eines Abschnitts
 \widowpenalty = 10000 \displaywidowpenalty = 10000
 % EOF
