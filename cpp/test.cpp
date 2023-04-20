@@ -209,7 +209,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 //    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
 //    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
 //    cout << "Q[3]: " + to_string(Q[3]) + " - " + " a: " + to_string(a) << endl;
-//
+//      
     for ( int t = 0; t < 64; t++)   
     {
     // x << std::hex << Q[t];
