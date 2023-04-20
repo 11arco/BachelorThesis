@@ -1,14 +1,14 @@
+% !TeX root = main.tex
 % main.tex
 \include{header}
 \begin{document}
-\selectlanguage{german}
 \include{kapitel/titelseite}
-\blankpage
+%\blankpage
 \pagenumbering{roman}
 \tableofcontents
-\cleardoublepage
+%\cleardoublepage
 \pagenumbering{arabic}
-% Kapitel
+% Kapitellatex-workshop.addtexroot
 \include{kapitel/einleitung}
 \include{kapitel/kapitel2}
 % Anhang
@@ -27,10 +27,12 @@
 \bibliography{literatur/diplom}
 \addcontentsline{toc}{chapter}{\bibname}
 % Erklaerung
+
 \thispagestyle{myheadings}
 \markboth{}{ERKLÄRUNG}
 \addcontentsline{toc}{chapter}{Erklärung}
 \include{kapitel/erklaerung}
 \cleardoublepage
+ 
 \end{document}
 

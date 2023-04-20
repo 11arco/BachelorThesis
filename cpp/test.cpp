@@ -296,8 +296,10 @@ string process( string input) //#todo
     {
         for (int i = 0; i < 4; i++){
 
-            shift = ((3 - i)*8);
-            msg_block[j] = padded_input.at((j * 4) + i) << shift;
+            shift = (8);
+            msg_block[j] =  msg_block[j] << shift;
+            msg_block[j] = padded_input.at((j * 4) + i) ;
+
 
         }
       //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
@@ -319,8 +321,10 @@ string process( string input) //#todo
         {
             for (int i = 0; i < 4; i++){
 
-                shift = ((3 - i)*8);
-                msg_block[j] = padded_input.at((j * 4) + i) << shift;
+                shift = (8);
+                msg_block[j] =  msg_block[j] << shift;
+
+                msg_block[j] = padded_input.at((j * 4) + i) ;
             }
         //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
         
