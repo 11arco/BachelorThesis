@@ -90,7 +90,7 @@ string pad(string msg)
     
     char zero = 0; //8bit
     char one = 1 << 7; //8bit
-        cout << bitset<8> (one) << endl;
+    //cout << bitset<8> (one) << endl;
 
     msg = msg + one;
 
@@ -134,13 +134,13 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
     {
     //  cout << "Case 0 : ";
     //  cout << t << endl;
-        return (X & Y) ^ (!X & Z);
+        return (X & Y) ^ ((~X) & Z);
     }
     else if (t < 32)
     {
     //    cout << "Case 1 : " ; 
     //    cout << t << endl;
-        return (Z & X) ^ (!Z & Y);
+        return (Z & X) ^ ((~Z) & Y);
     }
     else if (t < 48)
     {  
@@ -153,27 +153,32 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
     {
     //    cout << "Case 3 : " ; 
     //    cout << t << endl;
-        return (Y ^(X | !Z));
+        return (Y ^(X | (~Z)));
     }
     cout << "f_t faild. t not in scope.";
     return 0; // something went wrong
 }
+
 uint32 W ( uint32 m [16], int t) // m is the actual massage block
 { 
     int pos=-1;
     if (t < 16) pos = t ;
     else if (t < 32){ 
         pos = (1+(5*t)) % 16;
+
     }
     else if (t < 48){ 
         pos = (5+(3*t)) % 16;
+
     }
     else if (t < 64){ 
         pos = (7*t) % 16;
+
     }
 
     //cout << t;
     //cout << "-pos" + to_string(pos) + " ";
+   // cout << to_string(t) +": "+ to_string(m[pos]) + " at " + to_string(pos) << endl;     
     if (pos == -1) cout << "something went wrong:" + to_string(t)<< endl;
     return m[pos]; 
 
@@ -188,83 +193,82 @@ uint32 RC (int t) // only 0 if somethin went wrong
 }
 
 
+
+uint32 RL (uint32 T, int RC) // shifting being cyclict
+{
+    uint32 temp = T;
+    //cout <<"rotating ";
+    //cout << bitset<32>(T);
+    //cout << " by " + to_string(RC)+ " gives: ";
+
+    T = T << RC;
+    temp = temp >> (32-RC);
+    T = T + temp;
+    //cout << bitset<32>(T)<<endl;
+    return T;
+}
+
+
 uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo   
 {
     uint32 a = ihv [0];
     uint32 b = ihv [1];
     uint32 c = ihv [2];
     uint32 d = ihv [3];
+    
 
-    stringstream x;
-    //x << std::hex << ihv[3];
-    cout << x.str() << endl;
+    //stringstream x; 
+    //x << std::hex << block;
+    for (int i = 0; i< 16 ; i++)
+    {
+        cout << " | ";
+        cout << bitset<32> (block[i]);
+    }
+    cout << " | " << endl;
+
+
+    //cout << x.str() << endl;
 
     uint32 F;
     uint32 T_;
     uint32 R;
     uint32 AC;
 
-    uint32 Q[65] = {b};
+    const int size = 68; //64 + 0 init for Q(t-1) Q(t-2) Q(t-3) and for Q(t+1) at the end
+
+    uint32 Q[size] = {b,c,d,a};
 //    cout << "Q[0]: " + to_string(Q[0]) + " - " + " b: " + to_string(b) << endl;
 //    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
 //    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
 //    cout << "Q[3]: " + to_string(Q[3]) + " - " + " a: " + to_string(a) << endl;
 //      
-    for ( int t = 0; t < 64; t++)   
+    for ( int t = 3; t < size - 1; t++)   
     {
-    // x << std::hex << Q[t];
-    // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
+        // x << std::hex << Q[t];
+        // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
 
-    //cout <<"Q_t:" + to_string(Q[t]) + "|" ;
-
-        if (t == 0){
-            AC = floor(pow(2,32) * abs(sin( t + 1)));
-            F = f_t( Q[t], c, d, t);
-            //cout << to_string(W(block,t)) << endl;
-            T_ = F + a + AC + W( block, t);
-            R = T_ << RC(t) ;
-            Q[t+1] = Q[t] + R;
-        }
-        else if (t == 1)
-        {
-            AC = floor(pow(2,32) * abs(sin( t + 1)));
-            F = f_t( Q[t], Q[t-1], c, t);
-            //cout << W(block,t) << endl;
-            T_ = F + d + AC + W( block, t);
-            R = T_ << RC(t) ;
-            Q[t+1] = Q[t] + R;
-        }
-        else if (t == 2)
-        {
-            AC = floor(pow(2,32) * abs(sin( t + 1)));
-            F = f_t( Q[t], Q[t-1], Q[t-2], t);
-            //cout << "beep" << endl;
-            T_ = F + c + AC + W( block, t);
-            R = T_ << RC(t) ;
-            Q[t+1] = Q[t] + R;
-        }
-        else
-        {
-            AC = floor(pow(2,32) * abs(sin( t + 1)));
-            F = f_t( Q[t], Q[t-1], Q[t-2], t);
-            T_ = F + Q [t-3] + AC + W( block, t);
-            R = T_ << RC(t) ;
-            cout << to_string(T_) + " | " + to_string(R) << endl;;
+        //cout <<"Q_t:" + to_string(Q[t]) + "|" ;
 
 
-            Q[t+1] = Q[t] + R;
-        }
-        
+        AC = floor(pow(2,32) * abs(sin( (t-3) + 1)));
+        F = f_t( Q[t], Q[t-1], Q[t-2], (t-3));
+        T_ = F + Q [t-3] + AC + W( block, (t-3));
+        R = RL(T_, RC((t-3))) ;
+        //cout << to_string(T_) + " | " + to_string(R) << endl;;
+    	
+        Q[t+1] = Q[t] + R;
+            
     }
  
-    ihv[0] = a + Q[61];
-    ihv[1] = b + Q[64];
-    ihv[2] = c + Q[63];
-    ihv[3] = d + Q[62];
+    ihv[0] = a + Q[61 + 3];
+    ihv[1] = b + Q[64 + 3];
+    ihv[2] = c + Q[63 + 3];
+    ihv[3] = d + Q[62 + 3];
 
     
     return ihv;
 }
+
 
 string process( string input) //#todo
 {
@@ -288,29 +292,27 @@ string process( string input) //#todo
 
     uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ; //(67452301,EFCDAB89,98BADCFE,10325476);
     uint32* ihvN;
-    uint32 msg_block [16];// N blocks each block contains 32bit uint 16 * 32 = 512
+    uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
 
     cout << "calculating first block" << endl;
 
     for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
     {
-        for (int i = 0; i < 4; i++){
-
+        for (int i = 0; i < 4; i++)
+        {
             shift = (8);
-            msg_block[j] =  msg_block[j] << shift;
-            msg_block[j] = padded_input.at((j * 4) + i) ;
-
+            msg_block[j] =  (msg_block[j] << shift);
+            msg_block[j] = msg_block[j] + padded_input.at((j * 4) + i) ;
+            //cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
 
         }
       //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
     
     }
+        //cout << " msg in block vs paded input: " + to_string(msg_block[15]) + " vs " + to_string(padded_input.at(63)) << endl;
 
 
         ihvN = md5_compress(ihv,msg_block);
-
-
-
 
 
     for (int h = 1; h*64 < size ; h++) 
@@ -319,12 +321,12 @@ string process( string input) //#todo
       
         for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
         {
-            for (int i = 0; i < 4; i++){
-
+            for (int i = 0; i < 4; i++)
+            {
                 shift = (8);
                 msg_block[j] =  msg_block[j] << shift;
 
-                msg_block[j] = padded_input.at((j * 4) + i) ;
+                msg_block[j] = msg_block[j] + padded_input.at((j * 4) + i) ;
             }
         //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
         
@@ -342,18 +344,30 @@ string process( string input) //#todo
     c << std::hex << ihvN[2];
     d << std::hex << ihvN[3];
         
-    output = a.str() + b.str() + c.str() + d.str(); 
+  
     
-    return output;
+    return a.str() + b.str() + c.str() + d.str();
 }
 
 
 
 //MD5 attack implementation
 
+
+int find_block_1 ()
+{
+    // choose Q_1,Q_3,..,Q_16 fullfiliing condidtions
+    // calculate m_0,m_6,..,m_15
+    // 
+    return 0;
+}
+
 int attack_md5()
 {
-
+    // find block 1
+    // find block 2
+    // NCBSA
+    //
 
     return 0;
 }

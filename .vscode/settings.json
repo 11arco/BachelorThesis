@@ -1,3 +1,10 @@
 {
-    "rust-analyzer.cargo.sysroot": null
+    "rust-analyzer.cargo.sysroot": null,
+    "files.associations": {
+        "ostream": "cpp",
+        "iostream": "cpp",
+        "string": "cpp",
+        "random": "cpp",
+        "bitset": "cpp"
+    }
 }
