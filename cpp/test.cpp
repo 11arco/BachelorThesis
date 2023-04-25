@@ -433,6 +433,7 @@ int main()
     // input is string
     // string is char*
     // char ist 8 bit
+    //
 
     string val = "abcdefghijklmnopqrstuvwyxzabcdefghijklmnopqrstuvwyxzabcd";//len 50
     string large = val + val + val + val + val; // len 250
