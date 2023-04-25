@@ -156,7 +156,7 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
     {
     //    cout << "Case 3 : " ; 
     //    cout << t << endl;
-        return (Y ^(X | (~Z)));
+        return (Y ^ (X | (~Z)));
     }
     cout << "f_t faild. t not in scope.";
     return 0; // something went wrong
@@ -181,7 +181,7 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 
     //cout << t;
     //cout << "-pos" + to_string(pos) + " ";
-   // cout << to_string(t) +": "+ to_string(m[pos]) + " at " + to_string(pos) << endl;     
+    //cout << to_string(t) +": "+ to_string(m[pos]) + " at " + to_string(pos) << endl;     
     if (pos == -1) cout << "something went wrong:" + to_string(t)<< endl;
     return m[pos]; 
 
@@ -227,7 +227,7 @@ uint32 RL (uint32 T, int RC) // shifting being cyclict
 
     T = T << RC;
     temp = temp >> (32-RC);
-    T = T + temp;
+    T = T | temp;
     //cout << bitset<32>(T)<<endl;
     return T;
 }
@@ -241,7 +241,7 @@ uint32 RR (uint32 T, int RC) // shifting being cyclict
 
     T = T >> RC;
     temp = temp << (32-RC);
-    T = T + temp;
+    T = T | temp;
     //cout << bitset<32>(T)<<endl;
     return T;
 }
@@ -254,7 +254,10 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 b = ihv [1];
     uint32 c = ihv [2];
     uint32 d = ihv [3];
+
+    uint32 help = 0;
     
+    stringstream temp;
 
     //stringstream x; 
     //x << std::hex << block;
@@ -276,15 +279,17 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 R;
     uint32 AC;
 
-    const int size = 68; //64 + 0 init for Q(t-1) Q(t-2) Q(t-3) and for Q(t+1) at the end
+    //const int size = 68; //64 + 0 init for Q(t-1) Q(t-2) Q(t-3) and for Q(t+1) at the end
 
-    uint32 Q[size] = {a,d,c,b};
+    uint32 Q[68] = {a,d,c,b};
 //    cout << "Q[0]: " + to_string(Q[0]) + " - " + " b: " + to_string(b) << endl;
 //    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
 //    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
 //    cout << "Q[3]: " + to_string(Q[3]) + " - " + " a: " + to_string(a) << endl;
+
+
 //      
-    for ( int t = 3; t < size - 1; t++)   
+    for ( int t = 3; t < 68 - 1; t++)   
     {
         // x << std::hex << Q[t];
         // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
@@ -295,7 +300,6 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
         AC = floor(pow(2,32) * abs(sin( (t-3) + 1)));
         F = f_t( Q[t], Q[t-1], Q[t-2], (t-3));
         T_ = F + Q [t-3] + AC + W( block, (t-3));
-
         R = RL(T_, RC(t-3)) ;
         // cout << to_string(T_) + " | " + to_string(R) << endl;
         //_____________________________
@@ -303,12 +307,23 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
         Q[t+1] = Q[t] + R; //altering the state of Q[t+1]
             
     }
- 
+    
+    for(int i = 0; i<68;i++)
+    {
+        temp.str("");
+        temp << std::hex << Q[i];   
+        cout << "Q("+ to_string(i - 3) + ") = " + temp.str() <<endl;
+    }
+
     ihv[0] = a + Q[61 + 3];
     ihv[1] = b + Q[64 + 3];
     ihv[2] = c + Q[63 + 3];
     ihv[3] = d + Q[62 + 3];
 
+
+    temp.str("");
+    temp << std::hex << ihv[0];   
+    cout << temp.str() << endl;
     
     return ihv;
 }
@@ -435,7 +450,7 @@ int main()
     // char ist 8 bit
     //
 
-    string val = "abcdefghijklmnopqrstuvwyxzabcdefghijklmnopqrstuvwyxzabcd";//len 50
+    string val = "abc";//len 50
     string large = val + val + val + val + val; // len 250
     string xl = large + large + large + large + large; // len 1250
     string xxl = xl + xl + xl + xl + xl; // 6.250
