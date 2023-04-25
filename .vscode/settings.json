@@ -6,5 +6,6 @@
         "string": "cpp",
         "random": "cpp",
         "bitset": "cpp"
-    }
+    },
+    "files.maxMemoryForLargeFilesMB": 16.384
 }

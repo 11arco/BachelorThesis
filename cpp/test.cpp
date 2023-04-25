@@ -12,6 +12,7 @@
 
 #include <thread>
 
+#include <ctime>
 
 #include <cmath>
 
@@ -37,10 +38,9 @@ int get_msb_pos(uint32 u)
 
 void print_step(int step)
 {
-    string calc = "calculating ";
-    string end = "th block";
+    string calc = "calculating block ";
 
-    cout << calc + to_string(step + 1) + end << endl;
+    cout << calc + to_string(step + 1)  << endl;
 }
 
 //MD5 implementation
@@ -73,6 +73,7 @@ string pad(string msg)
 {
 
     int l = msg.length();
+    int counter = 0;
     bitset<32> x(l);
     string length_for_adding = "";
     length_for_adding = l;
@@ -94,12 +95,14 @@ string pad(string msg)
 
     msg = msg + one;
 
-    while (msg.length() % 64 != 63) //8bit * 64 = 512 bit // 16 *32 = 512
+
+    while ( (msg.length() % 64 != 63) || (counter < 7 ) ) //8bit * 64 = 512 bit // 16 *32 = 512
     {
        // cout<< "msg.length-offset: " + to_string(msg.length()) + "-" + to_string(offset) + " " << endl;;
         msg = msg + zero;
         cout << msg +"|";
         cout << msg.length() << endl;
+        counter++;
     }
     
     //int msb_l = get_msb_pos(l);
@@ -257,11 +260,14 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     //x << std::hex << block;
     for (int i = 0; i< 16 ; i++)
     {
+        if (i>0&&(i%4)==0) cout << " | " << endl;
+
         cout << " | ";
         cout << bitset<32> (block[i]);
+        
+
     }
     cout << " | " << endl;
-
 
     //cout << x.str() << endl;
 
@@ -313,7 +319,7 @@ string process( string input) //#todo
     cout << "staring" << endl;
     string output;
     string padded_input = pad(input);
-    cout << "padding comlete" << endl;
+    cout << "padding complete" << endl;
 
     int size = padded_input.size();
 
@@ -328,11 +334,11 @@ string process( string input) //#todo
     stringstream d;
     int shift = 0;
 
-    uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ; //(67452301,EFCDAB89,98BADCFE,10325476);
-    uint32* ihvN;
+    uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476) "ihv at pos 0"
+    uint32* ihvN;                                                       // ihv for the follwing N steps, since the initial 0 soze ihv has a fix size of 4
     uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
 
-    cout << "calculating first block" << endl;
+    cout << "calculating first block (16 x 32bit):" << endl;
 
     for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
     {
@@ -353,7 +359,7 @@ string process( string input) //#todo
         ihvN = md5_compress(ihv,msg_block);
 
 
-    for (int h = 1; h*64 < size ; h++) //64 *8 = 512
+    for (int h = 1; h*64 < size ; h++) //64 *8 = 512, after an iteration we look at the next 64 8bit chars and passing them into a block
     {   
         print_step(h);
       
@@ -364,7 +370,7 @@ string process( string input) //#todo
                 shift = (8);
                 msg_block[j] =  msg_block[j] << shift;
 
-                msg_block[j] = msg_block[j] + padded_input.at((j * 4) + i) ;
+                msg_block[j] = msg_block[j] + padded_input.at((h * 64) + (j * 4) + i) ;
             }
         //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
         
@@ -374,14 +380,14 @@ string process( string input) //#todo
 
 
     }
-     cout << "last block calculated" << endl;
+    cout << "last block calculated" << endl;
 
-
+    
     a << std::hex << ihvN[0];
     b << std::hex << ihvN[1];
     c << std::hex << ihvN[2];
     d << std::hex << ihvN[3];
-        
+    
   
     
     return a.str() + b.str() + c.str() + d.str();
@@ -390,6 +396,17 @@ string process( string input) //#todo
 
 
 //MD5 attack implementation
+
+
+
+int collsion_search_algorithm()
+{
+    srand(std::time(nullptr));
+    uint32 M_0 = rand() | rand();
+
+    cout << M_0;
+    return 0;
+}
 
 
 int find_block_1 ()
@@ -417,7 +434,7 @@ int main()
     // string is char*
     // char ist 8 bit
 
-    string val = "abc";//len 50
+    string val = "abcdefghijklmnopqrstuvwyxzabcdefghijklmnopqrstuvwyxzabcd";//len 50
     string large = val + val + val + val + val; // len 250
     string xl = large + large + large + large + large; // len 1250
     string xxl = xl + xl + xl + xl + xl; // 6.250
@@ -430,6 +447,7 @@ int main()
     cout << process(test)<< endl;
     //****************************
 
+   // collsion_search_algorithm();
 
     return 0;
 }
