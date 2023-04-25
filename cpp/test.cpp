@@ -159,7 +159,7 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
     return 0; // something went wrong
 }
 
-uint32 W ( uint32 m [16], int t) // m is the actual massage block
+uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 { 
     int pos=-1;
     if (t < 16) pos = t ;
@@ -186,10 +186,31 @@ uint32 W ( uint32 m [16], int t) // m is the actual massage block
 
 uint32 RC (int t) // only 0 if somethin went wrong
 {
-    uint32 arr[] = {7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21};
-    //cout << "RC: " + to_string(t) + " | " + to_string( arr[t] ) << endl;
+    uint32 c ;
+    uint32 RC0[4] ={7,12,17,22};
+    uint32 RC1[4] ={5,9,14,20};
+    uint32 RC2[4] ={4,11,16,23};
+    uint32 RC3[4] ={6,10,15,21};
 
-    return arr[t];
+    if (t < 16)
+    {
+        c = RC0[t % 4];
+    }
+    else if (t<32)
+    {
+        c = RC1[t % 4];
+    }
+    else if (t<48)
+    {
+        c = RC2[t % 4];
+    }
+    else if (t<64)
+    {
+        c = RC3[t % 4];
+    }
+    
+    //cout << "t: " + to_string(t) + " RC" + to_string(c) << endl;
+    return c;
 }
 
 
@@ -207,6 +228,21 @@ uint32 RL (uint32 T, int RC) // shifting being cyclict
     //cout << bitset<32>(T)<<endl;
     return T;
 }
+
+uint32 RR (uint32 T, int RC) // shifting being cyclict
+{
+    uint32 temp = T;
+    //cout <<"rotating ";
+    //cout << bitset<32>(T);
+    //cout << " by " + to_string(RC)+ " gives: ";
+
+    T = T >> RC;
+    temp = temp << (32-RC);
+    T = T + temp;
+    //cout << bitset<32>(T)<<endl;
+    return T;
+}
+
 
 
 uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo   
@@ -236,7 +272,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 
     const int size = 68; //64 + 0 init for Q(t-1) Q(t-2) Q(t-3) and for Q(t+1) at the end
 
-    uint32 Q[size] = {b,c,d,a};
+    uint32 Q[size] = {a,d,c,b};
 //    cout << "Q[0]: " + to_string(Q[0]) + " - " + " b: " + to_string(b) << endl;
 //    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
 //    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
@@ -253,10 +289,12 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
         AC = floor(pow(2,32) * abs(sin( (t-3) + 1)));
         F = f_t( Q[t], Q[t-1], Q[t-2], (t-3));
         T_ = F + Q [t-3] + AC + W( block, (t-3));
-        R = RL(T_, RC((t-3))) ;
-        //cout << to_string(T_) + " | " + to_string(R) << endl;;
-    	
-        Q[t+1] = Q[t] + R;
+
+        R = RL(T_, RC(t-3)) ;
+        // cout << to_string(T_) + " | " + to_string(R) << endl;
+        //_____________________________
+        
+        Q[t+1] = Q[t] + R; //altering the state of Q[t+1]
             
     }
  
@@ -315,11 +353,11 @@ string process( string input) //#todo
         ihvN = md5_compress(ihv,msg_block);
 
 
-    for (int h = 1; h*64 < size ; h++) 
+    for (int h = 1; h*64 < size ; h++) //64 *8 = 512
     {   
         print_step(h);
       
-        for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
+        for(int j = 0; j < 16; j++) //Block 16*32 = 512
         {
             for (int i = 0; i < 4; i++)
             {
