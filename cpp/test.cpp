@@ -132,34 +132,45 @@ string pad(string msg)
 
 uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t ) 
 { 
-    
+    uint32 out;
     if (t < 16)
     {
-    //  cout << "Case 0 : ";
-    //  cout << t << endl;
-        return (X & Y) ^ ((~X) & Z);
+        if (false)
+        {
+            cout << bitset<32>(X);
+            cout << "" << endl;
+            cout << bitset<32>(0);
+            cout << " | " << endl;
+            cout << "________________________________" << endl;
+
+            cout << bitset<32>(X | 0);
+            cout << ""<< endl;
+            cout << ""<< endl;
+        }
+        out = (X & Y) ^ ((~X) & Z);
     }
     else if (t < 32)
     {
-    //    cout << "Case 1 : " ; 
-    //    cout << t << endl;
-        return (Z & X) ^ ((~Z) & Y);
+
+        out = (Z & X) ^ ((~Z) & Y);
     }
     else if (t < 48)
     {  
-    //    cout << "Case 2 : " ; 
-    //    cout << (X ^ Y ^ Z) << endl;
 
-        return (X ^ Y ^ Z);
+         out = (X ^ Y ^ Z);
     }
     else if (t < 64)
     {
-    //    cout << "Case 3 : " ; 
-    //    cout << t << endl;
-        return (Y ^ (X | (~Z)));
+
+         out = (Y ^ (X | (~Z)));
     }
-    cout << "f_t faild. t not in scope.";
-    return 0; // something went wrong
+    //cout  <<"  X: " + to_string(X) << endl; 
+    //cout  <<"  Y: " + to_string(Y) << endl; 
+    //cout  <<"  Z: " + to_string(Z) << endl; 
+
+    //cout <<"f_t:" + to_string(out) << endl;
+    if (t<0 || t>63) cout << "f_t faild. t not in scope." + to_string(t) << endl;
+    return out; // something went wrong
 }
 
 uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
@@ -179,10 +190,12 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 
     }
 
-    //cout << t;
+    //cout << t<<endl;
     //cout << "-pos" + to_string(pos) + " ";
     //cout << to_string(t) +": "+ to_string(m[pos]) + " at " + to_string(pos) << endl;     
-    if (pos == -1) cout << "something went wrong:" + to_string(t)<< endl;
+    if (pos <= -1) cout << "something went wrong W:" + to_string(t)<< endl;
+    if (pos >= 16) cout << "something went wrong W:" + to_string(t)<< endl;
+
     return m[pos]; 
 
 }
@@ -228,7 +241,8 @@ uint32 RL (uint32 T, int RC) // shifting being cyclict
     T = T << RC;
     temp = temp >> (32-RC);
     T = T | temp;
-    //cout << bitset<32>(T)<<endl;
+    //cout << bitset<32>(T) ;
+    //cout << " - " + to_string(RC) <<endl;
     return T;
 }
 
@@ -246,6 +260,15 @@ uint32 RR (uint32 T, int RC) // shifting being cyclict
     return T;
 }
 
+
+uint32 AC(uint32 t)
+{
+    uint32 result ;
+    double sin_t =sin(t+1);
+    double pow_2 = pow(2,32);
+    result = floor(sin_t * pow_2);
+    return result;
+}
 
 
 uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo   
@@ -277,8 +300,9 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 F;
     uint32 T_;
     uint32 R;
-    uint32 AC;
-
+    uint32 AC_t;
+    uint32 two_pow32= (uint32) pow(2,32);
+    uint32 absin;
     //const int size = 68; //64 + 0 init for Q(t-1) Q(t-2) Q(t-3) and for Q(t+1) at the end
 
     uint32 Q[68] = {a,d,c,b};
@@ -289,17 +313,19 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 
 
 //      
-    for ( int t = 3; t < 68 - 1; t++)   
+    for ( int t = 3; t < 67 ; t++)   
     {
         // x << std::hex << Q[t];
         // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
 
         //cout <<"Q_t:" + to_string(Q[t]) + "|" ;
 
-
-        AC = floor(pow(2,32) * abs(sin( (t-3) + 1)));
+        AC_t = AC(t-3);
+        //cout << " AC: " + to_string(AC_t) + " t: " + to_string(t) << endl;
         F = f_t( Q[t], Q[t-1], Q[t-2], (t-3));
-        T_ = F + Q [t-3] + AC + W( block, (t-3));
+        cout << to_string( W(block,t)) << endl;
+        T_ = F + Q [t-3] + AC_t + W( block, (t-3));
+        //cout << to_string(t) + ": " ; // print actual step
         R = RL(T_, RC(t-3)) ;
         // cout << to_string(T_) + " | " + to_string(R) << endl;
         //_____________________________
@@ -308,7 +334,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
             
     }
     
-    for(int i = 0; i<68;i++)
+    for(int i = 0; i < 68; i++)
     {
         temp.str("");
         temp << std::hex << Q[i];   
@@ -334,6 +360,8 @@ string process( string input) //#todo
     cout << "staring" << endl;
     string output;
     string padded_input = pad(input);
+    long result = 0x000000000000;
+
     cout << "padding complete" << endl;
 
     int size = padded_input.size();
@@ -357,11 +385,10 @@ string process( string input) //#todo
 
     for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
     {
+        msg_block[j] = 0;
         for (int i = 0; i < 4; i++)
         {
-            shift = (8);
-            msg_block[j] =  (msg_block[j] << shift);
-            msg_block[j] = msg_block[j] + padded_input.at((j * 4) + i) ;
+            msg_block[j] = msg_block[j] + (uint32) (padded_input.at((j * 4) + i) <<(i+8)) ;
             //cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
 
         }
@@ -398,13 +425,15 @@ string process( string input) //#todo
     cout << "last block calculated" << endl;
 
     
+
+
+    //cout << std::hex << result;    
     a << std::hex << ihvN[0];
     b << std::hex << ihvN[1];
     c << std::hex << ihvN[2];
     d << std::hex << ihvN[3];
     
-  
-    
+      
     return a.str() + b.str() + c.str() + d.str();
 }
 
@@ -443,6 +472,17 @@ int attack_md5()
 }
 
 
+void test_RL()
+{   
+    uint32 test = 17;
+
+    if (RL(test,1) == 34) cout << "RL test 1 succes" << endl;
+    if (RL(test,31) == 8 + pow(2,31)) cout << "RL test 2 succes" << endl;
+    if (RL(test,32) == 17) cout << "RL test 3 succes" << endl;
+
+
+}
+
 int main()
 {
     // input is string
@@ -451,10 +491,7 @@ int main()
     //
 
     string val = "abc";//len 50
-    string large = val + val + val + val + val; // len 250
-    string xl = large + large + large + large + large; // len 1250
-    string xxl = xl + xl + xl + xl + xl; // 6.250
-    string xl3 = xxl + xxl + xxl + xxl + xxl + xxl + xxl + xxl + xxl + xxl + xxl + xxl +xxl +xxl +xxl +xxl +xxl +xxl +xxl +xxl +xxl +xxl +xxl +xxl +xxl  ;
+
     //uint32 t = 18446744073709551615;
     
     string test = val;
@@ -464,6 +501,11 @@ int main()
     //****************************
 
    // collsion_search_algorithm();
+
+    //test_RL();
+
+   
+   
 
     return 0;
 }
