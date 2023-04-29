@@ -75,10 +75,10 @@ string pad(string msg)
     int l = msg.length();
     int counter = 0;
     bitset<32> x(l);
-    string length_for_adding = "";
+    char length_for_adding ;
     length_for_adding = l;
 
-    cout << length_for_adding.length() <<endl;
+    cout << to_string(length_for_adding).length() <<endl;
 
     cout << "input: " + msg  << endl;
     cout << "length:" ;
@@ -89,30 +89,33 @@ string pad(string msg)
     cout << ""  << endl;
 
     
-    char zero = 0; //8bit
+    char end = 0; //8bit
     char one = 1 << 7; //8bit
     //cout << bitset<8> (one) << endl;
+    cout << bitset<8> (msg.at(0)) << endl;
 
-    msg = msg + one;
 
 
-    while ( (msg.length() % 64 != 63) || (counter < 7 ) ) //8bit * 64 = 512 bit // 16 *32 = 512
+
+
+
+    while ( (msg.length() % (63 - (l/8)) != 0)) //8bit * 64 = 512 bit // 16 *32 = 512
     {
        // cout<< "msg.length-offset: " + to_string(msg.length()) + "-" + to_string(offset) + " " << endl;;
-        msg = msg + zero;
+        msg = msg + end;
         cout << msg +"|";
         cout << msg.length() << endl;
         counter++;
     }
-    
-    //int msb_l = get_msb_pos(l);
 
-
+    msg[l] = one;
+    cout << bitset<8> (msg.at(l)) << endl;
+    cout << bitset<32> (l) << endl;
     msg = msg + length_for_adding; // 
 
 
 
-    cout << "final:" + msg +"|";
+    cout << "final:" + msg + "|";
     cout << msg.length() << endl;
     cout << bitset<64> (msg.at(msg.length() -1)) << endl;
 
@@ -190,11 +193,11 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 
     }
 
-    //cout << t<<endl;
+    cout << to_string( m[t] ) << endl;
     //cout << "-pos" + to_string(pos) + " ";
     //cout << to_string(t) +": "+ to_string(m[pos]) + " at " + to_string(pos) << endl;     
-    if (pos <= -1) cout << "something went wrong W:" + to_string(t)<< endl;
-    if (pos >= 16) cout << "something went wrong W:" + to_string(t)<< endl;
+    if (pos <= -1) cout << "something went wrong un W. t is:" + to_string(t)<< endl;
+    if (pos >= 16) cout << "something went wrong in W. t is:" + to_string(t)<< endl;
 
     return m[pos]; 
 
@@ -281,6 +284,8 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 help = 0;
     
     stringstream temp;
+    temp.str("");
+
 
     //stringstream x; 
     //x << std::hex << block;
@@ -323,7 +328,6 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
         AC_t = AC(t-3);
         //cout << " AC: " + to_string(AC_t) + " t: " + to_string(t) << endl;
         F = f_t( Q[t], Q[t-1], Q[t-2], (t-3));
-        cout << to_string( W(block,t)) << endl;
         T_ = F + Q [t-3] + AC_t + W( block, (t-3));
         //cout << to_string(t) + ": " ; // print actual step
         R = RL(T_, RC(t-3)) ;
@@ -388,8 +392,8 @@ string process( string input) //#todo
         msg_block[j] = 0;
         for (int i = 0; i < 4; i++)
         {
-            msg_block[j] = msg_block[j] + (uint32) (padded_input.at((j * 4) + i) <<(i+8)) ;
-            //cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
+            msg_block[j] = msg_block[j] + ( padded_input.at((j * 4) + i) << (i*8)) ;
+            //cout << (to_string(j*4+i)+ .: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
 
         }
       //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
@@ -405,18 +409,18 @@ string process( string input) //#todo
     {   
         print_step(h);
       
-        for(int j = 0; j < 16; j++) //Block 16*32 = 512
+        for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
         {
+            msg_block[j] = 0;
             for (int i = 0; i < 4; i++)
             {
-                shift = (8);
-                msg_block[j] =  msg_block[j] << shift;
+                msg_block[j] = msg_block[j] + (padded_input.at((j * 4) + i) << (i*8)) ;
+                //cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
 
-                msg_block[j] = msg_block[j] + padded_input.at((h * 64) + (j * 4) + i) ;
             }
         //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
-        
-        }
+    
+    }
 
         ihvN = md5_compress(ihvN,msg_block);
 
@@ -490,7 +494,7 @@ int main()
     // char ist 8 bit
     //
 
-    string val = "abc";//len 50
+    string val = "abcd";//len 50
 
     //uint32 t = 18446744073709551615;
     
