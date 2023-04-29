@@ -36,6 +36,25 @@ int get_msb_pos(uint32 u)
     return counter;
 }
 
+
+string to_hex(uint32 u)
+{
+    string temp ="";
+    stringstream temp_0 ;
+    temp_0 << hex << ((u << 0) >> 24);
+    stringstream temp_1;
+    temp_1 << hex << ((u << 8)  >> 24);
+    stringstream temp_2;
+    temp_2 << hex << ((u << 16)  >> 24);
+    stringstream temp_3;
+    temp_3 << hex << ((u << 24)  >> 24);
+
+    temp = temp_0.str() + temp_1.str() + temp_2.str() + temp_3.str();
+    return temp;
+
+
+}
+
 void print_step(int step)
 {
     string calc = "calculating block ";
@@ -76,7 +95,6 @@ string pad(string msg)
     int counter = 0;
     bitset<32> x(l);
     char length_for_adding ;
-    length_for_adding = l;
 
     cout << to_string(length_for_adding).length() <<endl;
 
@@ -109,24 +127,11 @@ string pad(string msg)
     }
 
     msg[l] = one;
-    cout << bitset<8> (msg.at(l)) << endl;
-    cout << bitset<32> (l) << endl;
-    msg = msg + length_for_adding; // 
-
-
-
+    msg += (uint64_t) l;
     cout << "final:" + msg + "|";
     cout << msg.length() << endl;
     cout << bitset<64> (msg.at(msg.length() -1)) << endl;
-
     cout << ""  << endl;
- //   char len = cast msg_len4;
-
-
-    //int pos_mbs = get_msb_pos(msg[msg_end]);  // 0000000001001
-                                                //          ^  ^  => 9
-                                                //    pos(msb)    => 3
-   // msg[msg_end] = shifting_word(msg[msg_end]);
 
 
     return msg;
@@ -363,6 +368,7 @@ string process( string input) //#todo
 {
     cout << "staring" << endl;
     string output;
+    uint32 l = input.length();
     string padded_input = pad(input);
     long result = 0x000000000000;
 
@@ -375,10 +381,7 @@ string process( string input) //#todo
      //   cout << "padi. at " + to_string(i) + " :" + padded_input.at(i) << endl;
     }
 
-    stringstream a;
-    stringstream b;
-    stringstream c;
-    stringstream d;
+
     int shift = 0;
 
     uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476) "ihv at pos 0"
@@ -392,11 +395,12 @@ string process( string input) //#todo
         msg_block[j] = 0;
         for (int i = 0; i < 4; i++)
         {
-            msg_block[j] = msg_block[j] + ( padded_input.at((j * 4) + i) << (i*8)) ;
+            msg_block[j] += uint32( (unsigned char) (padded_input.at((j * 4) + i)) << (i*8)) ;
             //cout << (to_string(j*4+i)+ .: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
 
         }
-      //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
+      //  cout << "translate"+ to_string(msg_block[j]) << endl;
+    
     
     }
         //cout << " msg in block vs paded input: " + to_string(msg_block[15]) + " vs " + to_string(padded_input.at(63)) << endl;
@@ -414,8 +418,8 @@ string process( string input) //#todo
             msg_block[j] = 0;
             for (int i = 0; i < 4; i++)
             {
-                msg_block[j] = msg_block[j] + (padded_input.at((j * 4) + i) << (i*8)) ;
-                //cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
+                msg_block[j] += uint32( (unsigned char) (padded_input.at((j * 4) + i)) << (i*8)) ;
+                cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
 
             }
         //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
@@ -431,14 +435,11 @@ string process( string input) //#todo
     
 
 
-    //cout << std::hex << result;    
-    a << std::hex << ihvN[0];
-    b << std::hex << ihvN[1];
-    c << std::hex << ihvN[2];
-    d << std::hex << ihvN[3];
+
+
     
       
-    return a.str() + b.str() + c.str() + d.str();
+    return to_hex(ihvN[0]) + to_hex(ihvN[1]) + to_hex(ihvN[2]) + to_hex(ihvN[3]);
 }
 
 
@@ -494,7 +495,7 @@ int main()
     // char ist 8 bit
     //
 
-    string val = "abcd";//len 50
+    string val = "abc";//len 50
 
     //uint32 t = 18446744073709551615;
     
