@@ -90,11 +90,11 @@ uint32 shifting_word(uint32 input)
 
 string pad(string msg)
 {
-
+    msg+= "\n"; // Wichtig! Endline wir immer mit verabreitet
     int l = msg.length();
     int counter = 0;
     bitset<32> x(l);
-    char length_for_adding ;
+    int  length_for_adding = l*8 ;
 
     cout << to_string(length_for_adding).length() <<endl;
 
@@ -117,7 +117,7 @@ string pad(string msg)
 
 
 
-    while ( (msg.length() % (63 - (l/8)) != 0)) //8bit * 64 = 512 bit // 16 *32 = 512
+    while ( (msg.length() % (64)) != 0) //8bit * 64 = 512 bit // 16 *32 = 512
     {
        // cout<< "msg.length-offset: " + to_string(msg.length()) + "-" + to_string(offset) + " " << endl;;
         msg = msg + end;
@@ -126,8 +126,8 @@ string pad(string msg)
         counter++;
     }
 
-    msg[l] = one;
-    msg += (uint64_t) l;
+    //msg[l] = one;
+    //msg[63]= (uint64_t) length_for_adding;
     cout << "final:" + msg + "|";
     cout << msg.length() << endl;
     cout << bitset<64> (msg.at(msg.length() -1)) << endl;
@@ -198,7 +198,7 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 
     }
 
-    cout << to_string( m[t] ) << endl;
+    //cout << to_string( m[t] ) << endl;
     //cout << "-pos" + to_string(pos) + " ";
     //cout << to_string(t) +": "+ to_string(m[pos]) + " at " + to_string(pos) << endl;     
     if (pos <= -1) cout << "something went wrong un W. t is:" + to_string(t)<< endl;
@@ -272,7 +272,7 @@ uint32 RR (uint32 T, int RC) // shifting being cyclict
 uint32 AC(uint32 t)
 {
     uint32 result ;
-    double sin_t =sin(t+1);
+    double sin_t =abs(sin(t+1));
     double pow_2 = pow(2,32);
     result = floor(sin_t * pow_2);
     return result;
@@ -288,8 +288,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 
     uint32 help = 0;
     
-    stringstream temp;
-    temp.str("");
+
 
 
     //stringstream x; 
@@ -304,6 +303,16 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 
     }
     cout << " | " << endl;
+        for (int i = 0; i< 16 ; i++)
+    {
+        if (i>0&&(i%4)==0) cout << " | " << endl;
+
+        cout << " | ";
+        cout << to_string(block[i]);
+        
+
+    }
+    cout << " | " << endl;
 
     //cout << x.str() << endl;
 
@@ -313,6 +322,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 AC_t;
     uint32 two_pow32= (uint32) pow(2,32);
     uint32 absin;
+    int s = 0;
     //const int size = 68; //64 + 0 init for Q(t-1) Q(t-2) Q(t-3) and for Q(t+1) at the end
 
     uint32 Q[68] = {a,d,c,b};
@@ -323,31 +333,32 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
 
 
 //      
-    for ( int t = 3; t < 67 ; t++)   
-    {
+    for ( int t = 3; t < 67 ; t++)   // t = s + 3
+    {   
+
         // x << std::hex << Q[t];
         // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
 
-        //cout <<"Q_t:" + to_string(Q[t]) + "|" ;
+        cout << to_string(s) + "Q_t:" + to_string(Q[t]) + "|" ;
 
-        AC_t = AC(t-3);
-        //cout << " AC: " + to_string(AC_t) + " t: " + to_string(t) << endl;
-        F = f_t( Q[t], Q[t-1], Q[t-2], (t-3));
-        T_ = F + Q [t-3] + AC_t + W( block, (t-3));
+        AC_t = AC(s);
+        cout << " AC: " + to_hex(AC_t) + " t: " + to_string(t) << endl;
+        F = f_t( Q[t], Q[t-1], Q[t-2], s);
+        T_ = F + Q [t-3] + AC_t + W( block, (s));
         //cout << to_string(t) + ": " ; // print actual step
-        R = RL(T_, RC(t-3)) ;
+        R = RL(T_, RC(s)) ;
         // cout << to_string(T_) + " | " + to_string(R) << endl;
         //_____________________________
         
         Q[t+1] = Q[t] + R; //altering the state of Q[t+1]
+        s++;
             
     }
     
     for(int i = 0; i < 68; i++)
     {
-        temp.str("");
-        temp << std::hex << Q[i];   
-        cout << "Q("+ to_string(i - 3) + ") = " + temp.str() <<endl;
+
+        cout << "Q("+ to_string(i - 3) + ") = " + to_string(Q[i]) <<endl;
     }
 
     ihv[0] = a + Q[61 + 3];
@@ -355,10 +366,6 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     ihv[2] = c + Q[63 + 3];
     ihv[3] = d + Q[62 + 3];
 
-
-    temp.str("");
-    temp << std::hex << ihv[0];   
-    cout << temp.str() << endl;
     
     return ihv;
 }
