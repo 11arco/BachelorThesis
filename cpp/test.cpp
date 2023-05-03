@@ -36,6 +36,20 @@ int get_msb_pos(uint32 u)
     return counter;
 }
 
+string from_64(uint64_t input)
+{
+    string output ="";
+    output += (char) (input);
+    output += (char) (input >> 8);
+    output += (char) (input >> 16);
+    output += (char) (input >> 24);
+    output += (char) (input >> 32);
+    output += (char) (input >> 40);
+    output += (char) (input >> 48);
+    output += (char) (input >> 56);
+    return output;
+}
+
 
 string to_hex(uint32 u)
 {
@@ -91,7 +105,9 @@ uint32 shifting_word(uint32 input)
 string pad(string msg)
 {
     msg+= "\n"; // Wichtig! Endline wir immer mit verabreitet
+
     int l = msg.length();
+
     int counter = 0;
     bitset<32> x(l);
     int  length_for_adding = l*8 ;
@@ -103,7 +119,7 @@ string pad(string msg)
     cout << l << endl;
 
     cout <<  "msg len as bit: ";
-    cout <<  x << '\n';
+    cout <<  x << endl;
     cout << ""  << endl;
 
     
@@ -113,21 +129,18 @@ string pad(string msg)
     cout << bitset<8> (msg.at(0)) << endl;
 
 
-
-
-
-
-    while ( (msg.length() % (64)) != 0) //8bit * 64 = 512 bit // 16 *32 = 512
+    //msg +=one; // maybe?
+    
+    while ( (msg.length() % (64)) != 0) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
     {
        // cout<< "msg.length-offset: " + to_string(msg.length()) + "-" + to_string(offset) + " " << endl;;
         msg = msg + end;
-        cout << msg +"|";
         cout << msg.length() << endl;
         counter++;
     }
 
-    //msg[l] = one;
-    //msg[63]= (uint64_t) length_for_adding;
+    //msg += from_64(length_for_adding); //maybe
+
     cout << "final:" + msg + "|";
     cout << msg.length() << endl;
     cout << bitset<64> (msg.at(msg.length() -1)) << endl;
@@ -339,7 +352,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
         // x << std::hex << Q[t];
         // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
 
-        cout << to_string(s) + "Q_t:" + to_string(Q[t]) + "|" ;
+        cout << to_string(s) + " Q_t:" + to_string(Q[t]) + "|" ;
 
         AC_t = AC(s);
         cout << " AC: " + to_hex(AC_t) + " t: " + to_string(t) << endl;
@@ -355,11 +368,10 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
             
     }
     
-    for(int i = 0; i < 68; i++)
-    {
-
-        cout << "Q("+ to_string(i - 3) + ") = " + to_string(Q[i]) <<endl;
-    }
+    //for(int i = 0; i < 68; i++)
+    //{
+    //    cout << "Q("+ to_string(i - 3) + ") = " + to_string(Q[i]) <<endl;
+    //}
 
     ihv[0] = a + Q[61 + 3];
     ihv[1] = b + Q[64 + 3];
@@ -438,14 +450,7 @@ string process( string input) //#todo
 
     }
     cout << "last block calculated" << endl;
-
     
-
-
-
-
-    
-      
     return to_hex(ihvN[0]) + to_hex(ihvN[1]) + to_hex(ihvN[2]) + to_hex(ihvN[3]);
 }
 
@@ -453,7 +458,23 @@ string process( string input) //#todo
 
 //MD5 attack implementation
 
+string reverse_md5(uint32 md5 [4] )
+{
+    uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]};
 
+    uint32 F_t;
+    uint32 m_t;
+    int s = 3;
+    for (int t = 0; t < 16; t++)
+    {   
+        F_t = f_t( Q[s], Q[s - 1], Q[s - 2], t);
+        m_t = RR(Q[s+1] - Q[s], RC(t)) - F_t - Q[s-3] + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
+        s++;
+    }
+
+
+
+}
 
 int collsion_search_algorithm()
 {
