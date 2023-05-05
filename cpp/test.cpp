@@ -52,19 +52,25 @@ string from_64(uint64_t input)
 
 
 string to_hex(uint32 u)
-{
-    string temp ="";
+{   
     stringstream temp_0 ;
-    temp_0 << hex << ((u << 0) >> 24);
-    stringstream temp_1;
-    temp_1 << hex << ((u << 8)  >> 24);
-    stringstream temp_2;
-    temp_2 << hex << ((u << 16)  >> 24);
-    stringstream temp_3;
-    temp_3 << hex << ((u << 24)  >> 24);
+    temp_0.str("");
+    if (((u << 24) >> 24) < 0x10 ) (temp_0 <<  '0');  
+    temp_0 << hex << ((u << 24) >> 24);
+    if (((u << 16) >> 24) < 0x10 ) (temp_0 <<  '0');  
+    temp_0 << hex << ((u << 16) >> 24);
+    if (((u << 8) >> 24) < 0x10 ) (temp_0 <<  '0');  
+    temp_0 << hex << ((u << 8) >> 24);
+    if (((u << 0) >> 24) < 0x10 ) (temp_0 <<  '0');  
 
-    temp = temp_0.str() + temp_1.str() + temp_2.str() + temp_3.str();
-    return temp;
+    temp_0 << hex << ((u << 0) >> 24);
+    
+    
+
+
+    //temp << hex << u;
+
+    return temp_0.str();
 
 
 }
@@ -129,9 +135,9 @@ string pad(string msg)
     cout << bitset<8> (msg.at(0)) << endl;
 
 
-    //msg +=one; // maybe?
+    msg +=one; // maybe?
     
-    while ( (msg.length() % (64)) != 0) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
+    while ( (msg.length() % (56)) != 0) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
     {
        // cout<< "msg.length-offset: " + to_string(msg.length()) + "-" + to_string(offset) + " " << endl;;
         msg = msg + end;
@@ -139,7 +145,7 @@ string pad(string msg)
         counter++;
     }
 
-    //msg += from_64(length_for_adding); //maybe
+    msg += from_64(length_for_adding); //maybe
 
     cout << "final:" + msg + "|";
     cout << msg.length() << endl;
@@ -168,7 +174,7 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
             cout << ""<< endl;
             cout << ""<< endl;
         }
-        out = (X & Y) ^ ((~X) & Z);
+        out = (X & Y) ^ ((~X) & Z); // out = 
     }
     else if (t < 32)
     {
@@ -403,7 +409,7 @@ string process( string input) //#todo
 
     int shift = 0;
 
-    uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476) "ihv at pos 0"
+    uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476) ||||
     uint32* ihvN;                                                       // ihv for the follwing N steps, since the initial 0 soze ihv has a fix size of 4
     uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
 
@@ -513,6 +519,15 @@ void test_RL()
     if (RL(test,31) == 8 + pow(2,31)) cout << "RL test 2 succes" << endl;
     if (RL(test,32) == 17) cout << "RL test 3 succes" << endl;
 
+}
+
+void test_to_hex()
+{
+    uint32 val = 0xF2345678 ; 
+    cout << to_string(val) + " " << to_hex(val) << endl;
+
+
+
 
 }
 
@@ -529,7 +544,8 @@ int main()
     
     string test = val;
     
-
+    //test_to_hex();
+    
     cout << process(test)<< endl;
     //****************************
 
