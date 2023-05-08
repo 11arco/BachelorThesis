@@ -19,6 +19,7 @@
 using namespace std;
 typedef unsigned int uint32; //actually 32 bit uint 
 
+uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476) ||||
 
 
 int get_msb_pos(uint32 u)
@@ -110,7 +111,7 @@ uint32 shifting_word(uint32 input)
 
 string pad(string msg)
 {
-    msg+= "\n"; // Wichtig! Endline wir immer mit verabreitet
+   // msg+= "\n"; // Wichtig! Endline wir immer mit verabreitet
 
     int l = msg.length();
 
@@ -137,7 +138,7 @@ string pad(string msg)
 
     msg +=one; // maybe?
     
-    while ( (msg.length() % (56)) != 0) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
+    while ( (msg.length()*8 % (64*8)) != 448 ) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
     {
        // cout<< "msg.length-offset: " + to_string(msg.length()) + "-" + to_string(offset) + " " << endl;;
         msg = msg + end;
@@ -298,7 +299,7 @@ uint32 AC(uint32 t)
 }
 
 
-uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo   
+void md5_compress( uint32 block [16])//#todo   
 {
     uint32 a = ihv [0];
     uint32 b = ihv [1];
@@ -343,8 +344,13 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     uint32 absin;
     int s = 0;
     //const int size = 68; //64 + 0 init for Q(t-1) Q(t-2) Q(t-3) and for Q(t+1) at the end
+    uint32 Q[68];
+    fill_n(Q,68,0);
+    Q[0] = a;
+    Q[1] = d;
+    Q[2] = c;
+    Q[3] = b;
 
-    uint32 Q[68] = {a,d,c,b};
 //    cout << "Q[0]: " + to_string(Q[0]) + " - " + " b: " + to_string(b) << endl;
 //    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
 //    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
@@ -385,7 +391,7 @@ uint32* md5_compress(uint32 ihv [4], uint32 block [16])//#todo
     ihv[3] = d + Q[62 + 3];
 
     
-    return ihv;
+    
 }
 
 
@@ -395,7 +401,6 @@ string process( string input) //#todo
     string output;
     uint32 l = input.length();
     string padded_input = pad(input);
-    long result = 0x000000000000;
 
     cout << "padding complete" << endl;
 
@@ -409,8 +414,6 @@ string process( string input) //#todo
 
     int shift = 0;
 
-    uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476) ||||
-    uint32* ihvN;                                                       // ihv for the follwing N steps, since the initial 0 soze ihv has a fix size of 4
     uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
 
     cout << "calculating first block (16 x 32bit):" << endl;
@@ -431,7 +434,7 @@ string process( string input) //#todo
         //cout << " msg in block vs paded input: " + to_string(msg_block[15]) + " vs " + to_string(padded_input.at(63)) << endl;
 
 
-        ihvN = md5_compress(ihv,msg_block);
+        md5_compress(msg_block);
 
 
     for (int h = 1; h*64 < size ; h++) //64 *8 = 512, after an iteration we look at the next 64 8bit chars and passing them into a block
@@ -439,25 +442,25 @@ string process( string input) //#todo
         print_step(h);
       
         for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
-        {
+        {   
             msg_block[j] = 0;
             for (int i = 0; i < 4; i++)
             {
-                msg_block[j] += uint32( (unsigned char) (padded_input.at((j * 4) + i)) << (i*8)) ;
-                cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
+                msg_block[j] += uint32( (unsigned char) (padded_input.at((h * 64 ) + (j * 4) + i)) << (i*8)) ;
+                //cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
 
             }
         //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
     
     }
 
-        ihvN = md5_compress(ihvN,msg_block);
+        md5_compress(msg_block);
 
 
     }
     cout << "last block calculated" << endl;
     
-    return to_hex(ihvN[0]) + to_hex(ihvN[1]) + to_hex(ihvN[2]) + to_hex(ihvN[3]);
+    return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
 }
 
 
@@ -538,9 +541,8 @@ int main()
     // char ist 8 bit
     //
 
-    string val = "abc";//len 50
-
-    //uint32 t = 18446744073709551615;
+    string val_stevens = "abc\n";
+    string val ="Fast taglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fallen von Datendiebstahl.";
     
     string test = val;
     
