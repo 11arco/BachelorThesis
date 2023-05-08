@@ -1,4 +1,12 @@
 % kapitel2.tex
 \chapter{Implementation of MD5}
 \label{chapter:kap2}
-    
+Stevens starts with Wangs attack, which trys to finde to pairs of blocks:
+\( (\ B_0 , B_0' )\ \)  and \( (\ B_1 , B_1' )\ \) that \( IHV = IHV' \),
+ with the goal to create two massages $ M $ and $ M' $, with the same hash value:\\
+
+\begin{gather*}
+     IHV_0 \xrightarrow[M_{(1)}] {} \cdots \xrightarrow[M_k]{}  IHV_k \xrightarrow[B_0]{}  IHV_{k + 1} \xrightarrow[B_1]{}  IHV_{k + 2} \xrightarrow[M_{k+1}]{} \cdots \xrightarrow[M_N]{}  IHV_N     \\
+    =  =  \ne  =  = \\
+     IHV_0 \xrightarrow[M_{(1)}] {} \cdots \xrightarrow[M_k]{}  IHV_k \xrightarrow[B_0]{}  IHV'_{k + 1} \xrightarrow[B_1]{}  IHV'_{k + 2} \xrightarrow[M_{k+1}]{} \cdots \xrightarrow[M_N]{} IHV_N   \\
+\end{gather*} 
