@@ -19,10 +19,10 @@
 using namespace std;
 typedef unsigned int uint32; //actually 32 bit uint 
 
-uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476) ||||
+uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
 
 
-int get_msb_pos(uint32 u)
+int get_msb_pos(uint32 u) // returns the msb from a uint32
 {
     int counter =0;
     uint32 u2 = u;
@@ -37,7 +37,7 @@ int get_msb_pos(uint32 u)
     return counter;
 }
 
-string from_64(uint64_t input)
+string from_64(uint64_t input) // converts a uint64 into a string
 {
     string output ="";
     output += (char) (input);
@@ -52,7 +52,7 @@ string from_64(uint64_t input)
 }
 
 
-string to_hex(uint32 u)
+string to_hex(uint32 u) // converts a uint32 into a hexadecimal vlaue
 {   
     stringstream temp_0 ;
     temp_0.str("");
@@ -63,12 +63,8 @@ string to_hex(uint32 u)
     if (((u << 8) >> 24) < 0x10 ) (temp_0 <<  '0');  
     temp_0 << hex << ((u << 8) >> 24);
     if (((u << 0) >> 24) < 0x10 ) (temp_0 <<  '0');  
-
     temp_0 << hex << ((u << 0) >> 24);
     
-    
-
-
     //temp << hex << u;
 
     return temp_0.str();
@@ -228,7 +224,7 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 
 }
 
-uint32 RC (int t) // only 0 if somethin went wrong
+uint32 RC (int t) // return the roataion constat
 {
     uint32 c ;
     uint32 RC0[4] ={7,12,17,22};
@@ -253,6 +249,7 @@ uint32 RC (int t) // only 0 if somethin went wrong
         c = RC3[t % 4];
     }
     
+    if (t > 64 || t < 0) (cout << "RC: something went wrong. c = " + to_string(c));
     //cout << "t: " + to_string(t) + " RC" + to_string(c) << endl;
     return c;
 }
@@ -262,24 +259,18 @@ uint32 RC (int t) // only 0 if somethin went wrong
 uint32 RL (uint32 T, int RC) // shifting being cyclict
 {
     uint32 temp = T;
-    //cout <<"rotating ";
-    //cout << bitset<32>(T);
-    //cout << " by " + to_string(RC)+ " gives: ";
-
+    //cout <<"rotating "; //cout << bitset<32>(T);//cout << " by " + to_string(RC)+ " gives: ";
     T = T << RC;
     temp = temp >> (32-RC);
     T = T | temp;
-    //cout << bitset<32>(T) ;
-    //cout << " - " + to_string(RC) <<endl;
+    //cout << bitset<32>(T); //cout << " - " + to_string(RC) <<endl;
     return T;
 }
 
 uint32 RR (uint32 T, int RC) // shifting being cyclict
 {
     uint32 temp = T;
-    //cout <<"rotating ";
-    //cout << bitset<32>(T);
-    //cout << " by " + to_string(RC)+ " gives: ";
+    //cout <<"rotating ";//cout << bitset<32>(T);//cout << " by " + to_string(RC)+ " gives: ";
 
     T = T >> RC;
     temp = temp << (32-RC);
@@ -308,32 +299,28 @@ void md5_compress( uint32 block [16])//#todo
 
     uint32 help = 0;
     
-
-
-
-    //stringstream x; 
-    //x << std::hex << block;
-    for (int i = 0; i< 16 ; i++)
+    //stringstream x;//x << std::hex << block;
+    for (int i = 0; i< 16 ; i++) //shows msg block as bin
     {
         if (i>0&&(i%4)==0) cout << " | " << endl;
 
         cout << " | ";
         cout << bitset<32> (block[i]);
         
-
     }
     cout << " | " << endl;
+    if(false) //show msg block as dec
+    { 
         for (int i = 0; i< 16 ; i++)
-    {
-        if (i>0&&(i%4)==0) cout << " | " << endl;
+        {
+            if (i>0&&(i%4)==0) cout << " | " << endl;
 
-        cout << " | ";
-        cout << to_string(block[i]);
-        
-
+            cout << " | ";
+            cout << to_string(block[i]);
+            
+        }
+        cout << " | " << endl;
     }
-    cout << " | " << endl;
-
     //cout << x.str() << endl;
 
     uint32 F;
@@ -343,7 +330,6 @@ void md5_compress( uint32 block [16])//#todo
     uint32 two_pow32= (uint32) pow(2,32);
     uint32 absin;
     int s = 0;
-    //const int size = 68; //64 + 0 init for Q(t-1) Q(t-2) Q(t-3) and for Q(t+1) at the end
     uint32 Q[68];
     fill_n(Q,68,0);
     Q[0] = a;
@@ -351,23 +337,15 @@ void md5_compress( uint32 block [16])//#todo
     Q[2] = c;
     Q[3] = b;
 
-//    cout << "Q[0]: " + to_string(Q[0]) + " - " + " b: " + to_string(b) << endl;
-//    cout << "Q[1]: " + to_string(Q[1]) + " - " + " c: " + to_string(c) << endl;
-//    cout << "Q[2]: " + to_string(Q[2]) + " - " + " d: " + to_string(d) << endl;
-//    cout << "Q[3]: " + to_string(Q[3]) + " - " + " a: " + to_string(a) << endl;
-
-
-//      
     for ( int t = 3; t < 67 ; t++)   // t = s + 3
     {   
 
-        // x << std::hex << Q[t];
-        // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
+        // x << std::hex << Q[t]; // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
 
-        cout << to_string(s) + " Q_t:" + to_string(Q[t]) + "|" ;
+        //cout << to_string(s) + " Q_t:" + to_string(Q[t]) + "|" ;
 
         AC_t = AC(s);
-        cout << " AC: " + to_hex(AC_t) + " t: " + to_string(t) << endl;
+        //cout << " AC: " + to_hex(AC_t) + " t: " + to_string(t) << endl;
         F = f_t( Q[t], Q[t-1], Q[t-2], s);
         T_ = F + Q [t-3] + AC_t + W( block, (s));
         //cout << to_string(t) + ": " ; // print actual step
@@ -379,7 +357,7 @@ void md5_compress( uint32 block [16])//#todo
         s++;
             
     }
-    
+
     //for(int i = 0; i < 68; i++)
     //{
     //    cout << "Q("+ to_string(i - 3) + ") = " + to_string(Q[i]) <<endl;
@@ -389,9 +367,7 @@ void md5_compress( uint32 block [16])//#todo
     ihv[1] = b + Q[64 + 3];
     ihv[2] = c + Q[63 + 3];
     ihv[3] = d + Q[62 + 3];
-
-    
-    
+   
 }
 
 
@@ -406,16 +382,13 @@ string process( string input) //#todo
 
     int size = padded_input.size();
 
-    for (int i = 0 ; i < size; i++)
-    {
-     //   cout << "padi. at " + to_string(i) + " :" + padded_input.at(i) << endl;
-    }
-
+    //for (int i = 0 ; i < size; i++)
+    //{
+    //    cout << "padi. at " + to_string(i) + " :" + padded_input.at(i) << endl;
+    //}
 
     int shift = 0;
-
     uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
-
     cout << "calculating first block (16 x 32bit):" << endl;
 
     for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
@@ -467,7 +440,7 @@ string process( string input) //#todo
 
 //MD5 attack implementation
 
-string reverse_md5(uint32 md5 [4] )
+void reverse_md5(uint32 md5 [4] )
 {
     uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]};
 
@@ -481,8 +454,7 @@ string reverse_md5(uint32 md5 [4] )
         s++;
     }
 
-
-
+return;
 }
 
 int collsion_search_algorithm()
@@ -542,7 +514,7 @@ int main()
     //
 
     string val_stevens = "abc\n";
-    string val ="Fast taglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fallen von Datendiebstahl.";
+    string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
     
     string test = val;
     
