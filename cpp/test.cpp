@@ -68,8 +68,6 @@ string to_hex(uint32 u) // converts a uint32 into a hexadecimal vlaue
     //temp << hex << u;
 
     return temp_0.str();
-
-
 }
 
 void print_step(int step)
@@ -88,19 +86,10 @@ uint32 shifting_word(uint32 input)
     int msb_pos =get_msb_pos(input);
     int wordlen = 31;
 
-
-    //cout << "msbpos :" + to_string(msb_pos)<< endl;
-    //cout << "input  :" + to_string(input)<< endl;
-
     input = input<<1;   //shift left with 1
     input +=1;          //set last bit 1 by adding 1
-    //cout << "input  after shifting 1:" + to_string(input)<< endl;
 
-    //cout << "to shift  :" + to_string(wordlen- (msb_pos +1))<< endl;
     input = input<< wordlen-(msb_pos +1); // fill max len with 0
-    
-    //cout << "check:" +to_string(input )<< endl;
-    //cout << "check:" +to_string(input >>(wordlen- (msb_pos )))<< endl;
 
     return input; //output
 }
@@ -115,22 +104,12 @@ string pad(string msg)
     bitset<32> x(l);
     int  length_for_adding = l*8 ;
 
-    cout << to_string(length_for_adding).length() <<endl;
-
     cout << "input: " + msg  << endl;
-    cout << "length:" ;
+    cout << "length: " ;
     cout << l << endl;
-
-    cout <<  "msg len as bit: ";
-    cout <<  x << endl;
-    cout << ""  << endl;
-
     
     char end = 0; //8bit
     char one = 1 << 7; //8bit
-    //cout << bitset<8> (one) << endl;
-    cout << bitset<8> (msg.at(0)) << endl;
-
 
     msg +=one; // maybe?
     
@@ -146,8 +125,6 @@ string pad(string msg)
 
     cout << "final:" + msg + "|";
     cout << msg.length() << endl;
-    cout << bitset<64> (msg.at(msg.length() -1)) << endl;
-    cout << ""  << endl;
 
 
     return msg;
@@ -188,10 +165,6 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
 
          out = (Y ^ (X | (~Z)));
     }
-    //cout  <<"  X: " + to_string(X) << endl; 
-    //cout  <<"  Y: " + to_string(Y) << endl; 
-    //cout  <<"  Z: " + to_string(Z) << endl; 
-
     //cout <<"f_t:" + to_string(out) << endl;
     if (t<0 || t>63) cout << "f_t faild. t not in scope." + to_string(t) << endl;
     return out; // something went wrong
@@ -298,8 +271,23 @@ void md5_compress( uint32 block [16])//#todo
     uint32 d = ihv [3];
 
     uint32 help = 0;
+
+    uint32 F;
+    uint32 T_;
+    uint32 R;
+    uint32 AC_t;
+    uint32 two_pow32= (uint32) pow(2,32);
+    uint32 absin;
+
+    int s = 0;
+
+    uint32 Q[68];
+    fill_n(Q,68,0);
+    Q[0] = a;
+    Q[1] = d;
+    Q[2] = c;
+    Q[3] = b;
     
-    //stringstream x;//x << std::hex << block;
     for (int i = 0; i< 16 ; i++) //shows msg block as bin
     {
         if (i>0&&(i%4)==0) cout << " | " << endl;
@@ -323,51 +311,22 @@ void md5_compress( uint32 block [16])//#todo
     }
     //cout << x.str() << endl;
 
-    uint32 F;
-    uint32 T_;
-    uint32 R;
-    uint32 AC_t;
-    uint32 two_pow32= (uint32) pow(2,32);
-    uint32 absin;
-    int s = 0;
-    uint32 Q[68];
-    fill_n(Q,68,0);
-    Q[0] = a;
-    Q[1] = d;
-    Q[2] = c;
-    Q[3] = b;
-
     for ( int t = 3; t < 67 ; t++)   // t = s + 3
     {   
-
-        // x << std::hex << Q[t]; // cout << "|" + to_string(t) + "|" + x.str() + "|" + to_string(RC(t)) + "|"<< endl;
-
-        //cout << to_string(s) + " Q_t:" + to_string(Q[t]) + "|" ;
-
         AC_t = AC(s);
-        //cout << " AC: " + to_hex(AC_t) + " t: " + to_string(t) << endl;
         F = f_t( Q[t], Q[t-1], Q[t-2], s);
         T_ = F + Q [t-3] + AC_t + W( block, (s));
-        //cout << to_string(t) + ": " ; // print actual step
-        R = RL(T_, RC(s)) ;
-        // cout << to_string(T_) + " | " + to_string(R) << endl;
-        //_____________________________
-        
+        R = RL(T_, RC(s)) ;        
         Q[t+1] = Q[t] + R; //altering the state of Q[t+1]
         s++;
-            
     }
-
-    //for(int i = 0; i < 68; i++)
-    //{
-    //    cout << "Q("+ to_string(i - 3) + ") = " + to_string(Q[i]) <<endl;
-    //}
 
     ihv[0] = a + Q[61 + 3];
     ihv[1] = b + Q[64 + 3];
     ihv[2] = c + Q[63 + 3];
     ihv[3] = d + Q[62 + 3];
-   
+    
+    return;
 }
 
 
@@ -376,18 +335,11 @@ string process( string input) //#todo
     cout << "staring" << endl;
     string output;
     uint32 l = input.length();
+
     string padded_input = pad(input);
-
     cout << "padding complete" << endl;
-
     int size = padded_input.size();
 
-    //for (int i = 0 ; i < size; i++)
-    //{
-    //    cout << "padi. at " + to_string(i) + " :" + padded_input.at(i) << endl;
-    //}
-
-    int shift = 0;
     uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
     cout << "calculating first block (16 x 32bit):" << endl;
 
@@ -398,41 +350,28 @@ string process( string input) //#todo
         {
             msg_block[j] += uint32( (unsigned char) (padded_input.at((j * 4) + i)) << (i*8)) ;
             //cout << (to_string(j*4+i)+ .: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
-
         }
-      //  cout << "translate"+ to_string(msg_block[j]) << endl;
-    
-    
+        //  cout << "translate"+ to_string(msg_block[j]) << endl;    
     }
-        //cout << " msg in block vs paded input: " + to_string(msg_block[15]) + " vs " + to_string(padded_input.at(63)) << endl;
-
-
-        md5_compress(msg_block);
+    //cout << " msg in block vs paded input: " + to_string(msg_block[15]) + " vs " + to_string(padded_input.at(63)) << endl;
+    md5_compress(msg_block);
 
 
     for (int h = 1; h*64 < size ; h++) //64 *8 = 512, after an iteration we look at the next 64 8bit chars and passing them into a block
     {   
-        print_step(h);
-      
+        print_step(h);      
         for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
         {   
             msg_block[j] = 0;
             for (int i = 0; i < 4; i++)
             {
                 msg_block[j] += uint32( (unsigned char) (padded_input.at((h * 64 ) + (j * 4) + i)) << (i*8)) ;
-                //cout << (to_string(j*4+i)+ ".: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
-
-            }
-        //  cout << "translate"+ to_string(msg_block[j]) << endl;;    
-    
-    }
-
+            }     
+        }
         md5_compress(msg_block);
-
-
     }
     cout << "last block calculated" << endl;
-    
+    cout << endl;
     return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
 }
 
@@ -443,26 +382,27 @@ string process( string input) //#todo
 void reverse_md5(uint32 md5 [4] )
 {
     uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]};
-
+    int k;
     uint32 F_t;
-    uint32 m_t;
+    uint32 m [16];
     int s = 3;
     for (int t = 0; t < 16; t++)
     {   
         F_t = f_t( Q[s], Q[s - 1], Q[s - 2], t);
-        m_t = RR(Q[s+1] - Q[s], RC(t)) - F_t - Q[s-3] + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
+        m[t] = RR(Q[s+1] - Q[s], RC(t)) - F_t - Q[s-3] + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
         s++;
     }
 
-return;
+    return;
 }
 
 int collsion_search_algorithm()
 {
     srand(std::time(nullptr));
-    uint32 M_0 = rand() | rand();
+    uint32 M_0 = rand() ^ rand();
 
     cout << M_0;
+
     return 0;
 }
 
@@ -471,7 +411,7 @@ int find_block_1 ()
 {
     // choose Q_1,Q_3,..,Q_16 fullfiliing condidtions
     // calculate m_0,m_6,..,m_15
-    // 
+    
     return 0;
 }
 
@@ -494,6 +434,7 @@ void test_RL()
     if (RL(test,31) == 8 + pow(2,31)) cout << "RL test 2 succes" << endl;
     if (RL(test,32) == 17) cout << "RL test 3 succes" << endl;
 
+    return;
 }
 
 void test_to_hex()
@@ -501,34 +442,19 @@ void test_to_hex()
     uint32 val = 0xF2345678 ; 
     cout << to_string(val) + " " << to_hex(val) << endl;
 
-
-
-
+    return;
 }
 
 int main()
 {
-    // input is string
-    // string is char*
-    // char ist 8 bit
-    //
-
     string val_stevens = "abc\n";
     string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
     
     string test = val;
-    
-    //test_to_hex();
-    
+        
     cout << process(test)<< endl;
-    //****************************
 
    // collsion_search_algorithm();
-
-    //test_RL();
-
-   
-   
 
     return 0;
 }
