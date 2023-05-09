@@ -96,8 +96,7 @@ uint32 shifting_word(uint32 input)
 
 string pad(string msg)
 {
-   // msg+= "\n"; // Wichtig! Endline wir immer mit verabreitet
-
+   // msg+= "\n"; // Wichtig! Endline wir immer mit verabreitet (bei Stevens). Enweder hier, oder vorhermitgeben.
     int l = msg.length();
 
     int counter = 0;
@@ -115,7 +114,6 @@ string pad(string msg)
     
     while ( (msg.length()*8 % (64*8)) != 448 ) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
     {
-       // cout<< "msg.length-offset: " + to_string(msg.length()) + "-" + to_string(offset) + " " << endl;;
         msg = msg + end;
         cout << msg.length() << endl;
         counter++;
@@ -125,7 +123,6 @@ string pad(string msg)
 
     cout << "final:" + msg + "|";
     cout << msg.length() << endl;
-
 
     return msg;
 }
@@ -152,17 +149,14 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
     }
     else if (t < 32)
     {
-
         out = (Z & X) ^ ((~Z) & Y);
     }
     else if (t < 48)
     {  
-
          out = (X ^ Y ^ Z);
     }
     else if (t < 64)
     {
-
          out = (Y ^ (X | (~Z)));
     }
     //cout <<"f_t:" + to_string(out) << endl;
@@ -187,11 +181,7 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 
     }
 
-    //cout << to_string( m[t] ) << endl;
-    //cout << "-pos" + to_string(pos) + " ";
-    //cout << to_string(t) +": "+ to_string(m[pos]) + " at " + to_string(pos) << endl;     
-    if (pos <= -1) cout << "something went wrong un W. t is:" + to_string(t)<< endl;
-    if (pos >= 16) cout << "something went wrong in W. t is:" + to_string(t)<< endl;
+    if (pos <= -1 || pos >= 16) cout << "something went wrong un W. t is:" + to_string(t)<< endl;
 
     return m[pos]; 
 
@@ -223,7 +213,6 @@ uint32 RC (int t) // return the roataion constat
     }
     
     if (t > 64 || t < 0) (cout << "RC: something went wrong. c = " + to_string(c));
-    //cout << "t: " + to_string(t) + " RC" + to_string(c) << endl;
     return c;
 }
 
@@ -232,23 +221,21 @@ uint32 RC (int t) // return the roataion constat
 uint32 RL (uint32 T, int RC) // shifting being cyclict
 {
     uint32 temp = T;
-    //cout <<"rotating "; //cout << bitset<32>(T);//cout << " by " + to_string(RC)+ " gives: ";
     T = T << RC;
     temp = temp >> (32-RC);
     T = T | temp;
-    //cout << bitset<32>(T); //cout << " - " + to_string(RC) <<endl;
+
     return T;
 }
 
 uint32 RR (uint32 T, int RC) // shifting being cyclict
 {
     uint32 temp = T;
-    //cout <<"rotating ";//cout << bitset<32>(T);//cout << " by " + to_string(RC)+ " gives: ";
 
     T = T >> RC;
     temp = temp << (32-RC);
     T = T | temp;
-    //cout << bitset<32>(T)<<endl;
+
     return T;
 }
 
@@ -349,13 +336,10 @@ string process( string input) //#todo
         for (int i = 0; i < 4; i++)
         {
             msg_block[j] += uint32( (unsigned char) (padded_input.at((j * 4) + i)) << (i*8)) ;
-            //cout << (to_string(j*4+i)+ .: " + to_string(msg_block[j] ))+ " vs " + to_string(padded_input.at((j * 4) + i)) << endl;
         }
-        //  cout << "translate"+ to_string(msg_block[j]) << endl;    
     }
-    //cout << " msg in block vs paded input: " + to_string(msg_block[15]) + " vs " + to_string(padded_input.at(63)) << endl;
-    md5_compress(msg_block);
 
+    md5_compress(msg_block);
 
     for (int h = 1; h*64 < size ; h++) //64 *8 = 512, after an iteration we look at the next 64 8bit chars and passing them into a block
     {   
@@ -372,9 +356,9 @@ string process( string input) //#todo
     }
     cout << "last block calculated" << endl;
     cout << endl;
+
     return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
 }
-
 
 
 //MD5 attack implementation
