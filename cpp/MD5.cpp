@@ -2,15 +2,10 @@
 #include <string>
 
 #include <bitset>
-#include <cstdint>
 
 #include <climits>
 #include <sstream>
 #include <string.h>
-
-#include <bitset>
-
-#include <thread>
 
 #include <ctime>
 
@@ -112,10 +107,11 @@ string pad(string msg)
 
     msg +=one; // maybe?
     
+    
     while ( (msg.length()*8 % (64*8)) != 448 ) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
     {
         msg = msg + end;
-        cout << msg.length() << endl;
+       //cout << msg.length() << endl;
         counter++;
     }
 
@@ -250,7 +246,7 @@ uint32 AC(uint32 t)
 }
 
 
-void md5_compress( uint32 block [16])//#todo   
+void md5_compress( uint32 block [16])   
 {
     uint32 a = ihv [0];
     uint32 b = ihv [1];
@@ -319,7 +315,7 @@ void md5_compress( uint32 block [16])//#todo
 
 string process( string input) //#todo
 {
-    cout << "staring" << endl;
+    cout << "starting" << endl;
     string output;
     uint32 l = input.length();
 
@@ -431,11 +427,14 @@ void test_to_hex()
 
 int main()
 {
+
     string val_stevens = "abc\n";
     string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
-    
+    string val_2 ="Every day millions of people rely on our free all-in-one privacy solution. The DuckDuckGo app includes our Private Search, Web Tracking Protection, Smarter Encryption, Email Protection, Android App Tracking Protection, and more.";
     string test = val;
-        
+    cout << "Please enter a string" << endl;
+    getline(cin, test); 
+    
     cout << process(test)<< endl;
 
    // collsion_search_algorithm();
