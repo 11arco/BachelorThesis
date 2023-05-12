@@ -294,7 +294,7 @@ void md5_compress( uint32 block [16])
     }
     //cout << x.str() << endl;
 
-    for ( int t = 3; t < 67 ; t++)   // t = s + 3
+    for ( int t = 3; t < 67 ; t++)   // t = s + 3 . The offset is 3 because the "last" pos for calculation is -3 (+3 = 0)
     {   
         AC_t = AC(s);
         F = f_t( Q[t], Q[t-1], Q[t-2], s);
@@ -356,54 +356,6 @@ string process( string input) //#todo
     return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
 }
 
-
-//MD5 attack implementation
-
-void reverse_md5(uint32 md5 [4] )
-{
-    uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]};
-    int k;
-    uint32 F_t;
-    uint32 m [16];
-    int s = 3;
-    for (int t = 0; t < 16; t++)
-    {   
-        F_t = f_t( Q[s], Q[s - 1], Q[s - 2], t);
-        m[t] = RR(Q[s+1] - Q[s], RC(t)) - F_t - Q[s-3] + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
-        s++;
-    }
-
-    return;
-}
-
-int collsion_search_algorithm()
-{
-    srand(std::time(nullptr));
-    uint32 M_0 = rand() ^ rand();
-
-    cout << M_0;
-
-    return 0;
-}
-
-
-int find_block_1 ()
-{
-    // choose Q_1,Q_3,..,Q_16 fullfiliing condidtions
-    // calculate m_0,m_6,..,m_15
-    
-    return 0;
-}
-
-int attack_md5()
-{
-    // find block 1
-    // find block 2
-    // NCBSA
-    //
-
-    return 0;
-}
 
 
 void test_RL()

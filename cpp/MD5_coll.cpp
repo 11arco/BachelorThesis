@@ -11,6 +11,35 @@
 #include "MD5.cpp"
 
 
+
+void reverse_md5(uint32 md5 [4] )
+{
+    uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]};
+    int k;
+    uint32 F_t;
+    uint32 m [16];
+    int s = 3;
+    for (int t = 0; t < 16; t++)
+    {   
+        F_t = f_t( Q[s], Q[s - 1], Q[s - 2], t);
+        m[t] = RR(Q[s+1] - Q[s], RC(t)) - F_t - Q[s-3] + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
+        s++;
+    }
+
+    return;
+}
+
+int collsion_search_algorithm()
+{
+    srand(std::time(nullptr));
+    uint32 M_0 = rand() ^ rand();
+
+    cout << M_0;
+
+    return 0;
+}
+
+
 uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, the names are not correct yet
 {
     /* 
@@ -27,15 +56,39 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
     * In the code the block are number from 0 to 1.
     * In the paper the numbering starts with 1 and end with 2
     * 
-    * 
-    * 
-    */ 
-   
-   for (int i = 0; i < 16 ; i++)
-   {
-    //#todo
-   }   
+    */
 
+    uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
+    uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
+
+
+    bool conds [4] = {false, false ,false, false}; //21 - 17 = 4 conditions (not final)
+    bool conds_2 [63];
+    fill_n(conds_2, 63, false); // maybe conds[0] = conds[1] & conds[2] & ... & conds[64] => size = 63 + 1 = 64  
+
+    while(true)
+    {
+        // choose Q_1 ...
+        // clac m0 ...
+
+        while(!conds[0] && !conds[1] && !conds[2] && !conds[3]) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
+        {
+            // choos Q_17
+            // calc m_1 at t = 16 with reversestep pp.
+            // calc Q_2 => m_2,m_3,m_4,m_5
+            // calc Q_18, .. Q_64 ( Q_64 is at pos Q[64 + offset] = 67, since Q_1 is at Q[0 ... offset ] is the IHV ,the MD5 input )
+
+        }
+
+        while (conds_2[0] ==  true)
+        {
+            // use tunnels
+            // calc m_8, ...
+            // clac Q_22, ...
+            // Verify conds
+        }
+
+    }
     return block;
 }
 
