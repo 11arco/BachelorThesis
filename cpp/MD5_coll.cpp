@@ -71,6 +71,37 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
         // choose Q_1 ...
         // clac m0 ...
 
+        /* 
+        * Bsp für Stevens Werte für Q_t mit t = 3 
+        *   01010101 00110011 00001111 00000000  some Example
+        * & 11111110 10000111 10111100 00111111  0xfe87bc3f
+        * _________________________________________________  
+        *   01010100 00000011 00001100 00000000  zwischen Ergebniss	
+        * | 00000001 01111000 01000001 11000000  0x017841c0
+        * _________________________________________________
+        * = 01010101 01111011 01001101 11000000  Ergebniss
+        *   .......1 .1111... .1....01 11......  new bit conds für t = 3
+        *   ........ ....0... ....0... .0......  old bit conds für t = 3
+        * 
+        *   00000000 00001111 00110011 01010101  some other Example
+        * & 11111110 10000111 10111100 00111111  0xfe87bc3f
+        * _________________________________________________  
+        *   00000000 00000111 00110000 00010101  zwischen Ergebniss	
+        * | 00000001 01111000 01000001 11000000  0x017841c0
+        * _________________________________________________
+        * = 00000001 01111111 01110001 11010101  Ergebniss
+        *   ........ ....0... ....0... .0......  bit conds für t = 3
+        *   .......1 .1111... .1....01 11...... new bit conds
+        *
+        * => matches with the new bit conds
+        *    Stevens is building a u32 with the bits that has to be one and or it with the val after he ands the oposite value:
+        *    & 11111110 10000111 10111100 00111111  0xfe87bc3f
+        *    | 00000001 01111000 01000001 11000000  0x017841c0
+        * 
+        *   the & flips the 0 correct, the | flips the 1 correct
+        * 
+        */
+
         while(!conds[0] && !conds[1] && !conds[2] && !conds[3]) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
         {
             // choos Q_17
