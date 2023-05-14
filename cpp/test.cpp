@@ -8,8 +8,6 @@
 #include <sstream>
 #include <string.h>
 
-#include <bitset>
-
 #include <thread>
 
 #include <ctime>
