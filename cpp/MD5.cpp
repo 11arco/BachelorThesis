@@ -16,6 +16,20 @@ typedef unsigned int uint32; //actually 32 bit uint
 
 uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
 
+void show_bits(uint32 block [16])
+{
+    for (int i = 0; i< 16 ; i++) //shows msg block as bin
+    {
+        if (i>0&&(i%4)==0) cout << " | " << endl;
+
+        cout << " | ";
+        cout << bitset<32> (block[i]);
+        
+    }
+    cout << " | " << endl;
+}
+
+
 
 int get_msb_pos(uint32 u) // returns the msb from a uint32
 {
@@ -246,6 +260,23 @@ uint32 AC(uint32 t)
 }
 
 
+uint32 step_foward(uint32 Q_t, uint32 Q_t_1, uint32 Q_t_2, uint32 Q_t_3, uint32 t, uint32 W_t)
+{
+    uint32 F;
+    uint32 T_;
+    uint32 R;
+    uint32 AC_t;
+    uint32 two_pow32 = (uint32) 4294967296;
+    uint32 absin;
+
+    AC_t = AC(t);
+    F = f_t( Q_t, Q_t_1, Q_t_2, t);
+    T_ = F + Q_t_3 + AC_t + W_t;
+    R = RL(T_, RC(t)) ;        
+    return Q_t + R; //altering the state of Q[t+1]
+
+}
+
 void md5_compress( uint32 block [16])   
 {
     uint32 a = ihv [0];
@@ -254,14 +285,6 @@ void md5_compress( uint32 block [16])
     uint32 d = ihv [3];
 
     uint32 help = 0;
-
-    uint32 F;
-    uint32 T_;
-    uint32 R;
-    uint32 AC_t;
-    uint32 two_pow32= (uint32) pow(2,32);
-    uint32 absin;
-
     int s = 0;
 
     uint32 Q[68];
@@ -270,37 +293,17 @@ void md5_compress( uint32 block [16])
     Q[1] = d;
     Q[2] = c;
     Q[3] = b;
+
+    show_bits(block);
     
-    for (int i = 0; i< 16 ; i++) //shows msg block as bin
-    {
-        if (i>0&&(i%4)==0) cout << " | " << endl;
-
-        cout << " | ";
-        cout << bitset<32> (block[i]);
-        
-    }
-    cout << " | " << endl;
-    if(false) //show msg block as dec
-    { 
-        for (int i = 0; i< 16 ; i++)
-        {
-            if (i>0&&(i%4)==0) cout << " | " << endl;
-
-            cout << " | ";
-            cout << to_string(block[i]);
-            
-        }
-        cout << " | " << endl;
-    }
-    //cout << x.str() << endl;
-
     for ( int t = 3; t < 67 ; t++)   // t = s + 3 . The offset is 3 because the "last" pos for calculation is -3 (+3 = 0)
     {   
-        AC_t = AC(s);
-        F = f_t( Q[t], Q[t-1], Q[t-2], s);
-        T_ = F + Q [t-3] + AC_t + W( block, (s));
-        R = RL(T_, RC(s)) ;        
-        Q[t+1] = Q[t] + R; //altering the state of Q[t+1]
+        //AC_t = AC(s);
+        //F = f_t( Q[t], Q[t-1], Q[t-2], s);
+        //T_ = F + Q [t-3] + AC_t + W( block, (s));
+        //R = RL(T_, RC(s)) ;        
+        //Q[t+1] = Q[t] + R; //altering the state of Q[t+1]
+        Q[t+1] = step_foward(Q[t],Q[t-1],Q[t-2],Q[t-3],s,W(block,s));
         s++;
     }
 
@@ -313,7 +316,28 @@ void md5_compress( uint32 block [16])
 }
 
 
-string process( string input) //#todo
+void reverse_md5(uint32 md5 [4], uint32 block [16] )
+{
+    uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]}; // vllt. gobal, da sonst abwechsenlde manipulation schwierig wird
+    int k;
+    uint32 F_t;
+    uint32 m [16];
+    int offset = 3;
+
+    show_bits(block);
+
+    for (int t = 0; t < 16; t++)
+    {   
+        F_t = f_t( Q[offset], Q[offset - 1], Q[offset - 2], t);
+        m[t] = RR( Q[offset + 1] - Q[offset], RC(t) ) - F_t - Q[t - 3] + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
+    
+    }
+
+    return;
+}
+
+
+string process( string input)
 {
     cout << "starting" << endl;
     string output;
@@ -355,8 +379,6 @@ string process( string input) //#todo
 
     return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
 }
-
-
 
 void test_RL()
 {   
