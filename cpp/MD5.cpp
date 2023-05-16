@@ -260,7 +260,7 @@ uint32 AC(uint32 t)
 }
 
 
-uint32 step_foward(uint32 Q_t, uint32 Q_t_1, uint32 Q_t_2, uint32 Q_t_3, uint32 t, uint32 W_t)
+uint32 step_foward(uint32 Q_t, uint32 Q_t_1, uint32 Q_t_2, uint32 Q_t_3, uint32 t, uint32 W_t) //if Q[] gloab => less 
 {
     uint32 F;
     uint32 T_;
@@ -285,7 +285,7 @@ void md5_compress( uint32 block [16])
     uint32 d = ihv [3];
 
     uint32 help = 0;
-    int s = 0;
+    int offset = 3;
 
     uint32 Q[68];
     fill_n(Q,68,0);
@@ -298,13 +298,7 @@ void md5_compress( uint32 block [16])
     
     for ( int t = 3; t < 67 ; t++)   // t = s + 3 . The offset is 3 because the "last" pos for calculation is -3 (+3 = 0)
     {   
-        //AC_t = AC(s);
-        //F = f_t( Q[t], Q[t-1], Q[t-2], s);
-        //T_ = F + Q [t-3] + AC_t + W( block, (s));
-        //R = RL(T_, RC(s)) ;        
-        //Q[t+1] = Q[t] + R; //altering the state of Q[t+1]
-        Q[t+1] = step_foward(Q[t],Q[t-1],Q[t-2],Q[t-3],s,W(block,s));
-        s++;
+        Q[t+1] = step_foward(Q[t],Q[t-1],Q[t-2],Q[t-3],(t-offset),W(block,t-offset));
     }
 
     ihv[0] = a + Q[61 + 3];
