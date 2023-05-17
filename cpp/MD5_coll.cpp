@@ -11,24 +11,6 @@
 #include "MD5.cpp"
 
 
-
-void reverse_md5(uint32 md5 [4] )
-{
-    uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]};
-    int k;
-    uint32 F_t;
-    uint32 m [16];
-    int s = 3;
-    for (int t = 0; t < 16; t++)
-    {   
-        F_t = f_t( Q[s], Q[s - 1], Q[s - 2], t);
-        m[t] = RR(Q[s+1] - Q[s], RC(t)) - F_t - Q[s-3] + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
-        s++;
-    }
-
-    return;
-}
-
 int collsion_search_algorithm()
 {
     srand(std::time(nullptr));
@@ -60,8 +42,9 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
 
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
     uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
+    srand(std::time(nullptr));
 
-
+    uint32 word = rand();
     bool conds [4] = {false, false ,false, false}; //21 - 17 = 4 conditions (not final)
     bool conds_2 [63];
     fill_n(conds_2, 63, false); // maybe conds[0] = conds[1] & conds[2] & ... & conds[64] => size = 63 + 1 = 64  
@@ -101,6 +84,25 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
         *   the & flips the 0 correct, the | flips the 1 correct
         * 
         */
+
+
+       // cant do lots
+        Q[offset + 1] = rand(); //?
+        Q[offset + 2]; //?
+        Q[offset + 3] = ( rand() & 0xfe98bc3f ) | 0x017841c0; // 0xfe98bc3f=11111110 10000111 10111100 00111111, 0x017841c0=00000001 01111000 01000001 11000000
+        Q[offset + 4] = ( rand() & 0x44000033 ) | 0x000002c0 | ( Q[offset + 3] & 0x0287bc00 );  // 
+        Q[offset + 5] = 0x41fffc8 | ( Q[offset + 4] & 0x04000033 );
+        Q[offset + 6] = 0xb84b82d6;
+        Q[offset + 7] = ( rand() & 0x68000084 ) | 0x02401b43;;
+        Q[offset + 8] = ( rand() & 0x2b8f6e04) | 0x005090d3 | (~Q[offset + 7] & 0x40000000 );
+        Q[offset + 9] = 0x20040068 | ( Q[offset + 8] & 0x00020000 ) | ( ~Q[offset + 8] & 0x40000000 );
+        Q[offset + 10]= ( rand() & 0x40000000 ) | 0x1040b089;
+        Q[offset + 11]= ( rand() & 0x10408008 ) | 0x0fbb7f16 | ( ~Q[offset + 10] & 0x40000000 );
+        Q[offset + 12]= ( rand() & 0x1ed9df7f ) | 0x00022080 | ( ~Q[offset + 11] & 0x40200000 );
+        Q[offset + 13]= ( rand() & 0x5efb4f77 ) | 0x20049008; 
+        Q[offset + 14]= ( rand() & 0x1fff5f77 ) | 0x0000a088 | ( ~Q[offset + 13] & 0x40000000 );
+        Q[offset + 15]= ( rand() & 0x5efe7ff7 ) | 0x80008000 | ( ~Q[offset + 14] & 0x00010000 );
+        Q[offset + 16]= ( rand() & 0x1ffdffff ) | 0xa0000000 | ( ~Q[offset + 15] & 0x40020000 );
 
         while(!conds[0] && !conds[1] && !conds[2] && !conds[3]) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
         {
