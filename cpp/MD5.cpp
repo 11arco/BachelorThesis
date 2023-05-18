@@ -15,6 +15,7 @@ using namespace std;
 typedef unsigned int uint32; //actually u32 
 
 uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
+uint32 Q[68];   // core to algorythm and collf.
 
 void show_bits(uint32 block [16])
 {
@@ -147,6 +148,7 @@ string pad(string msg) // pad an imput massage into the correct lgenth + correct
 uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t ) 
 { 
     uint32 out;
+
     if (t < 16)
     {
         out = (X & Y) ^ ((~X) & Z); // out = 
@@ -261,33 +263,20 @@ uint32 AC(uint32 t)
     return result;
 }
 
-uint32 step_backwards(uint32 Q_t, uint32 Q_t_1, uint32 Q_t_2, uint32 Q_t_3, uint32 t, uint32 W_t)
-{       int k;
-        uint32 F_t;
 
-        F_t = f_t( Q_t, Q_t_1, Q_t_2, t);
 
-        return RR( Q_t_1 - Q_t, RC(t) ) - F_t - Q_t + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
+void reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
+{  
+    uint32 offset = 3;
+
+    block[t] = Q[offset + t + 1] - Q[offset + t];
+	block[t] = RR(block[t], RC) - f_t(Q[offset + t], Q[offset + t - 1], Q[offset + t - 2], t) - Q[offset + t - 3] - AC ;
 }
 
 
-void reverse_md5(uint32 md5 [4], uint32 block [16] )
-{
-    uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]}; // vllt. gobal, da sonst abwechsenlde manipulation schwierig wird
-    uint32 m [16];
-
-    int offset = 3;
-
-    for (int t = 0; t < 16; t++)
-    {    
-        m[t] = step_backwards( Q[t], Q[t - 1], Q[t - 2],Q[t - 3], (t - offset), W(block, t - offset) );
-    }
-
-    return;
-}
 
 
-uint32 step_foward(uint32 Q_t, uint32 Q_t_1, uint32 Q_t_2, uint32 Q_t_3, uint32 t, uint32 W_t) //if Q[] gloab => less 
+uint32 step_foward( uint32 t, uint32 W_t) //if Q[] gloab => less 
 {
     uint32 F;
     uint32 T_;
@@ -295,12 +284,14 @@ uint32 step_foward(uint32 Q_t, uint32 Q_t_1, uint32 Q_t_2, uint32 Q_t_3, uint32 
     uint32 AC_t;
     uint32 two_pow32 = (uint32) 4294967296;
     uint32 absin;
+    uint32 offset = 3;
 
-    AC_t = AC(t);
-    F = f_t( Q_t, Q_t_1, Q_t_2, t);
-    T_ = F + Q_t_3 + AC_t + W_t;
-    R = RL(T_, RC(t)) ;        
-    return Q_t + R; //altering the state of Q[t+1]
+    AC_t = AC(t - offset );
+    F = f_t( Q[t], Q[t - 1], Q[t - 2], (t - offset));
+    T_ = F + Q[t - 3] + AC_t + W_t;
+    R = RL(T_, RC(t - offset)) ;        
+
+    return  R + (uint32) Q[t]; //altering the state of Q[t+1]
 
 }
 
@@ -312,20 +303,17 @@ void md5_compress( uint32 block [16])
     uint32 d = ihv [3];
 
     uint32 help = 0;
-    int offset = 3;
 
-    uint32 Q[68];
     fill_n(Q,68,0);
     Q[0] = a;
     Q[1] = d;
     Q[2] = c;
     Q[3] = b;
-  
-    for ( int t = 3; t < 67 ; t++)   // t = s + 3 . The offset is 3 because the "last" pos for calculation is -3 (+3 = 0)
-    {   
-        Q[t+1] = step_foward(Q[t],Q[t-1],Q[t-2],Q[t-3],(t - offset),W(block,t-offset));
-    }
 
+    for ( int t = 3; t < 67; t++)  
+    {   
+        Q[t+1] = step_foward((t ),W(block, t-3 ));
+    }
     ihv[0] = a + Q[61 + 3];
     ihv[1] = b + Q[64 + 3];
     ihv[2] = c + Q[63 + 3];

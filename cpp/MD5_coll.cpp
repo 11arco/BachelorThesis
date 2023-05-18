@@ -104,6 +104,9 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
         Q[offset + 15]= ( rand() & 0x5efe7ff7 ) | 0x80008000 | ( ~Q[offset + 14] & 0x00010000 );
         Q[offset + 16]= ( rand() & 0x1ffdffff ) | 0xa0000000 | ( ~Q[offset + 15] & 0x40020000 );
 
+
+        reverse_md5(0,0xd76aa478, 7);
+        
         while(!conds[0] && !conds[1] && !conds[2] && !conds[3]) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
         {
             // choos Q_17
