@@ -42,12 +42,8 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
 
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
     uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
-    srand(std::time(nullptr));
 
-    uint32 word = rand();
-    bool conds [4] = {false, false ,false, false}; //21 - 17 = 4 conditions (not final)
-    bool conds_2 [63];
-    fill_n(conds_2, 63, false); // maybe conds[0] = conds[1] & conds[2] & ... & conds[64] => size = 63 + 1 = 64  
+    srand(std::time(nullptr));
 
     while(true)
     {
@@ -104,10 +100,14 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
         Q[offset + 15]= ( rand() & 0x5efe7ff7 ) | 0x80008000 | ( ~Q[offset + 14] & 0x00010000 );
         Q[offset + 16]= ( rand() & 0x1ffdffff ) | 0xa0000000 | ( ~Q[offset + 15] & 0x40020000 );
 
+		reverse_md5(block, 0, AC(0), RC(0)); // stevens hard codes the AC and the RC
+		reverse_md5(block, 6, AC(6), RC(6)); // stevens hard codes the AC and the RC
+	    reverse_md5(block, 7, AC(7), RC(7)); // stevens hard codes the AC and the RC
+		reverse_md5(block, 11, AC(11), RC(11)); // stevens hard codes the AC and the RC
+		reverse_md5(block, 14, AC(14), RC(14)); // stevens hard codes the AC and the RC
+		reverse_md5(block, 15, AC(15), RC(15)); // stevens hard codes the AC and the RC
 
-        reverse_md5(0,0xd76aa478, 7);
-        
-        while(!conds[0] && !conds[1] && !conds[2] && !conds[3]) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
+        while(!true) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
         {
             // choos Q_17
             // calc m_1 at t = 16 with reversestep pp.
@@ -116,7 +116,7 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
 
         }
 
-        while (conds_2[0] ==  true)
+        while (true)
         {
             // use tunnels
             // calc m_8, ...
