@@ -89,7 +89,7 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
         Q[offset + 4] = ( rand() & 0x44000033 ) | 0x000002c0 | ( Q[offset + 3] & 0x0287bc00 );  // 
         Q[offset + 5] = 0x41fffc8 | ( Q[offset + 4] & 0x04000033 );
         Q[offset + 6] = 0xb84b82d6;
-        Q[offset + 7] = ( rand() & 0x68000084 ) | 0x02401b43;;
+        Q[offset + 7] = ( rand() & 0x68000084 ) | 0x02401b43;
         Q[offset + 8] = ( rand() & 0x2b8f6e04) | 0x005090d3 | (~Q[offset + 7] & 0x40000000 );
         Q[offset + 9] = 0x20040068 | ( Q[offset + 8] & 0x00020000 ) | ( ~Q[offset + 8] & 0x40000000 );
         Q[offset + 10]= ( rand() & 0x40000000 ) | 0x1040b089;

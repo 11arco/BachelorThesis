@@ -48,5 +48,20 @@ $1.$ the val to set the zeros (and with 0xfe87bc3f)\\
   the $\&$ flips the $0$ correct, the $\|$ flips the $1$ correct
 
 
+  \newpage
 
-\section{Chapter one}
+\section{Notation helper}
+
+
+\begin{table}[]
+    \begin{tabular}{ c | c | c }
+    Stevens & Wang  & Definition  \\
+    \hline 
+    $ RL \left(X , Y \right) $  & $ ROTL^{Y} \left( X\right) $  & cyclic left shift $X$ by $Y$ (usually mod 31) \\
+    $ RL \left(X , Y \right) $  & -                             & cyclic right shift $X$ by $Y$  \\
+    $ RC \left(t \right) $      &$ S \left(t \right) $          & rotation Constant of $t$ \\
+    Block 1, Block 2 & Block N, Block M & pair of first blocks for collisions finding   \\
+    Block 0, Block 1 & Block N, Block M & same pair but im Code\\
+    \end{tabular}
+\end{table}
+
