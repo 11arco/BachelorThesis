@@ -291,6 +291,10 @@ uint32 step_foward( uint32 t, uint32 W_t) //if Q[] gloab => less
     T_ = F + Q[t - 3] + AC_t + W_t;
     R = RL(T_, RC(t - offset)) ;        
 
+    if(t<10) cout<<" ";                     //debug
+    cout << " R_" + to_string(t) + ": ";    //debug
+    cout << bitset<32>(R) << endl;          //debug
+
     return  R + (uint32) Q[t]; //altering the state of Q[t+1]
 
 }
@@ -313,6 +317,14 @@ void md5_compress( uint32 block [16])
     for ( int t = 3; t < 67; t++)  
     {   
         Q[t+1] = step_foward((t ),W(block, t-3 ));
+
+        if(t<9) cout<<" ";                         //debug
+        cout << "Q[" + to_string(t) + "]: ";    //debug
+        cout << bitset<32>(Q[t]) << endl;       //debug
+        if(t<9) cout<<" ";                         //debug
+        cout << "Q[" + to_string(t + 1) + "]: ";    //debug
+        cout << bitset<32>(Q[t + 1]) << endl;       //debug
+        cout << endl;
     }
     ihv[0] = a + Q[61 + 3];
     ihv[1] = b + Q[64 + 3];
@@ -365,7 +377,8 @@ int main()
     cout << "Please enter a string" << endl;
     getline(cin, test); 
     
-    cout << process(test)<< endl;
+    if ( test == "r") cout << process(to_string(rand() * 3.2)  )<< endl;
+    else cout << process(test)<< endl;
 
    // collsion_search_algorithm();
 
