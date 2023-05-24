@@ -1,52 +1,69 @@
 % einleitung.tex
 \chapter{Introduction}
+\section{May Contains}
 \begin{enumerate}
 
- 
-    \item Introduction
     \item about hashfunctions
     \item about md5
-    \item about collisions
-    \item goals and motivation
-    \item notation explained
     \item Definition of md5
     \item impelmentation of md5
         \begin{enumerate}
-            \item padding (difficulties, missing by stevens )
-            \item processing
+            \item padding (missing in Stevens code )
             \item md5compress
-            \item representation
             \item potential for improvement 
-            \item difficulties
         \end{enumerate}
-    \item attack of md5
+    \item collisions for md5
+        \begin{enumerate}
+            \item Blocks N $\&$ M
+            \item 00, 01, 10, 11
+            \item MMM
+        \end{enumerate}
+    \item conclusion
+    \item SHA1
+    \item why not in SHA1
+    \item notation helper
+
 \end{enumerate}
 \section*{Motivation}
-This thesis is about a deeper look on MD5 and SHA1.
+This thesis is about a deeper look on MD5.
 We take a closer look at the Master thesis of M. Stevens: a fast collisions finding algorithm [1].
 The goal is to work out a more clear and understandable code, which is not necessarily faster, to reevaluate the code on modern systems and the difference to SHA1. 
 
 
-\section*{nodes}
+\section*{Nodes}
  
 Bsp für Stevens Werte für $Q_t$ mit $t = 3$ :\\
-
-Bit Conds for $Q_t | t =3$ :
-
+Bit Conds for $Q_t | t =3$ :\\
+\\
 $4.$ the old bit Conds\\
 $3.$ the new bit Conds\\
 $2.$ the val to set the ones ( or with $0x017841c0$)\\
 $1.$ the val to set the zeros (and with 0xfe87bc3f)\\
 
 \begin{align*}    
-    1.& \& & 11111110& &10000111& &10111100& &00111111& &0xfe87bc3f \\
-    2.& \| & 00000001& &01111000& &01000001& &11000000& &0x017841c0 \\
-    3.&    & ........& &.1111...& &.1....01& &11......& & \\
-    4.&    & ........& &....0...& &....0...& &.0......& & 
+    1.& \& & 11111110 & & 10000111 & & 10111100 & & 00111111 & & 0xfe87bc3f \\
+    2.& \| & 00000001 & & 01111000 & & 01000001 & & 11000000 & & 0x017841c0 \\
+    3.&    & ........ & & .1111... & & .1....01 & & 11...... & &  \\
+    4.&    & ........ & & ....0... & & ....0... & & .0...... & &  
 \end{align*}
 
   the $\&$ flips the $0$ correct, the $\|$ flips the $1$ correct
 
 
+  \newpage
 
-\section{Chapter one}
+\section{Notation helper}
+
+
+\begin{table}[]
+    \begin{tabular}{ c | c | c }
+    Stevens & Wang  & Definition  \\
+    \hline 
+    $ RL \left(X , Y \right) $  & $ ROTL^{Y} \left( X\right) $  & cyclic left shift $X$ by $Y$ (usually mod 31) \\
+    $ RR \left(X , Y \right) $  & -                             & cyclic right shift $X$ by $Y$  \\
+    $ RC \left(t \right) $      &$ S \left(t \right) $          & rotation Constant of $t$ \\
+    Block 1, Block 2 & Block N, Block M & pair of first blocks for collisions finding   \\
+    Block 0, Block 1 & Block N, Block M & same pair but im Code\\
+    \end{tabular}
+\end{table}
+

@@ -17,9 +17,10 @@
 #include <cmath>
 
 using namespace std;
-typedef unsigned int uint32; //actually 32 bit uint 
+typedef unsigned int uint32; //actually u32 
 
 uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
+uint32 Q[68];   // core to algorythm and collf.
 
 void show_bits(uint32 block [16])
 {
@@ -33,8 +34,6 @@ void show_bits(uint32 block [16])
     }
     cout << " | " << endl;
 }
-
-
 
 int get_msb_pos(uint32 u) // returns the msb from a uint32
 {
@@ -66,6 +65,7 @@ string from_64(uint64_t input) // converts a uint64 into a string
 }
 
 
+
 string to_hex(uint32 u) // converts a uint32 into a hexadecimal vlaue
 {   
     stringstream temp_0 ;
@@ -84,14 +84,22 @@ string to_hex(uint32 u) // converts a uint32 into a hexadecimal vlaue
     return temp_0.str();
 }
 
+void test_to_hex()
+{
+    uint32 val = 0xF2345678 ; 
+    cout << to_string(val) + " " << to_hex(val) << endl;
+
+    return;
+}
+
 void print_step(int step)
 {
     string calc = "calculating block ";
 
-    cout << calc + to_string(step + 1)  << endl;
-}
+    cout << calc + to_string(step + 1)  << " currect IHV: ";
 
-//MD5 implementation
+    cout << to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]) << endl;
+}
 
 
 uint32 shifting_word(uint32 input)
@@ -108,7 +116,7 @@ uint32 shifting_word(uint32 input)
     return input; //output
 }
 
-string pad(string msg)
+string pad(string msg) // pad an imput massage into the correct lgenth + correct format (adds a 1 at the start and length at the end)
 {
    // msg+= "\n"; // Wichtig! Endline wir immer mit verabreitet (bei Stevens). Enweder hier, oder vorhermitgeben.
     int l = msg.length();
@@ -124,17 +132,16 @@ string pad(string msg)
     char end = 0; //8bit
     char one = 1 << 7; //8bit
 
-    msg +=one; // maybe?
+    msg += one; // stevens does not do this part of padding
     
     
     while ( (msg.length()*8 % (64*8)) != 448 ) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
     {
         msg = msg + end;
-       //cout << msg.length() << endl;
         counter++;
     }
 
-    msg += from_64(length_for_adding); //maybe
+    msg += from_64(length_for_adding);  // stevens does not do this part of padding
 
     cout << "final:" + msg + "|";
     cout << msg.length() << endl;
@@ -146,20 +153,9 @@ string pad(string msg)
 uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t ) 
 { 
     uint32 out;
+
     if (t < 16)
     {
-        if (false)
-        {
-            cout << bitset<32>(X);
-            cout << "" << endl;
-            cout << bitset<32>(0);
-            cout << " | " << endl;
-            cout << "________________________________" << endl;
-
-            cout << bitset<32>(X | 0);
-            cout << ""<< endl;
-            cout << ""<< endl;
-        }
         out = (X & Y) ^ ((~X) & Z); // out = 
     }
     else if (t < 32)
@@ -185,15 +181,12 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
     if (t < 16) pos = t ;
     else if (t < 32){ 
         pos = (1+(5*t)) % 16;
-
     }
     else if (t < 48){ 
         pos = (5+(3*t)) % 16;
-
     }
     else if (t < 64){ 
         pos = (7*t) % 16;
-
     }
 
     if (pos <= -1 || pos >= 16) cout << "something went wrong un W. t is:" + to_string(t)<< endl;
@@ -243,6 +236,17 @@ uint32 RL (uint32 T, int RC) // shifting being cyclict
     return T;
 }
 
+void test_RL()
+{   
+    uint32 test = 17;
+
+    if (RL(test,1) == 34) cout << "RL test 1 succes" << endl;
+    if (RL(test,31) == 8 + pow(2,31)) cout << "RL test 2 succes" << endl;
+    if (RL(test,32) == 17) cout << "RL test 3 succes" << endl;
+
+    return;
+}
+
 uint32 RR (uint32 T, int RC) // shifting being cyclict
 {
     uint32 temp = T;
@@ -265,7 +269,19 @@ uint32 AC(uint32 t)
 }
 
 
-uint32 step_foward(uint32 Q_t, uint32 Q_t_1, uint32 Q_t_2, uint32 Q_t_3, uint32 t, uint32 W_t) //if Q[] gloab => less 
+
+void reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
+{  
+    uint32 offset = 3;
+
+    block[t] = Q[offset + t + 1] - Q[offset + t];
+	block[t] = RR(block[t], RC) - f_t(Q[offset + t], Q[offset + t - 1], Q[offset + t - 2], t) - Q[offset + t - 3] - AC ;
+}
+
+
+
+
+uint32 step_foward( uint32 t, uint32 W_t) //if Q[] gloab => less 
 {
     uint32 F;
     uint32 T_;
@@ -273,12 +289,18 @@ uint32 step_foward(uint32 Q_t, uint32 Q_t_1, uint32 Q_t_2, uint32 Q_t_3, uint32 
     uint32 AC_t;
     uint32 two_pow32 = (uint32) 4294967296;
     uint32 absin;
+    uint32 offset = 3;
 
-    AC_t = AC(t);
-    F = f_t( Q_t, Q_t_1, Q_t_2, t);
-    T_ = F + Q_t_3 + AC_t + W_t;
-    R = RL(T_, RC(t)) ;        
-    return Q_t + R; //altering the state of Q[t+1]
+    AC_t = AC(t - offset );
+    F = f_t( Q[t], Q[t - 1], Q[t - 2], (t - offset));
+    T_ = F + Q[t - 3] + AC_t + W_t;
+    R = RL(T_, RC(t - offset)) ;        
+
+    if(t<10) cout<<" ";                     //debug
+    cout << " R_" + to_string(t) + ": ";    //debug
+    cout << bitset<32>(R) << endl;          //debug
+
+    return  R + (uint32) Q[t]; //altering the state of Q[t+1]
 
 }
 
@@ -290,48 +312,30 @@ void md5_compress( uint32 block [16])
     uint32 d = ihv [3];
 
     uint32 help = 0;
-    int offset = 3;
 
-    uint32 Q[68];
     fill_n(Q,68,0);
     Q[0] = a;
     Q[1] = d;
     Q[2] = c;
     Q[3] = b;
 
-    show_bits(block);
-    
-    for ( int t = 3; t < 67 ; t++)   // t = s + 3 . The offset is 3 because the "last" pos for calculation is -3 (+3 = 0)
+    for ( int t = 3; t < 67; t++)  
     {   
-        Q[t+1] = step_foward(Q[t],Q[t-1],Q[t-2],Q[t-3],(t-offset),W(block,t-offset));
-    }
+        Q[t+1] = step_foward((t ),W(block, t-3 ));
 
+        if(t<9) cout<<" ";                         //debug
+        cout << "Q[" + to_string(t) + "]: ";    //debug
+        cout << bitset<32>(Q[t]) << endl;       //debug
+        if(t<9) cout<<" ";                         //debug
+        cout << "Q[" + to_string(t + 1) + "]: ";    //debug
+        cout << bitset<32>(Q[t + 1]) << endl;       //debug
+        cout << endl;
+    }
     ihv[0] = a + Q[61 + 3];
     ihv[1] = b + Q[64 + 3];
     ihv[2] = c + Q[63 + 3];
     ihv[3] = d + Q[62 + 3];
     
-    return;
-}
-
-
-void reverse_md5(uint32 md5 [4], uint32 block [16] )
-{
-    uint32 Q[19] = {md5[0], md5[1], md5[2], md5[3]}; // vllt. gobal, da sonst abwechsenlde manipulation schwierig wird
-    int k;
-    uint32 F_t;
-    uint32 m [16];
-    int offset = 3;
-
-    show_bits(block);
-
-    for (int t = 0; t < 16; t++)
-    {   
-        F_t = f_t( Q[offset], Q[offset - 1], Q[offset - 2], t);
-        m[t] = RR( Q[offset + 1] - Q[offset], RC(t) ) - F_t - Q[t - 3] + AC(t); // Q[t+1] - Q[t] = R_t =? RL(T_t, RC_(t)
-    
-    }
-
     return;
 }
 
@@ -347,20 +351,8 @@ string process( string input)
     int size = padded_input.size();
 
     uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
-    cout << "calculating first block (16 x 32bit):" << endl;
 
-    for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
-    {
-        msg_block[j] = 0;
-        for (int i = 0; i < 4; i++)
-        {
-            msg_block[j] += uint32( (unsigned char) (padded_input.at((j * 4) + i)) << (i*8)) ;
-        }
-    }
-
-    md5_compress(msg_block);
-
-    for (int h = 1; h*64 < size ; h++) //64 *8 = 512, after an iteration we look at the next 64 8bit chars and passing them into a block
+    for (int h = 0; h*64 < size ; h++) //64 *8 = 512, after an iteration we look at the next 64 8bit chars and passing them into a block
     {   
         print_step(h);      
         for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
@@ -368,9 +360,10 @@ string process( string input)
             msg_block[j] = 0;
             for (int i = 0; i < 4; i++)
             {
-                msg_block[j] += uint32( (unsigned char) (padded_input.at((h * 64 ) + (j * 4) + i)) << (i*8)) ;
+                msg_block[j] += uint32( (unsigned char) (padded_input.at((h * 64 ) + (j * 4) + i)) << (i * 8)) ;
             }     
         }
+        show_bits(msg_block);
         md5_compress(msg_block);
     }
     cout << "last block calculated" << endl;
@@ -379,28 +372,9 @@ string process( string input)
     return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
 }
 
-void test_RL()
-{   
-    uint32 test = 17;
-
-    if (RL(test,1) == 34) cout << "RL test 1 succes" << endl;
-    if (RL(test,31) == 8 + pow(2,31)) cout << "RL test 2 succes" << endl;
-    if (RL(test,32) == 17) cout << "RL test 3 succes" << endl;
-
-    return;
-}
-
-void test_to_hex()
-{
-    uint32 val = 0xF2345678 ; 
-    cout << to_string(val) + " " << to_hex(val) << endl;
-
-    return;
-}
 
 int main()
 {
-
     string val_stevens = "abc\n";
     string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
     string val_2 ="Every day millions of people rely on our free all-in-one privacy solution. The DuckDuckGo app includes our Private Search, Web Tracking Protection, Smarter Encryption, Email Protection, Android App Tracking Protection, and more.";
@@ -408,7 +382,8 @@ int main()
     cout << "Please enter a string" << endl;
     getline(cin, test); 
     
-    cout << process(test)<< endl;
+    if ( test == "r") cout << process(to_string(rand() * 3.2)  )<< endl;
+    else cout << process(test)<< endl;
 
    // collsion_search_algorithm();
 
