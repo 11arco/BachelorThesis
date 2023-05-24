@@ -1092,7 +1092,6 @@ OUTPUT main.out
 INPUT .\kapitel\titelseite.tex
 INPUT .\kapitel\titelseite.tex
 INPUT .\kapitel\titelseite.tex
-INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\map\pdftex\pdftex.map
 OUTPUT kapitel\titelseite.aux
 INPUT .\kapitel\titelseite.tex
 INPUT .\kapitel\titelseite.tex
@@ -1138,12 +1137,14 @@ INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\amsfonts
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\amsfonts\symbols\msbm7.tfm
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecss1440.tfm
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecss1728.tfm
-INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecsx1440.tfm
+INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecss2074.tfm
+INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecsx2074.tfm
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1cmtt.fd
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1cmtt.fd
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1cmtt.fd
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1cmtt.fd
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\ectt1200.tfm
+INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\map\pdftex\pdftex.map
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecrm2488.tfm
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\ecbx2488.tfm
 INPUT .\main.toc
@@ -1183,6 +1184,9 @@ INPUT .\kapitel\anhang.tex
 INPUT kapitel\anhang.tex
 INPUT .\kapitel\anhang.tex
 INPUT kapitel\anhang.tex
+INPUT .\main.lof
+INPUT main.lof
+INPUT main.lof
 OUTPUT main.lof
 INPUT .\main.loa
 INPUT main.loa
@@ -1226,6 +1230,8 @@ INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecsl1200.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1728.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1728.pk
+INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
+INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx2488.pk
@@ -1236,12 +1242,10 @@ INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecss1200.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecss1440.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecss1440.pk
-INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecsx1440.pk
-INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecsx1440.pk
+INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecsx2074.pk
+INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecsx2074.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecss1728.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecss1728.pk
-INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
-INPUT C:\Users\marco\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmmi12.pfb
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmmi12.pfb
 INPUT C:\Users\marco\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmmi6.pfb
