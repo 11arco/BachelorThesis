@@ -28,9 +28,21 @@
 This thesis is about a deeper look on MD5.
 We take a closer look at the Master thesis of M. Stevens: a fast collisions finding algorithm [1].
 The goal is to work out a more clear and understandable code, which is not necessarily faster, to reevaluate the code on modern systems and the difference to SHA1. 
+\section{MD5}
+Massage Digest Algorithm 5 is a .. to , from ..., in ... \\
+MD5 is usually seen as 4 steps as seen in fig \ref{md5}\\
+\begin{figure}
+    \begin{enumerate}
+        \item padding
+        \item procseesing
+        \item md5 sum 
+        \item output
+    \end{enumerate}
+\caption{MD5 algo}
+\label{md5}
+\end{figure}
 
-
-\section*{Nodes}
+\section*{Notes}
  
 Bsp für Stevens Werte für $Q_t$ mit $t = 3$ :\\
 Bit Conds for $Q_t | t =3$ :\\
@@ -56,6 +68,7 @@ $1.$ the val to set the zeros (and with 0xfe87bc3f)\\
 
 
 \begin{table}[]
+    \caption*{\large Notation}
     \begin{tabular}{ c | c | c }
     Stevens & Wang  & Definition  \\
     \hline 
@@ -65,5 +78,6 @@ $1.$ the val to set the zeros (and with 0xfe87bc3f)\\
     Block 1, Block 2 & Block N, Block M & pair of first blocks for collisions finding   \\
     Block 0, Block 1 & Block N, Block M & same pair but im Code\\
     \end{tabular}
+    \label{notation}
 \end{table}
 
