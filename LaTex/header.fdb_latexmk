@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1685014218 "f:/CPPSpace/Project1/LaTex/header.tex" "header.pdf" "header" 1685014220 2
+["pdflatex"] 1685123530 "f:/CPPSpace/Project1/LaTex/header.tex" "header.pdf" "header" 1685123532 2
   "C:/Program Files/MiKTeX/fonts/tfm/jknappen/ec/ecrm1200.tfm" 993062126 3152 4850ff0163852b7fab34bd55e1197f28 ""
   "C:/Program Files/MiKTeX/fonts/tfm/public/cm/cmr12.tfm" 1136768653 1288 655e228510b4c2a1abe905c368440826 ""
   "C:/Program Files/MiKTeX/fonts/tfm/public/latex-fonts/lasy6.tfm" 1136768653 520 4889cce2180234b97cad636b6039c722 ""
@@ -152,11 +152,12 @@
   "C:/Program Files/MiKTeX/tex/latex/tools/xspace.sty" 1667245866 4545 4c279ac9292a1be8afa9ab2f1d3299c2 ""
   "C:/Program Files/MiKTeX/tex/latex/ulem/ulem.sty" 1578655045 15682 94f55b803e160cf7fb6e4d77d07cfe1d ""
   "C:/Program Files/MiKTeX/tex/latex/url/url.sty" 1388494052 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
+  "C:/Program Files/MiKTeX/tex/latex/wrapfig/wrapfig.sty" 1044406800 26220 3701aebf80ccdef248c0c20dd062fea9 ""
   "C:/Program Files/MiKTeX/tex/latex/xcolor/xcolor.sty" 1656236890 56148 51a9a8571c07b9921892ae11063ae853 ""
   "C:/Users/marco/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1682001579 23169145 4fadac127bebef75defb213d760b16fd ""
-  "f:/CPPSpace/Project1/LaTex/header.tex" 1685014215 4155 ee9149b990beb2c4a725c61dd74041cc ""
-  "header.aux" 1685014218 34 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "header.tex" 1685014215 4155 ee9149b990beb2c4a725c61dd74041cc ""
+  "f:/CPPSpace/Project1/LaTex/header.tex" 1685123527 4276 bb1d8a55e07fd89fb1770e4f1e30914d ""
+  "header.aux" 1685123530 34 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "header.tex" 1685123527 4276 bb1d8a55e07fd89fb1770e4f1e30914d ""
   (generated)
   "header.aux"
   "header.log"

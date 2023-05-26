@@ -30,7 +30,7 @@ We take a closer look at the Master thesis of M. Stevens: a fast collisions find
 The goal is to work out a more clear and understandable code, which is not necessarily faster, to reevaluate the code on modern systems and the difference to SHA1. 
 \section{MD5}
 Massage Digest Algorithm 5 is a .. to , from ..., in ... \\
-MD5 is usually seen as 4 steps as seen in fig \ref{md5}\\
+MD5 is usually seen as 4 steps as seen in fig {md5}\\
 \begin{figure}
     \begin{enumerate}
         \item padding
@@ -62,7 +62,6 @@ $1.$ the val to set the zeros (and with 0xfe87bc3f)\\
   the $\&$ flips the $0$ correct, the $\|$ flips the $1$ correct
 
 
-  \newpage
 
 \section{Notation helper}
 
@@ -72,12 +71,15 @@ $1.$ the val to set the zeros (and with 0xfe87bc3f)\\
     \begin{tabular}{ c | c | c }
     Stevens & Wang  & Definition  \\
     \hline 
-    $ RL \left(X , Y \right) $  & $ ROTL^{Y} \left( X\right) $  & cyclic left shift $X$ by $Y$ (usually mod 31) \\
-    $ RR \left(X , Y \right) $  & -                             & cyclic right shift $X$ by $Y$  \\
+    $ RL \left(X , Y \right) $  & $ ROTL^{Y} \left( X\right) $  & cyclic left shift $X$ by $Y$ (mod 31) \\
+    $ RR \left(X , Y \right) $  & -                             & cyclic right shift $X$ by $Y$ (mod 31) \\
     $ RC \left(t \right) $      &$ S \left(t \right) $          & rotation Constant of $t$ \\
     Block 1, Block 2 & Block N, Block M & pair of first blocks for collisions finding   \\
     Block 0, Block 1 & Block N, Block M & same pair but im Code\\
     \end{tabular}
     \label{notation}
 \end{table}
+
+$RR\left(X,Y\right) \equiv X  \circled{RR} Y$
+
 

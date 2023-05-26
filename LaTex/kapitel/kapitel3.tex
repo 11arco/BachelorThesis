@@ -1,0 +1,55 @@
+% kapitel3.tex
+\chapter{ MD5-Attack}
+\label{chapter:kap3}
+
+\section{Bit Conditions}
+We need the bit Conditions to avoid a carry, so a manipulation in step t stays in step t and does not propagate beyond the 31st bit.\\
+\begin{wrapfigure}[]{r}{0.2\textwidth}
+    %\caption{}
+    %\begin{table}[]
+        \begin{tabular}{| c | c |}
+            \hline
+            $t$ & $RC(t)$    \\
+            \hline
+            \hline
+            0  & 7 \\
+            1  & 12 \\
+            2  & 17 \\
+            3  & 22 \\
+            4  & 7 \\
+            5  & 12 \\
+            6  & 17 \\
+            7  & 22 \\
+            8  & 7 \\
+            9  & 12 \\
+            10 & 17 \\
+            11 & 22 \\
+            12 & 7 \\
+            13 & 12 \\
+            14 & 17 \\
+            15 & 22 \\
+            \hline
+        \end{tabular}
+        \label{RC}
+    %\end{table}
+    \end{wrapfigure}
+We calculate the bit conditions by using the Add difference.
+We calculate an $\delta$ for each $f_t$, $Q_t$, $T_t$ and $R_t$ to calculate the Add-Difference for $Q_{t+1}$.
+Additional we need the rotation constant $RC$ for each $t$. 
+In general we begin with the $f_t$:
+\begin{enumerate}
+    \item $t \in \{0,1,2,3\}$:\\
+     $Q_t = 0 $ since here is no influence by an message and no calculation of f, there is nothing to change:
+    \item $t = 4$\\
+    $\Delta T_4 = -2^{31}$, because we must not have a carry, we \textit{lock} the last bit.
+    Since  $RL(T_4, RC_4) = RL(-2^{31}, 7) = -2^6 $ and $\delta Q_4 = 0 \Rightarrow  \delta Q_5 = -2^6$  
+\end{enumerate}
+An MD5 hash is created by taking a string of an any length and encoding it into a 128-bit fingerprint. Encoding the same string using the MD5 algorithm will always result in the same 128-bit hash output. MD5 hashes are commonly used with smaller strings when storing passwords, credit card numbers or other sensitive data in databases such as the popular MySQL. This tool provides a quick and easy way to encode an MD5 hash from a simple string of up to 256 characters in length.
+
+\newpage
+
+
+\begin{align*}
+    m_t = RR \left( Q_{t+1} - Q_t , RC_t\right) - f_t \left( Q_t, Q_{t-1}, Q_{t-2} \right) - Q_{t-3} - AC
+\end{align*}
+

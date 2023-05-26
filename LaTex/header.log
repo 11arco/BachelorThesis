@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.4) (preloaded format=pdflatex 2023.4.20)  25 MAY 2023 13:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.4) (preloaded format=pdflatex 2023.4.20)  26 MAY 2023 19:52
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -668,68 +668,75 @@ Package: enumitem 2019/06/20 v3.9 Customized lists
 ) (C:\Program Files\MiKTeX\tex/latex/etoolbox\etoolbox.sty
 Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count334
+) (C:\Program Files\MiKTeX\tex/latex/wrapfig\wrapfig.sty
+\wrapoverhang=\dimen304
+\WF@size=\dimen305
+\c@WF@wrappedlines=\count335
+\WF@box=\box93
+\WF@everypar=\toks62
+Package: wrapfig 2003/01/31  v 3.6
 )
-\c@currtheoremctr=\count335
-\c@endtheoremctr=\count336
-\c@theorem=\count337
-\c@currsatzctr=\count338
-\c@endsatzctr=\count339
-\c@currlemmactr=\count340
-\c@endlemmactr=\count341
-\c@currkorollarctr=\count342
-\c@endkorollarctr=\count343
-\c@currpropositionctr=\count344
-\c@endpropositionctr=\count345
-\c@currtheorem*ctr=\count346
-\c@endtheorem*ctr=\count347
-\c@theorem*=\count348
-\c@currsatz*ctr=\count349
-\c@endsatz*ctr=\count350
-\c@satz*=\count351
-\c@currlemma*ctr=\count352
-\c@endlemma*ctr=\count353
-\c@lemma*=\count354
-\c@currkorollar*ctr=\count355
-\c@endkorollar*ctr=\count356
-\c@korollar*=\count357
-\c@currproposition*ctr=\count358
-\c@endproposition*ctr=\count359
-\c@proposition*=\count360
-\c@currdefinitionctr=\count361
-\c@enddefinitionctr=\count362
-\c@currdefinition*ctr=\count363
-\c@enddefinition*ctr=\count364
-\c@definition*=\count365
-\c@currnotationctr=\count366
-\c@endnotationctr=\count367
-\c@notation=\count368
-\c@currkonventionctr=\count369
-\c@endkonventionctr=\count370
-\c@konvention=\count371
-\c@currbezeichnungctr=\count372
-\c@endbezeichnungctr=\count373
-\c@bezeichnung=\count374
-\c@currbeweisctr=\count375
-\c@endbeweisctr=\count376
-\c@beweis=\count377
-\c@currbemerkungctr=\count378
-\c@endbemerkungctr=\count379
-\c@currbeobachtungctr=\count380
-\c@endbeobachtungctr=\count381
-\c@currbeispielctr=\count382
-\c@endbeispielctr=\count383
-\c@currproblemctr=\count384
-\c@endproblemctr=\count385
-\c@problem=\count386
-\c@currbemerkung*ctr=\count387
-\c@endbemerkung*ctr=\count388
-\c@bemerkung*=\count389
-\c@currbeispiel*ctr=\count390
-\c@endbeispiel*ctr=\count391
-\c@beispiel*=\count392
-\c@currproblem*ctr=\count393
-\c@endproblem*ctr=\count394
-\c@problem*=\count395
+\c@currtheoremctr=\count336
+\c@endtheoremctr=\count337
+\c@theorem=\count338
+\c@currsatzctr=\count339
+\c@endsatzctr=\count340
+\c@currlemmactr=\count341
+\c@endlemmactr=\count342
+\c@currkorollarctr=\count343
+\c@endkorollarctr=\count344
+\c@currpropositionctr=\count345
+\c@endpropositionctr=\count346
+\c@currtheorem*ctr=\count347
+\c@endtheorem*ctr=\count348
+\c@theorem*=\count349
+\c@currsatz*ctr=\count350
+\c@endsatz*ctr=\count351
+\c@satz*=\count352
+\c@currlemma*ctr=\count353
+\c@endlemma*ctr=\count354
+\c@lemma*=\count355
+\c@currkorollar*ctr=\count356
+\c@endkorollar*ctr=\count357
+\c@korollar*=\count358
+\c@currproposition*ctr=\count359
+\c@endproposition*ctr=\count360
+\c@proposition*=\count361
+\c@currdefinitionctr=\count362
+\c@enddefinitionctr=\count363
+\c@currdefinition*ctr=\count364
+\c@enddefinition*ctr=\count365
+\c@definition*=\count366
+\c@currnotationctr=\count367
+\c@endnotationctr=\count368
+\c@notation=\count369
+\c@currkonventionctr=\count370
+\c@endkonventionctr=\count371
+\c@konvention=\count372
+\c@currbezeichnungctr=\count373
+\c@endbezeichnungctr=\count374
+\c@bezeichnung=\count375
+\c@currbeweisctr=\count376
+\c@endbeweisctr=\count377
+\c@beweis=\count378
+\c@currbemerkungctr=\count379
+\c@endbemerkungctr=\count380
+\c@currbeobachtungctr=\count381
+\c@endbeobachtungctr=\count382
+\c@currbeispielctr=\count383
+\c@endbeispielctr=\count384
+\c@currproblemctr=\count385
+\c@endproblemctr=\count386
+\c@problem=\count387
+\c@currbemerkung*ctr=\count388
+\c@endbemerkung*ctr=\count389
+\c@bemerkung*=\count390
+\c@currbeispiel*ctr=\count391
+\c@endbeispiel*ctr=\count392
+\c@beispiel*=\count393
+\c@currproblem*ctr=\count394
+\c@endproblem*ctr=\count395
+\c@problem*=\count396
  (C:\Program Files\MiKTeX\tex/latex/tools\xspace.sty
 Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
 ))
@@ -740,10 +747,10 @@ Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
 
  
 Here is how much of TeX's memory you used:
- 27222 strings out of 476331
- 508361 string characters out of 5797580
+ 27290 strings out of 476331
+ 509500 string characters out of 5797580
  1850660 words of memory out of 5000000
- 47247 multiletter control sequences out of 15000+600000
+ 47311 multiletter control sequences out of 15000+600000
  513455 words of font info for 35 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,0n,80p,446b,261s stack positions out of 10000i,1000n,20000p,200000b,200000s

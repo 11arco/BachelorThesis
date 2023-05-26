@@ -26,7 +26,6 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows,automata}
 
-
 % Bibtex deutsch
 \usepackage{bibgerm}
  
@@ -47,9 +46,12 @@
 \usepackage{etoolbox}
 \makeatletter
 
-%\usepackage{wrapfig}
+\usepackage{wrapfig}
 %\usepackage{subfigure}
 
+
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+    \node[shape=circle,draw,inner sep=1pt] (char) {\scriptsize #1};}}
 
 % Theorem-Optionen %
 \theoremseparator{.}
