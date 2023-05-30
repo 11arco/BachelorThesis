@@ -1,12 +1,17 @@
 % kapitel2.tex
 \chapter{Implementation of MD5}
 \label{chapter:kap2}
-Stevens starts with Wangs attack, which trys to finde to pairs of blocks:
-\( (\ B_0 , B_0' )\ \)  and \( (\ B_1 , B_1' )\ \) that \( IHV = IHV' \),
- with the goal to create two massages $ M $ and $ M' $, with the same hash value:\\
-
-\begin{gather*}
-     IHV_0 \xrightarrow[M_{(1)}] {} \cdots \xrightarrow[M_k]{}  IHV_k \xrightarrow[B_0]{}  IHV_{k + 1} \xrightarrow[B_1]{}  IHV_{k + 2} \xrightarrow[M_{k+1}]{} \cdots \xrightarrow[M_N]{}  IHV_N     \\
-    =  =  \ne  =  = \\
-     IHV_0 \xrightarrow[M_{(1)}] {} \cdots \xrightarrow[M_k]{}  IHV_k \xrightarrow[B_0]{}  IHV'_{k + 1} \xrightarrow[B_1]{}  IHV'_{k + 2} \xrightarrow[M_{k+1}]{} \cdots \xrightarrow[M_N]{} IHV_N   \\
-\end{gather*} 
+\section{MD5}
+MD5 stands for \textit{Message-Digest Algorithm 5} since it generates a digest for any given text. MD5's output length is $128$ Bit, represented in hexadecimal. Since the amount of possible text it close to
+and the amount of MD5s is limited by $32^{16}$, some text may have the MD5. If two different inputs create have the same hash value, that is what we call a collision.
+MD5 is usually seen as 4 steps as seen in fig {md5}\\
+\begin{figure}
+    \begin{enumerate}
+        \item padding
+        \item procseesing
+        \item md5 sum 
+        \item output
+    \end{enumerate}
+\caption{MD5 algo}
+\label{md5}
+\end{figure}

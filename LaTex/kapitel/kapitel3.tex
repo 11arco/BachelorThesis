@@ -1,11 +1,34 @@
 % kapitel3.tex
-\chapter{ MD5-Attack}
+\chapter{ Collision Finding}
 \label{chapter:kap3}
+\section {About collisions }
+Hash functions have resistance:
+\begin{enumerate}
+    \item First Preimage Resistance: for a hash function $h(m) = H$ the massage $m$ is hard to find.       
+    \item Second Preimage Resistance: for a given messages $m_1$ it is hard to find an $m_2$ with $m_1 \neq m_2 $ and $h(m_1) = h(m_2)$.
+    \item Collision Resistance: two arbitrary messages  $m_1$ and $m_2$ with $\neq m_2 $ and  $h(m_1) = h(m_2)$ are hard to find.
+\end{enumerate}
 
+
+\section{Differential Path}
+Stevens starts with Wangs attack, which trys to finde to pairs of blocks:
+\( \left(B_0 , B_0' \right) \)  and \( \left(B_1 , B_1' \right) \) that \( IHV = IHV' \),
+ with the goal to create two massages $ M $ and $ M' $, with the same hash value:
+
+\begin{align*}
+    &IHV_0 &\xrightarrow[M_{(1)}] {}&\cdots &\xrightarrow[M_k]{} &IHV_k \xrightarrow[B_0]{} &IHV_{k + 1}  &\xrightarrow[B_1]{} &IHV_{k + 2}  &\xrightarrow[M_{k+1}]{}&\cdots &\xrightarrow[M_N]{} &IHV_N\\
+    &=     &                        &       &                    &=                         &\ne          &                    &=            &                       &       &                    &= \\
+    &IHV_0 &\xrightarrow[M_{(1)}] {}&\cdots &\xrightarrow[M_k]{} &IHV_k \xrightarrow[B_0]{} &IHV'_{k + 1} &\xrightarrow[B_1]{} &IHV'_{k + 2} &\xrightarrow[M_{k+1}]{}&\cdots &\xrightarrow[M_N]{} &IHV_N\\
+\end{align*} 
+The idea to manipulate a block $B$ such that $Q_1 \dots Q_{16}$ maintain their conditions and that $Q_17$ to some $Q_k$ do not change at all. We try to make k as large as possible.
 \section{Bit Conditions}
-We need the bit Conditions to avoid a carry, so a manipulation in step t stays in step t and does not propagate beyond the 31st bit.\\
+Bit conditions describe the differential path on bit conditions. 
+We need the bit conditions to avoid a carry, so a manipulation in step t stays in step t and does not propagate beyond the 31st bit.
+We look at conditions and restrictions. The restrictions leads to conditions, which we calculate in the following.
+A restriction e.g. $\Delta T_2 \left[\ 31 \right] = +1 $ leads to conditions $ Q_1\left[ 16 \right] Q_2\left[ 16 \right] = Q_3\left[ 15 \right] = 0 $ and $ Q_2[15] = 1$.
+Notice, conditions are on $\Delta T_t[i]$ a state in md5-algorithm before the rotation and restrictions are on $Q_t[i]$ states of the md5-algorithm after the rotation.\\ 
 \begin{wrapfigure}[]{r}{0.2\textwidth}
-    %\caption{}
+    \caption*{\textcolor{red}{fix writing}}
     %\begin{table}[]
         \begin{tabular}{| c | c |}
             \hline
@@ -44,7 +67,6 @@ In general we begin with the $f_t$:
     $\Delta T_4 = -2^{31}$, because we must not have a carry, we \textit{lock} the last bit.
     Since  $RL(T_4, RC_4) = RL(-2^{31}, 7) = -2^6 $ and $\delta Q_4 = 0 \Rightarrow  \delta Q_5 = -2^6$  
 \end{enumerate}
-An MD5 hash is created by taking a string of an any length and encoding it into a 128-bit fingerprint. Encoding the same string using the MD5 algorithm will always result in the same 128-bit hash output. MD5 hashes are commonly used with smaller strings when storing passwords, credit card numbers or other sensitive data in databases such as the popular MySQL. This tool provides a quick and easy way to encode an MD5 hash from a simple string of up to 256 characters in length.
 
 \newpage
 
