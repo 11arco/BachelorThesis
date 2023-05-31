@@ -1178,6 +1178,8 @@ INPUT .\kapitel\kapitel3.tex
 INPUT kapitel\kapitel3.tex
 INPUT .\kapitel\kapitel3.tex
 INPUT kapitel\kapitel3.tex
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecrm0800.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecrm0600.tfm
 INPUT .\kapitel\anhang.tex
 INPUT .\kapitel\anhang.tex
 INPUT .\kapitel\anhang.tex
@@ -1259,6 +1261,8 @@ INPUT C:\Users\marco\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecs
 INPUT C:\Users\marco\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecss1728.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecss1200.pk
 INPUT C:\Users\marco\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecss1200.pk
+INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmex10.pfb
+INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmex10.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi12.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi12.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi6.pfb

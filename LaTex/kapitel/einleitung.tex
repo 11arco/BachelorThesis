@@ -4,9 +4,8 @@
 \begin{enumerate}
 
     \item about hashfunctions
-    \item about md5
     \item Definition of md5
-    \item impelmentation of md5
+    \item my impelmentation of md5
         \begin{enumerate}
             \item padding (missing in Stevens code )
             \item md5compress
@@ -14,12 +13,12 @@
         \end{enumerate}
     \item collisions for md5
         \begin{enumerate}
-            \item Blocks N $\&$ M
+            \item Blocks 1 and 2 finding 
             \item 00, 01, 10, 11
             \item MMM
         \end{enumerate}
     \item conclusion
-    \item SHA1
+    \item Definition of SHA1
     \item why not in SHA1
     \item notation helper
 
@@ -71,9 +70,14 @@ $4.$ the old bit Conds
     \label{notation}
 \end{table}
 
-$RR\left(X,Y\right) \equiv X  \circled{>>} Y$\\
-$RL\left(X,Y\right) \equiv X  \circled{<<} Y$\\
+$RR\left(X,Y\right) :\equiv X  \circled{>>} Y$\\
+$RL\left(X,Y\right) :\equiv X  \circled{<<} Y$\\
+$X \oplus Y :\equiv X "XOR"  Y$
 
-$ 10000000000000000000000000000001  \circled{<<} 7 \equiv 00000000000000000000000011000000$
+
+\begin{align*}
+10000000000000000000000000000001  \circled{<<} 7 &\equiv 00000000000000000000000011000000
+\end{align*}
+  
 
 
