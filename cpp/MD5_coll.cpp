@@ -104,6 +104,7 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
         Q[offset + 15]= ( rand() & 0x5efe7ff7 ) | 0x80008000 | ( ~Q[offset + 14] & 0x00010000 );
         Q[offset + 16]= ( rand() & 0x1ffdffff ) | 0xa0000000 | ( ~Q[offset + 15] & 0x40020000 );
 
+        // we now claculate the massage m for t =0,6,...,15. For this we use the reverse md5 fuction.
 		reverse_md5(block, 0, AC(0), RC(0)); // reverse_md5 is a void altering the input: block
 		reverse_md5(block, 6, AC(6), RC(6)); // stevens hard codes the AC and the RC
 	    reverse_md5(block, 7, AC(7), RC(7));
@@ -111,9 +112,9 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
 		reverse_md5(block, 14, AC(14), RC(14)); 
 		reverse_md5(block, 15, AC(15), RC(15)); 
 
-        while(!true) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
+        for (int t = 17; t <= 21; t++) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
         {
-            // choos Q_17
+            // we try to pick a Q_17 that Q18 ..Q21 can be calculated with Q17 and fulfill their conidtions
             // calc m_1 at t = 16 with reversestep pp.
             // calc Q_2 => m_2,m_3,m_4,m_5
             // calc Q_18, .. Q_64 ( Q_64 is at pos Q[64 + offset] = 67, since Q_1 is at Q[0 ... offset ] is the IHV ,the MD5 input )

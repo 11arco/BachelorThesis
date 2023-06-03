@@ -16,7 +16,7 @@
 \contentsline {section}{\numberline {3.4}About Code}{8}{section.3.4}%
 \contentsline {chapter}{\numberline {A}Tables}{10}{appendix.A}%
 \contentsline {chapter}{\numberline {B}Code}{11}{appendix.B}%
-\contentsline {chapter}{Abbildungsverzeichnis}{12}{appendix*.7}%
-\contentsline {chapter}{Algorithmenverzeichnis}{13}{appendix*.8}%
-\contentsline {chapter}{Bibliography}{15}{appendix*.9}%
-\contentsline {chapter}{Erklärung}{15}{appendix*.9}%
+\contentsline {chapter}{Abbildungsverzeichnis}{12}{appendix*.8}%
+\contentsline {chapter}{Algorithmenverzeichnis}{13}{appendix*.9}%
+\contentsline {chapter}{Bibliography}{15}{appendix*.10}%
+\contentsline {chapter}{Erklärung}{15}{appendix*.10}%

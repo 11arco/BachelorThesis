@@ -102,7 +102,6 @@ $3.$ the new bit Conds\\
 $4.$ the old bit Conds
 
 
-
 \begin{align*}    
     1.& \& & 11111110 & & 10000111 & & 10111100 & & 00111111 & & 0xfe87bc3f \\
     2.& \| & 00000001 & & 01111000 & & 01000001 & & 11000000 & & 0x017841c0 \\
@@ -110,11 +109,47 @@ $4.$ the old bit Conds
     4.&    & ........ & & ....0... & & ....0... & & .0...... & &  
 \end{align*}
 
-  the $\&$ flips the $0$ correct, the $\|$ flips the $1$ correct
-\newpage
-
-
+  the $\&$ flips the $0$ correct, the $\|$ flips the $1$ correct\\
+We now calculate the massage $m_t$ for $t \in \{0,6,\dots,15\} $. For this we use the reverse md5 function:
 \begin{align*}
     m_t = RR \left( Q_{t+1} - Q_t , RC_t\right) - f_t \left( Q_t, Q_{t-1}, Q_{t-2} \right) - Q_{t-3} - AC
 \end{align*}
+\hfill
+\newpage
+We try to pick a $Q_{17}$ that $Q_{18}, \dots, Q_{21}$ can be calculated with $Q_{17},\dots,Q_{15}$ and fulfill their conditions. 
+We can solve this by looping about the calculation as long as the conditions are not fulfilled and then brake. Note: we may calculate the values in temp variable before pasting them into the actual $Q$.\\
+\begin{wrapfigure}[]{r}{0.4\textwidth}
+    \begin{tikzpicture}
+        \tikzstyle{every node}=[font=\normalsize]
+        \draw  (6.75,24) circle (0.5cm) node{\normalsize $Q_{17}$};
+        \draw  (6.75,22) circle (0.5cm) node{\normalsize $Q_{18}$};
+        \draw  (6.75,20) circle (0.5cm) node{\normalsize $Q_{19}$};
+        \draw  (6.75,18) circle (0.5cm) node{\normalsize $Q_{20}$};
+        \draw  (6.75,16) circle (0.5cm) node{\normalsize $Q_{21}$};
 
+        \draw [ -to] (6.75,25.5) -- (6.75,24.5) ;
+        \draw [ -to] (6.75,23.5) -- (6.75,22.5);
+        \draw [ -to] (6.75,21.5) -- (6.75,20.5);
+        \draw [ -to] (6.75,19.5) -- (6.75,18.5);
+        \draw [ -to] (6.75,17.5) -- (6.75,16.5);
+        \draw [ -to] (6.75,15.5) -- (6.75,14.5);
+
+        \node[] at (8,25) {\normalsize "arbitrary"};
+        \node[] at (10.25,23) {\normalsize $f\left( Q_{17},Q_{16},Q_{15},17\right) + W_{17} + AC\left(17\right)$};
+        \node[] at (10.25,21) {\normalsize $f\left( Q_{18},Q_{17},Q_{16},18\right) + W_{18} + AC\left(18\right)$};
+        \node[] at (10.25,19) {\normalsize $f\left( Q_{19},Q_{18},Q_{17},19\right) + W_{19} + AC\left(19\right)$};
+        \node[] at (10.25,17) {\normalsize $f\left( Q_{20},Q_{19},Q_{18},20\right) + W_{20} + AC\left(20\right)$};
+        \node[] at (10.25,15) {\normalsize $f\left( Q_{21},Q_{20},Q_{19},21\right) + W_{21} + AC\left(21\right)$};
+        
+        \node[draw] at (8.75,24) {\normalsize 0xc0008008 };
+        \node[draw] at (8.75,22) {\normalsize 0x00020000 };
+        \node[draw] at (8.75,20) {\normalsize 0x80000000 };
+        \node[draw] at (8.75,18) {\normalsize 0x00040000 };
+        \node[draw] at (8.75,16) {\normalsize 0x80020000 };
+
+
+        \end{tikzpicture}
+    
+    \label{demepndeces}
+\end{wrapfigure}
+For a good pick for $Q_{17}$ we just generate a random value and force the conditions manual.
