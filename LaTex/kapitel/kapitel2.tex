@@ -15,3 +15,10 @@ MD5 is usually seen as 4 steps as seen in fig {md5}\\
 \caption{MD5 algo}
 \label{md5}
 \end{figure}
+
+\section{On Code}
+
+As mention before, we can describe the MD5 hash algorithm in four steps.
+The implementation of the padding is the least interesting, yet there are many mistakes one can make.
+To archive an adequate comparison we need build simply ignore the process of padding and pretend to expect the padding to be done, even thou we do it ourselves.
+The processing step is were the codes vary the most. Stevens works a lot with global variables. All in all his code is extremely optimized for performance.

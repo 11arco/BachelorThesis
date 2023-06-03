@@ -30,25 +30,7 @@ The goal is to work out a more clear and understandable code, which is not neces
 
 
 \section*{Notes}
- 
-Example for Stevens bit manipulation for $Q_t$ mit $t = 3$ :\\
-Bit condition for $Q_t | t =3$ :\\
-\\
-$1.$ the val to set the zeros (and with 0xfe87bc3f)\\
-$2.$ the val to set the ones ( or with $0x017841c0$)\\
-$3.$ the new bit Conds\\
-$4.$ the old bit Conds
 
-
-
-\begin{align*}    
-    1.& \& & 11111110 & & 10000111 & & 10111100 & & 00111111 & & 0xfe87bc3f \\
-    2.& \| & 00000001 & & 01111000 & & 01000001 & & 11000000 & & 0x017841c0 \\
-    3.&    & ........ & & .1111... & & .1....01 & & 11...... & &  \\
-    4.&    & ........ & & ....0... & & ....0... & & .0...... & &  
-\end{align*}
-
-  the $\&$ flips the $0$ correct, the $\|$ flips the $1$ correct
 
 
 

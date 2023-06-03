@@ -7,11 +7,7 @@
 #include <sstream>
 #include <string.h>
 
-<<<<<<< HEAD:cpp/test.cpp
-#include <thread>
 
-=======
->>>>>>> 54122fed10d9c71b6e354036624392af6cd738fa:cpp/MD5.cpp
 #include <ctime>
 
 #include <cmath>
