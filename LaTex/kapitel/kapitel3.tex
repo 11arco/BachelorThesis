@@ -112,7 +112,7 @@ $4.$ the old bit Conds
   the $\&$ flips the $0$ correct, the $\|$ flips the $1$ correct\\
 We now calculate the massage $m_t$ for $t \in \{0,6,\dots,15\} $. For this we use the reverse md5 function:
 \begin{align*}
-    m_t = RR \left( Q_{t+1} - Q_t , RC_t\right) - f_t \left( Q_t, Q_{t-1}, Q_{t-2} \right) - Q_{t-3} - AC
+    m_t = RR \left( Q_{t+1} - Q_t , RC_t\right) - f_t \left( Q_t, Q_{t-1}, Q_{t-2} \right) - Q_{t-3} - AC(t)
 \end{align*}
 \hfill
 \newpage

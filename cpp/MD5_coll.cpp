@@ -112,12 +112,42 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
 		reverse_md5(block, 14, AC(14), RC(14)); 
 		reverse_md5(block, 15, AC(15), RC(15)); 
 
-        for (int t = 17; t <= 21; t++) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
+        //preparation for next calculations
+        uint32 q_2;
+        uint32 q_17;
+        uint32 q_18;
+        uint32 q_19;
+        uint32 q_20;
+        bool progress = false;
+        while (!progress) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
         {
             // we try to pick a Q_17 that Q18 ..Q21 can be calculated with Q17 and fulfill their conidtions
-            // calc m_1 at t = 16 with reversestep pp.
+            q_17 = ((rand() & 0x3ffd7ff7) | (Q[16] & 0xc0008008)) ^ 0x40000000;
+            q_18 = step_foward(17,W(block,17));
+    	    if (0x00020000 != ((q_18 ^ q_17) & 0xa0020000)){
+                q_19 = step_foward(18,W(block,18));
+                if (0x80000000 != (q_19 & 0x80020000)){
+                    q_20 = step_foward(19,W(block,19));;
+                    if (0x00040000 != ((q_20^q_19) & 0x80040000)){
+                        progress = true;
+                    }                    
+                }
+            }
+
+            // calc m_1 at t = 16 with reversestep pp. We can't use the reverse step, since it uses the states of Q based on t, so they would take q_1, q_0, q_-1, q_-2
+            block[1] = RR( q_17 - Q[16 + offset], RC(16)) - f_t(Q[16 + offset], Q[15 + offset], Q[14 + offset], 16 ) - Q[13 + offset] - AC(16) ;//mt = RR (Qt+1 − Qt, RCt) − ft (Qt, Qt−1, Qt−2) − Qt−3 − AC(t)
+
             // calc Q_2 => m_2,m_3,m_4,m_5
+            q_2 = step_foward(1,W(block,1));
+            reverse_md5(block,5,AC(5),RC(5));
             // calc Q_18, .. Q_64 ( Q_64 is at pos Q[64 + offset] = 67, since Q_1 is at Q[0 ... offset ] is the IHV ,the MD5 input )
+
+            if(progress){
+                Q[17 + offset] = q_17;
+                Q[18 + offset] = q_17;
+                Q[19 + offset] = q_17;
+                Q[20 + offset] = q_17;
+            }
 
         }
 

@@ -283,8 +283,6 @@ uint32 step_foward( uint32 t, uint32 W_t) //if Q[] gloab => less
     uint32 T_;
     uint32 R;
     uint32 AC_t;
-    uint32 two_pow32 = (uint32) 4294967296;
-    uint32 absin;
     uint32 offset = 3;
 
     AC_t = AC(t - offset );
