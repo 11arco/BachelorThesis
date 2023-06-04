@@ -113,50 +113,92 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
 		reverse_md5(block, 15, AC(15), RC(15)); 
 
         //preparation for next calculations
+        uint32 q_1;
         uint32 q_2;
         uint32 q_17;
         uint32 q_18;
         uint32 q_19;
         uint32 q_20;
+        uint32 q_21;
+
+        uint32 m_0;
+        uint32 m_1;
+
         bool progress = false;
+
         while (!progress) // as long as we do nor fulfil all bitconds for Q_17 - Q_21
         {
             // we try to pick a Q_17 that Q18 ..Q21 can be calculated with Q17 and fulfill their conidtions
-            q_17 = ((rand() & 0x3ffd7ff7) | (Q[16] & 0xc0008008)) ^ 0x40000000;
-            q_18 = step_foward(17,W(block,17));
-    	    if (0x00020000 != ((q_18 ^ q_17) & 0xa0020000)){
-                q_19 = step_foward(18,W(block,18));
+            // we can't use stepforward since we havent past the vlaues in Q[t]
+            q_1 = (0x02020801 | (Q[offset + 0] & 0x80000000) ) | (rand() & 0x7dfdf7be);
+            m_1 = Q[offset + 2] - q_1;
+            q_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset +13] + AC(16)+ m_1;
+            q_17 = RL(Q[17], RC(17));
+            q_17 += Q[offset + 16];
+            if(true);
+            q_18 = f_t(q_17, Q[offset + 16], Q[offset + 15], 17) + Q[offset + 14] + AC(17) + block[6];
+            q_18 = RL(q_18, RC(18));
+            q_18 += q_17; 
+    	    if (0x00020000 != ((q_18 ^ q_17) & 0xa0020000)){ // nesting probably better than: while (true) - maybe not ..
+                q_19 = f_t( Q[offset + 18], Q[offset + 17],Q[offset + 16], 18) + Q[offset + 15] + AC(18) +  block[11];
+                q_19 = RL(q_19, RC(19));
+                q_19 += q_18;
                 if (0x80000000 != (q_19 & 0x80020000)){
-                    q_20 = step_foward(19,W(block,19));;
+                    m_0 = Q[1 + offset] -Q[0 + offset];
+                    m_0 = RR(m_0, RC(0)) - f_t(Q[0 + offset],Q[offset - 1], Q[ offset - 2], 0) + Q[offset - 3] + AC(0);
+                    q_20 = f_t(q_19, q_18,q_17,19) + Q[16 + offset] + AC(19) + m_0;
+                    q_20 = RL(q_20,RC(20));
+                    q_20 += q_19;
                     if (0x00040000 != ((q_20^q_19) & 0x80040000)){
-                        progress = true;
+                        progress = true; // go on
                     }                    
                 }
-            }
-
-            // calc m_1 at t = 16 with reversestep pp. We can't use the reverse step, since it uses the states of Q based on t, so they would take q_1, q_0, q_-1, q_-2
-            block[1] = RR( q_17 - Q[16 + offset], RC(16)) - f_t(Q[16 + offset], Q[15 + offset], Q[14 + offset], 16 ) - Q[13 + offset] - AC(16) ;//mt = RR (Qt+1 − Qt, RCt) − ft (Qt, Qt−1, Qt−2) − Qt−3 − AC(t)
-
-            // calc Q_2 => m_2,m_3,m_4,m_5
-            q_2 = step_foward(1,W(block,1));
-            reverse_md5(block,5,AC(5),RC(5));
-            // calc Q_18, .. Q_64 ( Q_64 is at pos Q[64 + offset] = 67, since Q_1 is at Q[0 ... offset ] is the IHV ,the MD5 input )
-
-            if(progress){
+            }      
+            if(progress)
+            {
+                Q[1 + offset] = q_1;
                 Q[17 + offset] = q_17;
-                Q[18 + offset] = q_17;
-                Q[19 + offset] = q_17;
-                Q[20 + offset] = q_17;
+                Q[18 + offset] = q_18;
+                Q[19 + offset] = q_19;
+                Q[20 + offset] = q_20;
+            
+                // block m_1
+                block[0] = m_0;
+                block[1] = m_1;
+
+                reverse_md5(block,5,AC(5),RC(5));
+                // calc Q_21
+                reverse_md5(block, 5, AC(5),RC(5));
+                q_21 = f_t(q_20, q_19,q_18,20) + Q[17 + offset] + AC(20) + block[5];
+                q_21 = RL(21,RC(21));
+                q_21 += q_20;
+                if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000)){
+                    Q[offset + 21] = q_21;	
+                }
+                else
+                {
+                    progress = false;
+                }
+                
             }
-
         }
+        //preparation for next calculations
+        uint32 q_9 = Q[offset + 9];
+        uint32 q_10 = Q[offset + 10];
+        reverse_md5(block, 2, AC(2), RC(2));
+        reverse_md5(block, 3, AC(3), RC(3));
+        reverse_md5(block, 4, AC(4), RC(4));
+        reverse_md5(block, 7, AC(7), RC(7));
 
+
+
+        //loop over all pos. Q_9 - Q_10 conds so m_11 does not change:
         while (true)
         {
-            // use tunnels
-            // calc m_8, ...
-            // clac Q_22, ...
-            // Verify conds
+            // calc m_8, ..., m_13
+            // clac Q_22, ..., Q_64
+            // Verify conds on Q_22, .., Q_64, T_22, T_34 and IHV-conds for netxt block
+            // stop if aöö conds are sat and a near coll. is verified
         }
 
     }
@@ -166,9 +208,12 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
 
 
 void find_coll(uint32 md5[4]) // MD5 is the IV or IHV, the names are not correct yet
-{
+{   
+    uint32 block_0[16];
+    uint32 block_1[16];
 
-    // find block 0
+
+    find_block0(block_0, ihv);
     //  -compress
     // find blcok 1
     //  -compress
