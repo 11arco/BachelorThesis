@@ -94,17 +94,17 @@ Something\\
 There are multiple approaches to find the first block, Stevens used in his code five. Four written by himself.
 They all have similarities, especially in the beginnings. 
 The first \textit{find-first-block} algorithm though, is the algorithm by Wang. His additional algorithms are "just" improvements, if the algorithm of Wang does not success.
-Since the similarities we only go in Wangs algorithm with a deeper view and explain some improvements eventually.\\
+Since the similarities we only go in Wang's algorithm with a deeper view and explain some improvements eventually.\\
 The question: "\textit{If there are "better" algorithms by Stevens, why start with Wang's anyway?}" may come up, yet we have to clarify what better could. The algorithm of Wang is quite efficient, but also in very minimalistic. 
 The quote I have to check is, \textit{if the code by Wang finds a first block, it is in the most efficient way}, but it does not always find a first block were some is.
 So using the algorithm by Wang as a first search algorithm, may increases our performance. It is also an more easy way to implement working code, since the algorithms of Stevens tend to be more complex, 
-but also building up on Wangs.\\ 
+but also building up on Wang's.\\ 
 The first 16 Qs can be chosen arbitrary, as long as we fulfill the conditions.
 Stevens does this by generating really good random values.
 After this he alters the random values so thy fulfill conditions.
-We follow Stevens appoache but genereate "normal" random values and alter these so they fullfill the condidtions
-Improvement for rng is possible. \\
-Example for Stevens bit manipulation for $Q_t$ mit $t = 3$ :\\
+We follow Stevens approach but generate "normal" random values and alter these so they fulfill the conditions
+Improvements for random number generation are possible. \\
+Example for Stevens bit manipulation for $Q_t$ with $t = 3$ :\\
 \\
 $1.$ the val to set the zeros (bitwise-and with $0xfe87bc3f$)\\
 $2.$ the val to set the ones ( bitwise-or with $0x017841c0$)\\
