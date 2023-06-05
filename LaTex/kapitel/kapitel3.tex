@@ -70,14 +70,16 @@ Additional we need the rotation constant $RC$ for each $t$.
 In general we begin with the $f_t$ since we want $f_t$ to be in a particular state.
 Since we want to avoid a carries in our calculation 
 
-
-\begin{align*}
-    \delta F_t &= f \left( Q'_t,Q'_{t-1},Q'_{t-2} \right) \\
-    \delta T_t &= \delta F_t + \delta  Q'_{t-3} + \delta W_t \\
-    \delta R_t &=  RL \left(T'_t,RC_t \right) - RL \left(T_t,RC_t \right)\\
-    \delta Q_{t+1} &= \delta Q_t + \delta R_t
-\end{align*}
-
+\begin{figure}
+    \begin{align*}
+        \delta F_t &= f \left( Q'_t,Q'_{t-1},Q'_{t-2} \right) \\
+        \delta T_t &= \delta F_t + \delta  Q'_{t-3} + \delta W_t \\
+        \delta R_t &=  RL \left(T'_t,RC_t \right) - RL \left(T_t,RC_t \right)\\
+        \delta Q_{t+1} &= \delta Q_t + \delta R_t
+    \end{align*}
+    \caption[short]{Add difference}
+    \label{md5delta}
+\end{figure}
 
 \begin{enumerate}
     \item $t \in \{0,1,2,3\}$:\\
@@ -86,27 +88,34 @@ Since we want to avoid a carries in our calculation
     $\Delta T_4 = -2^{31}$, because we must not have a carry, we \textit{lock} the last bit.
     Since  $RL(T_4, RC_4) = RL(-2^{31}, 7) = -2^6 $ and $\delta Q_4 = 0 \Rightarrow  \delta Q_5 = -2^6$  
 \end{enumerate}
-
+Something\\
+\newpage
 \section{About Code}
-The first 16 Qs can be choosen abretary, as long as we fullfill the conditions.\\
-Stevens does this by generating really good ramdom values.
-After this he alters the random values so thy fullfill conditions.
-We follow Stevens appoache but genereate "normal" random vlaues and alter these so they fullfill the condidtions
+There are multiple approaches to find the first block, Stevens used in his code five. Four written by himself.
+They all have similarities, especially in the beginnings. 
+The first \textit{find-first-block} algorithm though, is the algorithm by Wang. His additional algorithms are "just" improvements, if the algorithm of Wang does not success.
+Since the similarities we only go in Wangs algorithm with a deeper view and explain some improvements eventually.\\
+The question: "\textit{If there are "better" algorithms by Stevens, why start with Wang's anyway?}" may come up, yet we have to clarify what better could. The algorithm of Wang is quite efficient, but also in very minimalistic. 
+The quote I have to check is, \textit{if the code by Wang finds a first block, it is in the most efficient way}, but it does not always find a first block were some is.
+So using the algorithm by Wang as a first search algorithm, may increases our performance. It is also an more easy way to implement working code, since the algorithms of Stevens tend to be more complex, 
+but also building up on Wangs.\\ 
+The first 16 Qs can be chosen arbitrary, as long as we fulfill the conditions.
+Stevens does this by generating really good random values.
+After this he alters the random values so thy fulfill conditions.
+We follow Stevens appoache but genereate "normal" random values and alter these so they fullfill the condidtions
 Improvement for rng is possible. \\
 Example for Stevens bit manipulation for $Q_t$ mit $t = 3$ :\\
-Bit condition for $Q_t | t =3$ :\\
 \\
-$1.$ the val to set the zeros (and with 0xfe87bc3f)\\
-$2.$ the val to set the ones ( or with $0x017841c0$)\\
+$1.$ the val to set the zeros (bitwise-and with $0xfe87bc3f$)\\
+$2.$ the val to set the ones ( bitwise-or with $0x017841c0$)\\
 $3.$ the new bit Conds\\
 $4.$ the old bit Conds
 
-
 \begin{align*}    
-    1.& \& & 11111110 & & 10000111 & & 10111100 & & 00111111 & & 0xfe87bc3f \\
-    2.& \| & 00000001 & & 01111000 & & 01000001 & & 11000000 & & 0x017841c0 \\
-    3.&    & ........ & & .1111... & & .1....01 & & 11...... & &  \\
-    4.&    & ........ & & ....0... & & ....0... & & .0...... & &  
+    1.& \text{ AND} & 11111110 & & 10000111 & & 10111100 & & 00111111 & & 0xfe87bc3f \\
+    2.& \text{ OR}  & 00000001 & & 01111000 & & 01000001 & & 11000000 & & 0x017841c0 \\
+    3.&             & ........ & & .1111... & & .1....01 & & 11...... & &  \\
+    4.&             & ........ & & ....0... & & ....0... & & .0...... & &  
 \end{align*}
 
   the $\&$ flips the $0$ correct, the $\|$ flips the $1$ correct\\
@@ -114,8 +123,7 @@ We now calculate the massage $m_t$ for $t \in \{0,6,\dots,15\} $. For this we us
 \begin{align*}
     m_t = RR \left( Q_{t+1} - Q_t , RC_t\right) - f_t \left( Q_t, Q_{t-1}, Q_{t-2} \right) - Q_{t-3} - AC(t)
 \end{align*}
-\hfill
-\newpage
+This function comes up by simply processing the MD5 sum \ref{md5sum} backwards.
 We try to pick a $Q_{17}$ that $Q_{18}, \dots, Q_{21}$ can be calculated with $Q_{17},\dots,Q_{15}$ and fulfill their conditions. 
 We can solve this by looping about the calculation as long as the conditions are not fulfilled and then brake. Note: we may calculate the values in temp variable before pasting them into the actual $Q$.\\
 \begin{wrapfigure}[]{r}{0.4\textwidth}
@@ -146,10 +154,7 @@ We can solve this by looping about the calculation as long as the conditions are
         \node[draw] at (8.75,20) {\normalsize 0x80000000 };
         \node[draw] at (8.75,18) {\normalsize 0x00040000 };
         \node[draw] at (8.75,16) {\normalsize 0x80020000 };
-
-
-        \end{tikzpicture}
-    
+        \end{tikzpicture}    
     \label{demepndeces}
 \end{wrapfigure}
 For a good pick for $Q_{17}$ we just generate a random value and force the conditions manual.

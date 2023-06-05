@@ -22,3 +22,14 @@ As mention before, we can describe the MD5 hash algorithm in four steps.
 The implementation of the padding is the least interesting, yet there are many mistakes one can make.
 To archive an adequate comparison we need build simply ignore the process of padding and pretend to expect the padding to be done, even thou we do it ourselves.
 The processing step is were the codes vary the most. Stevens works a lot with global variables. All in all his code is extremely optimized for performance.
+The MD5 sum is build up like:\\
+\begin{figure}
+    \begin{align*}
+        F_t &= f \left( Q'_t,Q'_{t-1},Q'_{t-2} \right) \\
+        T_t &=  F_t + Q'_{t-3} +  W_t \\
+        R_t &=  RL \left(T'_t,RC_t \right) \\
+        Q_{t+1} &=  Q_t +  R_t
+    \end{align*}
+    \caption[short]{MD5 sum}
+\label{md5sum}
+\end{figure}

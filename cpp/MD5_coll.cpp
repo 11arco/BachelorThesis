@@ -156,43 +156,44 @@ uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, 
             }      
             if(progress)
             {
-                Q[1 + offset] = q_1;
+                block[1] = q_17 - Q[16]; 
+                block[1] = RR(block[1], AC(1)); 
+                block[1] -=f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset + 13] + AC(16); 
+                q_2 = block[1] + f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + Q[offset - 2] + AC(1); 
+                q_2 = RL(q_2, RC(2)); 
+                q_2 += Q[offset + 1];
+                block[5] = RR(Q[offset + 6] - Q[offset + 5], 12) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3],5) - AC(5) - q_2;
+
+                Q[2 + offset] = q_2;
                 Q[17 + offset] = q_17;
                 Q[18 + offset] = q_18;
                 Q[19 + offset] = q_19;
                 Q[20 + offset] = q_20;
+
+                reverse_md5(block, 2, AC(2), RC(2));
             
                 // block m_1
-                block[0] = m_0;
-                block[1] = m_1;
-
-                reverse_md5(block,5,AC(5),RC(5));
+                /*block[0] = m_0;
+                *block[1] = m_1;
+                *
+                *reverse_md5(block,5,AC(5),RC(5));
                 // calc Q_21
-                reverse_md5(block, 5, AC(5),RC(5));
-                q_21 = f_t(q_20, q_19,q_18,20) + Q[17 + offset] + AC(20) + block[5];
-                q_21 = RL(21,RC(21));
-                q_21 += q_20;
-                if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000)){
-                    Q[offset + 21] = q_21;	
-                }
-                else
-                {
-                    progress = false;
-                }
-                
+                *reverse_md5(block, 5, AC(5),RC(5));
+                *q_21 = f_t(q_20, q_19,q_18,20) + Q[17 + offset] + AC(20) + block[5];
+                *q_21 = RL(21,RC(21));
+                *q_21 += q_20;
+                *if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000)){
+                *    Q[offset + 21] = q_21;	
+                *}
+                *else
+                *{
+                *    progress = false;
+                *}
+                */
             }
         }
         //preparation for next calculations
-        uint32 q_9 = Q[offset + 9];
-        uint32 q_10 = Q[offset + 10];
-        reverse_md5(block, 2, AC(2), RC(2));
-        reverse_md5(block, 3, AC(3), RC(3));
-        reverse_md5(block, 4, AC(4), RC(4));
-        reverse_md5(block, 7, AC(7), RC(7));
 
-
-
-        //loop over all pos. Q_9 - Q_10 conds so m_11 does not change:
         while (true)
         {
             // calc m_8, ..., m_13
