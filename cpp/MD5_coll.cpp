@@ -20,10 +20,129 @@ int collsion_search_algorithm()
 
     return 0;
 }
-
-
-uint32* find_block0(uint32 block [16], uint32 IHV[4] ) // MD5 is the IV or IHV, the names are not correct yet
+uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
 {
+    bool progress = false;
+    uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
+    uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
+
+    while (true) //meh
+	{
+		uint32 aa = Q[offset] & 0x80000000;
+		uint32 bb = 0x80000000 ^ aa;
+
+		Q[offset + 2] = (rand() & 0x71de7799) | 0x0c008840 | bb;
+		Q[offset + 3] = (rand() & 0x01c06601) | 0x3e1f0966 | (Q[offset + 2] & 0x80000018);
+		Q[offset + 4] = 0x3a040010 | (Q[offset + 3] & 0x80000601);
+		Q[offset + 5] = (rand() & 0x03c0e000) | 0x482f0e50 | aa;
+		Q[offset + 6] = (rand() & 0x600c0000) | 0x05e2ec56 | aa;
+		Q[offset + 7] = (rand() & 0x604c203e) | 0x16819e01 | bb | (Q[offset + 6] & 0x01000000);
+		Q[offset + 8] = (rand() & 0x604c7c1c) | 0x043283e0 | (Q[offset + 7] & 0x80000002);
+		Q[offset + 9] =  (rand() & 0x00002800) | 0x1c0101c1 | (Q[offset + 8] & 0x80001000);
+		Q[offset + 10] = 0x078bcbc0 | bb;
+		Q[offset + 11] = (rand() & 0x07800000) | 0x607dc7df | bb;
+		Q[offset + 12] = (rand() & 0x00f00f7f) | 0x00081080 | (Q[offset + 11] & 0xe7000000);
+		Q[offset + 13] = (rand() & 0x00701f77) | 0x3f0fe008 | aa;
+		Q[offset + 14] = (rand() & 0x00701f77) | 0x408be088 | aa;
+		Q[offset + 15] = (rand() & 0x00ff3ff7) | 0x7d000000;
+		Q[offset + 16] = (rand() & 0x4ffdffff) | 0x20000000 | (~Q[offset + 15] & 0x00020000);
+	    
+		reverse_md5(block,5, AC(5), RC(5));
+		reverse_md5(block,6, AC(6), RC(6));
+		reverse_md5(block,7, AC(22), RC(7));
+		reverse_md5(block,11, AC(11), RC(11));
+		reverse_md5(block,14, AC(14), RC(14));
+		reverse_md5(block,15, AC(15), RC(15));
+
+        // prerparing next values for active work
+        uint32 q_1;
+        uint32 q_2;
+        uint32 q_17;
+        uint32 q_18;
+        uint32 q_19;
+        uint32 q_20;
+        uint32 q_21;
+
+        uint32 m_0;
+        uint32 m_1;
+
+
+        while(!progress)
+        {
+            // we try to pick a Q_17 that Q18 ..Q21 can be calculated with Q17 and fulfill their conidtions
+            // we can't use stepforward since we havent past the vlaues in Q[t]
+            q_1 = (0x01c0e71f | (Q[offset + 2] & 0xf01e1080) ) | (rand() & 0x01c0e71f); 
+            m_1 = Q[offset + 2] - q_1;
+            m_1 = RR(m_1,RC(1)) - f_t(Q[offset + 1], Q[offset + 0], Q[offset -1], 1) - Q[offset -2] + AC(1);
+
+            q_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset +13] + AC(16)+ m_1;
+            q_17 = RL(Q[17], RC(17));
+            q_17 += Q[offset + 16];
+            if (0x40000000 != ((q_17 ^ Q[16]) & 0xc0008008)) 
+            {// nesting probably better than: while (true) - maybe not ..
+                if (0 != (q_17 & 0x00020000)) 
+                {
+                    q_18 = f_t( Q[offset + 17], Q[offset + 16],Q[offset + 15], 17) + Q[offset + 14] + AC(17) +  block[6];
+                    q_18 = RL(q_18, RC(18));
+                    q_18 += q_17;
+
+                    if (0x00020000 != ((q_18 ^ q_17) & 0xa0020000))
+                    { 
+                        q_19 = f_t( Q[offset + 18], Q[offset + 17],Q[offset + 16], 18) + Q[offset + 15] + AC(18) +  block[11];
+                        q_19 = RL(q_19, RC(19));
+                        q_19 += q_18;
+                        if (0 != (q_19 & 0x80020000))
+                        {
+                            m_0 = Q[1 + offset] -Q[0 + offset];
+                            m_0 = RR(m_0, RC(0)) - f_t(Q[0 + offset],Q[offset - 1], Q[ offset - 2], 0) + Q[offset - 3] + AC(0);
+                            q_20 = f_t(q_19, q_18,q_17,19) + Q[16 + offset] + AC(19) + m_0;
+                            q_20 = RL(q_20,RC(20));
+                            q_20 += q_19;
+                            if (0x00040000 != ((q_20^q_19) & 0x80040000))
+                            {
+                                progress = true; // go on
+                            }                   
+                        }
+                    }
+                }
+            }
+
+            if (progress) // assures this only happens in the last iteration
+            {
+                Q[2 + offset] = q_2;
+                Q[17 + offset] = q_17;
+                Q[18 + offset] = q_18;
+                Q[19 + offset] = q_19;
+                Q[20 + offset] = q_20;
+                
+                block[0] = m_0;
+                block[1] = m_1;
+            }
+        }        
+    
+
+        reverse_md5(block, 2, AC(2), RC(2));
+        // prerparing next values for active work
+        uint32 q_4 = Q[4];
+        uint32 q_9 = Q[9];
+        uint32 q_10 = Q[10];
+
+        progress = false; // recycling the progress value from the it before
+        while(!progress)
+        {   
+
+            
+        }
+    }
+
+
+}
+
+
+
+uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
+{//MD5 is the IV or IHV, the names are not correct yet
+
     /* 
     * Stevens works a lot with voids, which overwrites varibale on an upper, or even global level.
     * This causes confusion, since we do not know which vale is alterd.
@@ -214,7 +333,7 @@ void find_coll(uint32 md5[4]) // MD5 is the IV or IHV, the names are not correct
     uint32 block_1[16];
 
 
-    find_block0(block_0, ihv);
+    find_block1_Wang(block_0, ihv);
     //  -compress
     // find blcok 1
     //  -compress
