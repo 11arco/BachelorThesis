@@ -126,13 +126,20 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
         uint32 q_4 = Q[4];
         uint32 q_9 = Q[9];
         uint32 q_10 = Q[10];
+        uint32 m_10;
 
         progress = false; // recycling the progress value from the it before
         while(!progress)
         {   
 
-            
+
+        if(progress){
+            block[10] = m_10;
+            Q[offset + 9] = q_9;
+            Q[offset + 10] = q_10;
+            }    
         }
+        reverse_md5(block, 13, AC(13), RC(13));
     }
 
 
