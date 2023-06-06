@@ -66,7 +66,6 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
         uint32 m_0;
         uint32 m_1;
 
-
         while(!progress)
         {
             // we try to pick a Q_17 that Q18 ..Q21 can be calculated with Q17 and fulfill their conidtions
@@ -120,7 +119,6 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
             }
         }        
     
-
         reverse_md5(block, 2, AC(2), RC(2));
         // prerparing next values for active work
         uint32 q_4 = Q[4];
@@ -129,23 +127,30 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
         uint32 m_10;
 
         progress = false; // recycling the progress value from the it before
-        while(!progress)
+
+        // In original equivalent to the following code we Steven's works a lot wit htemp and helper values to minimize the amount of calcuations (I guess), but it also helps to keep an overvie
+        // so we try to find a good midling way, which is quite compact but also understandable without messing up the entire performance.
+        // Some easy understandable helper values were mentioned before (e.g. q_4). Without these the clacuation wouldn't be possible or wrong results were givien as an output.
+        // The following helper values are just only to help in case of overview, perfornace and clarity in code.
+        // Stevens calls the helper Values like aa, bb, tt9, etc. This is hard to read.
+        // We may call the values by there function.
+        uint32 help_cond_Q_21 = Q[offset + 21]; // aa
+        uint32 help_cond_Q_20 = Q[offset + 20]; // bb
+        uint32 help_cond_M_10 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21); // dd
+        help_cond_M_10 = RL(help_cond_M_10, RC(21)) + help_cond_Q_21; // for t = 21 
+        uint32 help_cond_result;
+
+        while(progress)
         {   
+            if (0 != (help_cond_M_10 & 0x80000000))
+            {
+                help_cond_result = Q[offset + 19] + AC(22) + block[15] + f_t(help_cond_M_10, help_cond_Q_21, help_cond_Q_20, 22); // t = 22
 
+            }	
+        }		
 
-        if(progress){
-            block[10] = m_10;
-            Q[offset + 9] = q_9;
-            Q[offset + 10] = q_10;
-            }    
-        }
-        reverse_md5(block, 13, AC(13), RC(13));
     }
-
-
 }
-
-
 
 uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 {//MD5 is the IV or IHV, the names are not correct yet
@@ -206,7 +211,6 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
         *   the & flips the 0 correct, the | flips the 1 correct
         * 
         */
-
 
         // The first 16 Qs can be choosen abretary, as long as we fullfill the conditions.
         // Stevens does this by generating really good ramdom values.
