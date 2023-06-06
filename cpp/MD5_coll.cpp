@@ -7,6 +7,7 @@
 #include <bitset>
 
 #include <cmath>
+#include <vector>
 
 #include "MD5.cpp"
 
@@ -26,6 +27,11 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
     uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
 
+	vector<uint32> q9mask2(1<<10);
+    for (unsigned k = 0; k < q9mask2.size(); ++k)
+    {
+		q9mask2[k] = ((k<<1) ^ (k<<7) ^ (k<<14) ^ (k<<15) ^ (k<<22)) & 0x6074041c;
+    }
     while (true) //meh
 	{
 		uint32 aa = Q[offset] & 0x80000000;
@@ -133,22 +139,44 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
         // Some easy understandable helper values were mentioned before (e.g. q_4). Without these the clacuation wouldn't be possible or wrong results were givien as an output.
         // The following helper values are just only to help in case of overview, perfornace and clarity in code.
         // Stevens calls the helper Values like aa, bb, tt9, etc. This is hard to read.
-        // We may call the values by there function.
+        // We may call the values by there function, at least we try.
         uint32 help_cond_Q_21 = Q[offset + 21]; // aa
         uint32 help_cond_Q_20 = Q[offset + 20]; // bb
-        uint32 help_cond_M_10 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21); // dd
+        uint32 help_cond_M_10 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21); // dd // m_10 somewhere between Q_22 and Q_21
         help_cond_M_10 = RL(help_cond_M_10, RC(21)) + help_cond_Q_21; // for t = 21 
-        uint32 help_cond_result;
+        uint32 help_cond_Q_22;//cc
 
         while(progress)
         {   
             if (0 != (help_cond_M_10 & 0x80000000))
             {
-                help_cond_result = Q[offset + 19] + AC(22) + block[15] + f_t(help_cond_M_10, help_cond_Q_21, help_cond_Q_20, 22); // t = 22
+                help_cond_Q_22 = Q[offset + 19] + AC(22) + block[15] + f_t(help_cond_M_10, help_cond_Q_21, help_cond_Q_20, 22); // t = 22 //  cc
 
+                if (0 != (help_cond_Q_22 & 0x20000)) 
+                {
+                    help_cond_Q_22 =RL(help_cond_Q_22, RC(22)) + help_cond_M_10;
+                    if (0 != (help_cond_Q_22 & 0x80000000)) 
+                    {
+                        help_cond_Q_20 = Q[offset + 20] + AC(23) + block[4] + f_t(help_cond_Q_22, help_cond_M_10, help_cond_Q_21, 22); 
+                        help_cond_Q_20 = RL(help_cond_Q_20, 20) + help_cond_Q_22;
+                        if (0 == (help_cond_Q_20 & 0x80000000)) 
+                        {
+                            block[10] = m_10;
+                            Q[offset + 9] = q_9;
+                            Q[offset + 10] = q_10;
+                            reverse_md5(block,13, AC(13), RC(13));
+
+                        }
+                        for (uint32 k9 = 0; k9 < 1024;)
+				        {       
+                            uint32 IV[4] ={help_cond_Q_21,help_cond_Q_20,help_cond_Q_22,help_cond_M_10};
+                            Q[9] = q_9 ^ q9mask2[k9] ;
+                            k9++;
+                        }
+                    }
+                }
             }	
         }		
-
     }
 }
 
