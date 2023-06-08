@@ -122,6 +122,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
                 
                 block[0] = m_0;
                 block[1] = m_1;
+                reverse_md5(block, 2, AC(2),RC(1));
             }
         }        
     
@@ -145,6 +146,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
         uint32 help_cond_M_10 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21); // dd // m_10 somewhere between Q_22 and Q_21
         help_cond_M_10 = RL(help_cond_M_10, RC(21)) + help_cond_Q_21; // for t = 21 
         uint32 help_cond_Q_22;//cc
+        uint32 t;
 
         while(progress)
         {   
@@ -176,6 +178,71 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
                             reverse_md5(block, 9, AC(9), RC(9));
                             reverse_md5(block, 12, AC(12), RC(12));
 
+                            //doing steps for t \in {24,...,33}
+                            t =24;
+                            precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                            t =25;
+                            precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                            t =26;
+                            precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                            t =27;
+                            precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
+                            t =28;
+                            precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                            t =29;
+                            precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                            t =30;
+                            precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                            t =31;
+                            precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
+                            t =32;
+                            precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                            t =33;
+                            precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                            IV[2] += f_t(IV[3],IV[0],IV[1],34); //t = 34
+
+                            if((IV[2] & (1 << 15)) == 0) // if bit at pos 15 is zero
+                            {
+                                IV[2] = RL(IV[2],16) + IV[3];
+
+                                //doing steps for t \in {35,...,47}
+                                t =35;
+                                precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                t =36;
+                                precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                t =37;
+                                precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                t =38;
+                                precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                t =39;
+                                precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                t =40;
+                                precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                t =41;
+                                precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                t =42;
+                                precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                t =43;
+                                precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                t =44;
+                                precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                t =45;
+                                precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                t =46;
+                                precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                t =47;
+                                precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+
+                                if(IV[1] ^IV[3] == 1)//checks wether IV[1] or IV[3] is 1 at pos.s of 0x80000000 
+
+
+
+
+
+
+
+                            }
                             //md5_compress(); =/
                         }
                     }
@@ -215,7 +282,7 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
         // clac m0 ...
 
         /* 
-        * Bsp für Stevens Werte für Q_t mit t = 3 
+        * Exp. for Stevens vlaues for Q_t with t = 3 
         *   01010101 00110011 00001111 00000000  some Example
         * & 11111110 10000111 10111100 00111111  0xfe87bc3f
         * _________________________________________________  

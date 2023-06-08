@@ -313,10 +313,10 @@ void md5_compress( uint32 block [16])
     uint32 help = 0;
 
     fill_n(Q,68,0);
-    Q[0] = a;
-    Q[1] = d;
-    Q[2] = c;
-    Q[3] = b;
+    Q[0] = a; // !
+    Q[1] = d; // !
+    Q[2] = c; // !
+    Q[3] = b; // !
     for ( int t = 3; t < 67; t++)  
     {   
         Q[t+1] = step_foward((t ),W(block, t-3 ));
