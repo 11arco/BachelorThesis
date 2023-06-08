@@ -172,6 +172,11 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
                             uint32 IV[4] ={help_cond_Q_21,help_cond_Q_20,help_cond_Q_22,help_cond_M_10};
                             Q[9] = q_9 ^ q9mask2[k9] ;
                             k9++;
+                            reverse_md5(block, 8, AC(8), RC(80));
+                            reverse_md5(block, 9, AC(9), RC(9));
+                            reverse_md5(block, 12, AC(12), RC(12));
+
+                            //md5_compress(); =/
                         }
                     }
                 }

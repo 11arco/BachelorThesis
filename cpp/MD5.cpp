@@ -274,28 +274,33 @@ void reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
 	block[t] = RR(block[t], RC) - f_t(Q[offset + t], Q[offset + t - 1], Q[offset + t - 2], t) - Q[offset + t - 3] - AC ;
 }
 
-
-
-
-uint32 step_foward( uint32 t, uint32 W_t) //if Q[] gloab => less 
+uint32 precise_step_foward(uint32 t, uint32 r, uint32 q_2, uint32 q_1, uint32 q_0, uint32 w_t,uint32 ac, uint32 rc )
 {
-    uint32 F;
-    uint32 T_;
-    uint32 R;
-    uint32 AC_t;
+    // q_0 = Q[t-0]; q_1 = Q[t-1] ..
+    r += f_t(q_0,q_1,q_2, t) + ac + w_t;
+    r = RL(r, rc) + q_0;
+    return r;
+
+}
+
+         
+uint32 step_foward( uint32 t, uint32 w_t) //if Q[] gloab => less 
+{
+    uint32 R = Q[t - 3];
     uint32 offset = 3;
 
-    AC_t = AC(t - offset );
-    F = f_t( Q[t], Q[t - 1], Q[t - 2], (t - offset));
-    T_ = F + Q[t - 3] + AC_t + W_t;
-    R = RL(T_, RC(t - offset)) ;        
+    /*AC_t = AC(t - offset );
+    *F = f_t( Q[t], Q[t - 1], Q[t - 2], (t - offset));
+    *T_ = F + Q[t - 3] + AC_t + W_t;
+    *R = RL(T_, RC(t - offset)) ;        
+    */
 
+    R = precise_step_foward(t - offset,R, Q[t - 2], Q[t - 1], Q[t ], w_t, AC(t - offset), RC(t - offset));
     if(t<10) cout<<" ";                     //debug
     cout << " R_" + to_string(t) + ": ";    //debug
     cout << bitset<32>(R) << endl;          //debug
 
-    return  R + (uint32) Q[t]; //altering the state of Q[t+1]
-
+    return  R; //altering the state of Q[t+1]
 }
 
 void md5_compress( uint32 block [16])   
@@ -312,7 +317,6 @@ void md5_compress( uint32 block [16])
     Q[1] = d;
     Q[2] = c;
     Q[3] = b;
-
     for ( int t = 3; t < 67; t++)  
     {   
         Q[t+1] = step_foward((t ),W(block, t-3 ));
