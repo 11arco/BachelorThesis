@@ -21,6 +21,57 @@ int collsion_search_algorithm()
 
     return 0;
 }
+
+uint32 find_block0(uint32 block[16], uint32 IHV[4])
+{
+    bool progress = false;
+    uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
+    uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
+
+	vector<uint32> q9mask2(1<<10);
+    for (unsigned k = 0; k < q9mask2.size(); ++k)
+    {
+
+		q9mask2[k] = ((k<<1) ^ (k<<7) ^ (k<<14) ^ (k<<15) ^ (k<<22)) & 0x6074041c;
+
+    }
+
+    while (true) //meh
+	{
+		Q[offset + 1] = rand();
+		Q[offset + 3] = (rand() & 0xfe87bc3f) | 0x3e1f0966;
+        // #todo()
+		Q[offset + 4] = 0x3a040010 | (Q[offset + 3] & 0x80000601);
+		Q[offset + 5] = (rand() & 0x03c0e000) | 0x482f0e50 ;
+		Q[offset + 6] = (rand() & 0x600c0000) | 0x05e2ec56 ;
+		Q[offset + 7] = (rand() & 0x604c203e) | 0x16819e01 | (Q[offset + 6] & 0x01000000);
+		Q[offset + 8] = (rand() & 0x604c7c1c) | 0x043283e0 | (Q[offset + 7] & 0x80000002);
+		Q[offset + 9] =  (rand() & 0x00002800) | 0x1c0101c1 | (Q[offset + 8] & 0x80001000);
+		Q[offset + 10] = 0x078bcbc0 ;
+		Q[offset + 11] = (rand() & 0x07800000) | 0x607dc7df ;
+		Q[offset + 12] = (rand() & 0x00f00f7f) | 0x00081080 | (Q[offset + 11] & 0xe7000000);
+		Q[offset + 13] = (rand() & 0x00701f77) | 0x3f0fe008 ;
+		Q[offset + 14] = (rand() & 0x00701f77) | 0x408be088 ;
+		Q[offset + 15] = (rand() & 0x00ff3ff7) | 0x7d000000;
+		Q[offset + 16] = (rand() & 0x4ffdffff) | 0x20000000 | (~Q[offset + 15] & 0x00020000);
+	    
+		reverse_md5(block,0, AC(0), RC(0));
+		reverse_md5(block,6, AC(6), RC(6));
+		reverse_md5(block,7, AC(22), RC(7));
+		reverse_md5(block,11, AC(11), RC(11));
+		reverse_md5(block,14, AC(14), RC(14));
+		reverse_md5(block,15, AC(15), RC(15));
+
+        // prerparing next values for active work
+        uint32 q_1;
+
+
+
+    }
+
+}
+
+
 uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
 {
     bool progress = false;
@@ -34,22 +85,19 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
     }
     while (true) //meh
 	{
-		uint32 aa = Q[offset] & 0x80000000;
-		uint32 bb = 0x80000000 ^ aa;
-
-		Q[offset + 2] = (rand() & 0x71de7799) | 0x0c008840 | bb;
+		Q[offset + 2] = (rand() & 0x71de7799) | 0x0c008840 | (0x80000000 ^ Q[offset] & 0x80000000);
 		Q[offset + 3] = (rand() & 0x01c06601) | 0x3e1f0966 | (Q[offset + 2] & 0x80000018);
 		Q[offset + 4] = 0x3a040010 | (Q[offset + 3] & 0x80000601);
-		Q[offset + 5] = (rand() & 0x03c0e000) | 0x482f0e50 | aa;
-		Q[offset + 6] = (rand() & 0x600c0000) | 0x05e2ec56 | aa;
-		Q[offset + 7] = (rand() & 0x604c203e) | 0x16819e01 | bb | (Q[offset + 6] & 0x01000000);
+		Q[offset + 5] = (rand() & 0x03c0e000) | 0x482f0e50 | (Q[offset] & 0x80000000);
+		Q[offset + 6] = (rand() & 0x600c0000) | 0x05e2ec56 | (Q[offset] & 0x80000000);
+		Q[offset + 7] = (rand() & 0x604c203e) | 0x16819e01 | (0x80000000 ^ Q[offset] & 0x80000000) | (Q[offset + 6] & 0x01000000);
 		Q[offset + 8] = (rand() & 0x604c7c1c) | 0x043283e0 | (Q[offset + 7] & 0x80000002);
 		Q[offset + 9] =  (rand() & 0x00002800) | 0x1c0101c1 | (Q[offset + 8] & 0x80001000);
-		Q[offset + 10] = 0x078bcbc0 | bb;
-		Q[offset + 11] = (rand() & 0x07800000) | 0x607dc7df | bb;
+		Q[offset + 10] = 0x078bcbc0 | (0x80000000 ^ Q[offset] & 0x80000000);
+		Q[offset + 11] = (rand() & 0x07800000) | 0x607dc7df | (0x80000000 ^ Q[offset] & 0x80000000);
 		Q[offset + 12] = (rand() & 0x00f00f7f) | 0x00081080 | (Q[offset + 11] & 0xe7000000);
-		Q[offset + 13] = (rand() & 0x00701f77) | 0x3f0fe008 | aa;
-		Q[offset + 14] = (rand() & 0x00701f77) | 0x408be088 | aa;
+		Q[offset + 13] = (rand() & 0x00701f77) | 0x3f0fe008 | (Q[offset] & 0x80000000);
+		Q[offset + 14] = (rand() & 0x00701f77) | 0x408be088 | (Q[offset] & 0x80000000);
 		Q[offset + 15] = (rand() & 0x00ff3ff7) | 0x7d000000;
 		Q[offset + 16] = (rand() & 0x4ffdffff) | 0x20000000 | (~Q[offset + 15] & 0x00020000);
 	    
@@ -541,18 +589,13 @@ void find_coll(uint32 md5[4]) // MD5 is the IV or IHV, the names are not correct
     uint32 block_0[16];
     uint32 block_1[16];
 
-
-    find_block1_Wang(block_0, ihv);
-    //  -compress
-    // find blcok 1
-    //  -compress
-    // manipulate
-
-
+    find_block0(block_0, ihv);
+    find_block1_Wang(block_1, ihv);
 
 
 
 }
+
     // determine bitconditions ( q_i )|_ i = -3 ^ 0
     // generate partial lower diff path 
     // generate partial upper diff path
