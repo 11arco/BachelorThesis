@@ -12,7 +12,7 @@
 #include "MD5.cpp"
 
 
-int collsion_search_algorithm()
+/* int collsion_search_algorithm()
 {
     srand(std::time(nullptr));
     uint32 M_0 = rand() ^ rand();
@@ -20,7 +20,7 @@ int collsion_search_algorithm()
     cout << M_0;
 
     return 0;
-}
+} */
 
 uint32 find_block0(uint32 block[16], uint32 IHV[4])
 {
@@ -40,20 +40,19 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 	{
 		Q[offset + 1] = rand();
 		Q[offset + 3] = (rand() & 0xfe87bc3f) | 0x3e1f0966;
-        // #todo()
-		Q[offset + 4] = 0x3a040010 | (Q[offset + 3] & 0x80000601);
-		Q[offset + 5] = (rand() & 0x03c0e000) | 0x482f0e50 ;
-		Q[offset + 6] = (rand() & 0x600c0000) | 0x05e2ec56 ;
-		Q[offset + 7] = (rand() & 0x604c203e) | 0x16819e01 | (Q[offset + 6] & 0x01000000);
-		Q[offset + 8] = (rand() & 0x604c7c1c) | 0x043283e0 | (Q[offset + 7] & 0x80000002);
-		Q[offset + 9] =  (rand() & 0x00002800) | 0x1c0101c1 | (Q[offset + 8] & 0x80001000);
-		Q[offset + 10] = 0x078bcbc0 ;
-		Q[offset + 11] = (rand() & 0x07800000) | 0x607dc7df ;
-		Q[offset + 12] = (rand() & 0x00f00f7f) | 0x00081080 | (Q[offset + 11] & 0xe7000000);
-		Q[offset + 13] = (rand() & 0x00701f77) | 0x3f0fe008 ;
-		Q[offset + 14] = (rand() & 0x00701f77) | 0x408be088 ;
-		Q[offset + 15] = (rand() & 0x00ff3ff7) | 0x7d000000;
-		Q[offset + 16] = (rand() & 0x4ffdffff) | 0x20000000 | (~Q[offset + 15] & 0x00020000);
+		Q[offset + 4] = (rand() & 0x44000033)| 0x000002c0 | (Q[offset + 3] & 0x0287bc00);
+		Q[offset + 5] =  0x41ffffc8 | (Q[offset + 4] & 0x04000033);
+		Q[offset + 6] = 0xb84b82d6;
+		Q[offset + 7] = (rand() & 0x68000084) | 0x02401b43;
+		Q[offset + 8] = (rand() & 0x2b8f6e04) | 0x005090d3 | (~Q[offset + 7] & 0x40000000);
+		Q[offset + 9] =  0x20040068 | (Q[offset + 8] & 0x00020000) | (~Q[offset + 8] & 0x40000000);
+		Q[offset + 10] = (rand() & 0x40000000) | 0x1040b089;
+		Q[offset + 11] = (rand() & 0x10408008) | 0x0fbb7f16 | (~Q[offset + 10] & 0x40000000);
+		Q[offset + 12] = (rand() & 0x1ed9df7f) | 0x00022080 | (~Q[offset + 11] & 0x40200000);
+		Q[offset + 13] = (rand() & 0x5efb4f77) | 0x20049008;
+		Q[offset + 14] = (rand() & 0x1fff5f77) | 0x0000a088 | (~Q[offset + 13] & 0x40000000);
+		Q[offset + 15] = (rand() & 0x5efe7ff7) | 0x80008000 | (~Q[offset + 14] & 0x00010000);
+		Q[offset + 16] = (rand() & 0x1ffdffff) | 0xa0000000 | (~Q[offset + 15] & 0x40020000);
 	    
 		reverse_md5(block,0, AC(0), RC(0));
 		reverse_md5(block,6, AC(6), RC(6));
@@ -62,17 +61,76 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 		reverse_md5(block,14, AC(14), RC(14));
 		reverse_md5(block,15, AC(15), RC(15));
 
+        // prepare some helper values which are not necassery, but useful
+        // we refer to the T_t state of the MD5 sum without the word (W_t), when speaking about t_t
+        // sometimes the helper value is having the word (W-t) but not Funktion (f_t)
+        // it apperars to be seölected arbritary, how the t_t values are selected. We may proofe this later and find a solution that applies genreally.
+        // F_t = f_t(Q[t]], Q[t−1], Q[t−2], t) ,
+        // T_t = F_t + Q[t−3} + AC_t + W_t ,
+        // in general
+        uint32 t_1 = f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + AC(1);
+        uint32 t_5 = f_t(Q[offset + 6], Q[offset + 5], 12, 6) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], AC(5)); // RC(6) = 12 but why?
+
+        uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + AC(16);
+        uint32 t_18 = Q[offset + 14] + 0xc040b340 + W(block, 17);// why called t_18 t = 17 ?
+        uint32 t_19 = Q[offset + 15] + 0x265e5a51 + W(block, 18);// why called t_19 t = 18 ?
+        uint32 t_20 = Q[offset + 16] + 0xe9b6c7aa + W(block, 19);// why called t_20 t = 19 ?
+
         // prerparing next values for active work
-        uint32 q_1;
+        uint32 q_2;
+        uint32 q_16;
+        uint32 q_17;
+        uint32 q_18;
+        uint32 q_19;
+        uint32 q_20;
+        uint32 q_21;
 
+        bool something = true;
+        while( something )
+        {
+            q_16 = Q[offset + 16];
+			q_17 = ((rand() & 0x3ffd7ff7) | (q_16 & 0xc0008008)) ^ 0x40000000;
 
+			q_18 = f_t(q_17, q_16, Q[offset + 15],17) + t_18;
+			q_18 = RL(q_18, 9); 
+            q_18 += q_17;
+			if (0x00020000 != ((q_18 ^ q_17)&0xa0020000))
+            {
 
+                 q_19 = f_t(q_18, q_17, q_16, 18 + t_19);
+                q_19 = RL(q_19, 14); 
+                q_19 += q_18;
+                if (0x80000000 != (q_19 & 0x80020000))
+                {
+                     q_20 = f_t(q_19, q_18, q_17, 19) + t_20;
+                    q_20 = RL(q_20, 20); 
+                    q_20 += q_19;
+                    if (0x00040000 != ((q_20 ^ q_19) & 0x80040000))
+                    {    
+
+                        block[1] = q_17 - q_16;
+                        block[1] = RR(block[1], 5);
+                        block[1] -= t_17;
+                        q_2 = block[1] + t_1;
+                        q_2 = RL(q_2, 12); 
+                        q_2 += Q[offset + 1];
+                        block[5] = t_5 - q_2;
+                    }
+                }
+            }
+        }
+        Q[offset + 2] = q_2;
+        Q[offset + 17] = q_17;
+        Q[offset + 18] = q_18;
+        Q[offset + 19] = q_19;
+        Q[offset + 20] = q_20;
+        reverse_md5(block, 2, AC(2), RC(2));
     }
-
+    return 0;
 }
 
 
-uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
+uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
 {
     bool progress = false;
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
