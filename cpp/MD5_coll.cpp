@@ -156,7 +156,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
 
                 if (0 != (help_cond_Q_22 & 0x20000)) 
                 {
-                    help_cond_Q_22 =RL(help_cond_Q_22, RC(22)) + help_cond_M_10;
+                    help_cond_Q_22 = RL(help_cond_Q_22, RC(22)) + help_cond_M_10;
                     if (0 != (help_cond_Q_22 & 0x80000000)) 
                     {
                         help_cond_Q_20 = Q[offset + 20] + AC(23) + block[4] + f_t(help_cond_Q_22, help_cond_M_10, help_cond_Q_21, 22); 
@@ -234,21 +234,119 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4] )
                                 t =47;
                                 precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
-                                if(IV[1] ^IV[3] == 1)//checks wether IV[1] or IV[3] is 1 at pos.s of 0x80000000 
+                                if((IV[1] ^IV[3]) & 0x80000000 != 1)//checks wether IV[1] or IV[3] is 1 at pos.s of 0x80000000 
+                                {   // dunno how to sove this nicely just copyed it .. for pregress
+                                    // for t = 48 ... 63
+                                    t = 48;
+                                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[0] ^ IV[3]) >> 31)) continue;
+                                    t = 49;
+                                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                                    if (0 == ((IV[1] ^ IV[3]) >> 31)) continue;
+                                    t = 50;
+                                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[0] ^ IV[3]) >> 31)) continue;
+                                    t = 51;
+                                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
+                                    t = 52;
+                                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                                    t = 53;
+                                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[1]^IV[3]) >> 31)) continue;
+                                    t = 54;
+                                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+    
+                                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                                    t = 55;
+                                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
+                                    t = 56;
+                                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                                    t = 57;
+                                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
+                                    t = 58;
+                                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                                    t = 59;
+                                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+
+                                    if (0 == ((IV[1] ^ IV[3]) >> 31)) continue;
+                                    t = 60;
+                                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                                    t = 61;
+                                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
+                                    t = 62;
+                                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+
+                                    if (0 != ((IV[0]^IV[2]) >> 31)) continue;
+                                    t = 63;
+                                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
 
+                                    cout <<"." << flush;
 
+                                    uint32 block2[16];
+                                    uint32 IV1[4];
+                                    uint32 IV2[4];
+                                    for (int t = 0; t < 4; ++t)
+                                    {
+                                        IV1[t] = IV[t];
+                                        IV2[t] = IV[t] + (1 << 31);
+                                    }
+                                    IV2[1] += (1 << 25);
+                                    IV2[2] += (1 << 25);
+                                    IV2[3] += (1 << 25);
 
+                                    for (int t = 0; t < 16; ++t)
+                                    {
+                                        block2[t] = block[t];
+                                    }
+                                    block2[4] += 1<<31;
+                                    block2[11] -= 1<<15;
+                                    block2[14] += 1<<31;
 
+                                    ihv[0] = IV1[0];
+                                    ihv[1] = IV1[1];
+                                    ihv[2] = IV1[2];
+                                    ihv[3] = IV1[3];
+                                    md5_compress(block);
 
+                                    ihv[0] = IV2[0];
+                                    ihv[1] = IV2[1];
+                                    ihv[2] = IV2[2];
+                                    ihv[3] = IV2[3];
+                                    md5_compress(block2);
+                                    if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
+                                        cout << "success" << endl;
+                                        return 0;
 
+                                    if (IV2[0] != IV1[0])
+                                        cout << "!" << flush;
+                                }
                             }
-                            //md5_compress(); =/
                         }
                     }
                 }
-            }	
-        }		
+            }
+        }
     }
 }
 
