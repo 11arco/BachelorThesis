@@ -167,7 +167,7 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
          out = (Y ^ (X | (~Z)));
     }
     //cout <<"f_t:" + to_string(out) << endl;
-    if (t<0 || t>63) cout << "f_t faild. t not in scope." + to_string(t) << endl;
+    if (t<0 || t>63) cout << "f_t faild. t not in scope:" + to_string(t) << endl;
     return out; // something went wrong
 }
 
@@ -368,5 +368,30 @@ string process( string input)
     cout << endl;
 
     return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
+}
+
+uint32* to_block( string input, uint32 msg_block [16]) //only for msgs. with len < 17
+{
+    string output;
+    uint32 l = input.length();
+    string padded_input = pad(input);
+    int size = padded_input.size();
+
+    //uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
+
+    for (int h = 0; h*64 < size ; h++) //64 *8 = 512, after an iteration we look at the next 64 8bit chars and passing them into a block
+    {   
+        print_step(h);      
+        for(int j = 0; j < 16; j++) //first run. Block 16*32 = 512
+        {   
+            msg_block[j] = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                msg_block[j] += uint32( (unsigned char) (padded_input.at((h * 64 ) + (j * 4) + i)) << (i * 8)) ;
+            }     
+        }
+    }
+
+    return msg_block;
 }
 

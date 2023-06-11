@@ -49,7 +49,7 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 		q9q10mask[k] = ((k<<13) ^ (k<<4)) & 0x2060;
 
     while (true) //meh
-	{
+	{   
 		Q[offset + 1] = rand();
 		Q[offset + 3] = (rand() & 0xfe87bc3f) | 0x3e1f0966;
 		Q[offset + 4] = (rand() & 0x44000033)| 0x000002c0 | (Q[offset + 3] & 0x0287bc00);
@@ -81,7 +81,7 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
         // T_t = F_t + Q[t−3} + AC_t + W_t ,
         // in general
         uint32 t_1 = f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + AC(1);
-        uint32 t_5 = f_t(Q[offset + 6], Q[offset + 5], 12, 6) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], AC(5)); // RC(6) = 12 but why?
+        uint32 t_5 = f_t(Q[offset + 6], Q[offset + 5], 12, 6) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], RC(5)); // RC(6) = 12 but why?
 
         uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + AC(16);
         uint32 t_18 = Q[offset + 14] + 0xc040b340 + W(block, 17);// why called t_18 t = 17 ?
@@ -89,19 +89,20 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
         uint32 t_20 = Q[offset + 16] + 0xe9b6c7aa + W(block, 19);// why called t_20 t = 19 ?
 
         // prerparing next values for active work
-        uint32 q_2;
-        uint32 q_16;
-        uint32 q_17;
-        uint32 q_18;
-        uint32 q_19;
-        uint32 q_20;
-        uint32 q_21;
+        uint32 q_2=0;
+        uint32 q_16=0;
+        uint32 q_17=0;
+        uint32 q_18=0;
+        uint32 q_19=0;
+        uint32 q_20=0;
+        uint32 q_21=0;
 
         bool something = true;
+        // t=16 - t=21
         while( something )
         {
             q_16 = Q[offset + 16];
-			q_17 = ((rand() & 0x3ffd7ff7) | (q_16 & 0xc0008008)) ^ 0x40000000;
+			q_17 = (((uint32)rand() & 0x3ffd7ff7) | (q_16 & 0xc0008008)) ^ 0x40000000;
 
 			q_18 = f_t(q_17, q_16, Q[offset + 15],17) + t_18;
 			q_18 = RL(q_18, 9); 
@@ -109,7 +110,7 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 			if (0x00020000 != ((q_18 ^ q_17)&0xa0020000))
             {
 
-                 q_19 = f_t(q_18, q_17, q_16, 18 + t_19);
+                q_19 = f_t(q_18, q_17, q_16, 18) + t_19;
                 q_19 = RL(q_19, 14); 
                 q_19 += q_18;
                 if (0x80000000 != (q_19 & 0x80020000))
@@ -139,7 +140,8 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
         Q[offset + 19] = q_19;
         Q[offset + 20] = q_20;
         reverse_md5(block, 2, AC(2), RC(2));
-    
+        cout << "reverse 2" << endl;
+
 
         // iterate over possible changes of q4 
 		// while keeping all conditions on q1-q20 intact
@@ -150,16 +152,29 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
         uint32 t_21 = f_t(Q[offset + 20], Q[offset + 19], Q[offset + 18],20) + Q[offset + 17] + AC(20);
 
         something = true; // being honest, this needs work but I also need a base to work with
-        while(something)  // I choose this bad name intentional to force to rework this entire thing after it actually works, becuase I am afraid that I may leave the while (true)'s just as they are
-        {
+        unsigned counter2 = 0;
+
+        while(counter2 < (1<<4))  // I choose this bad name intentional to force to rework this entire thing after it actually works, becuase I am afraid that I may leave the while (true)'s just as they are
+        {            
+            Q[offset + 4] = q4 ^ q4mask[counter2];
+			++counter2;
+            cout << "while something" << endl;
+
             //Q[offset + 4] = q4 ^ q4mask[counter2]; TBD
 			reverse_md5(block,5, AC(5), RC(5));
-			 q_21 = t_21 + W(block,20);
+			q_21 = t_21 + W(block,20);
 			q_21 = RL(q_21,RC(20));
             q_21 += Q[offset + 20];
-			if (0 != ((q_21^Q[offset + 20]) & 0x80020000))
+            cout << to_string(q_21) + (": ");
+            cout << bitset<32>(q_21) << endl;
+            cout << to_string(Q[20]) + (": ");
+            cout << bitset<32>(Q[20]) << endl;
+
+			if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000))
 				continue;
 
+
+            cout << "contine" << endl;
 			Q[offset + 21] = q_21;
 			reverse_md5(block, 3, AC(3), RC(3));
 			reverse_md5(block, 4, AC(4), RC(4));
@@ -185,6 +200,8 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
             uint32 m_10;
 			for (int counter3 = 0; counter3 < (1<<3);)
 			{
+             cout << "for counter3 " << endl;
+
                 q_10 = Q[offset + 10] ^ (q9q10mask[counter3] & 0x60);
 				Q[offset + 9] = q9backup ^ (q9q10mask[counter3] & 0x2000);
 				++counter3;
@@ -224,6 +241,8 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                 uint32 m_9;
 				for (unsigned counter4 = 0; counter4 < (1<<16); ++counter4)
 				{
+                    cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
+
                     q_9 = Q[offset + 9] ^ q9mask[counter4];
 					block[12] = t_12 - f_t(Q[offset + 12], Q[offset + 11], q_10,12) - q_9;
 					m_8 = q_9 - Q[offset + 8];
@@ -256,10 +275,13 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                     t =33;
                     precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
+                    
 					IV[2] += f_t(IV[3], IV[0], IV[1],34) + block[11] + AC(34);
 					if (0 != (IV[2] & (1 << 15))) 
 						continue;
 					IV[2] = (IV[2]<<16 | IV[2]>>16) + IV[3];
+                    cout << "progress 1 " + to_string(counter4) << endl;
+
 
                     //doing steps for t \in {35,...,47}
                     t =35;
@@ -288,6 +310,8 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                     precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                     t =47;
                     precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    cout << "progress 1 " + to_string(counter4) << endl;
+
 	                if (0 != ((IV[1]^IV[3]) & 0x80000000))
 						continue;
                     // for t = 48 ... 63
@@ -928,19 +952,27 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 
 void find_coll() // MD5 is the IV or IHV, the names are not correct yet
 {   
+    string a = "abcdefghijklmnopqrst";
+    string b = "bcdefghijklmnopqrstu";
+
     uint32 block_10[16];
     uint32 block_11[16];
     uint32 block_20[16];
     uint32 block_21[16];
+    to_block(a,block_10);
+    to_block(b,block_10);
+
+
+
     cout << "try to find collsions" << endl;
-    cout << "Block1: " << endl;
+    cout << "Block0: " << endl;
 
 	find_block0(block_10, ihv);
-    cout << "Block1 ... " << endl;
+    cout << "Block0 ... " << endl;
 	md5_compress(block_10);
-    cout << "Block2: " << endl;
+    cout << "Block1: " << endl;
 	find_block1_Wang(block_11, ihv);
-    cout << "Block2 ... " << endl;
+    cout << "Block1 ... " << endl;
 
 	for (int t = 0; t < 16; ++t) {
 		block_20[t] = block_10[t];
@@ -973,6 +1005,7 @@ int main()
     else cout << process(test)<< endl;
 
     cout << "init coll finding" << endl;
+
 
     find_coll();
     return 0;
