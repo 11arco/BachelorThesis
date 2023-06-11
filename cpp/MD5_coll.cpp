@@ -28,6 +28,11 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
     uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
 
+    std::vector<uint32> q4mask(1<<4);
+	for (unsigned k = 0; k < q4mask.size(); ++k)
+		q4mask[k] = ((k<<2) ^ (k<<26)) & 0x38000004;
+
+
 	vector<uint32> q9mask2(1<<10);
     for (unsigned k = 0; k < q9mask2.size(); ++k)
     {
@@ -35,6 +40,13 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 		q9mask2[k] = ((k<<1) ^ (k<<7) ^ (k<<14) ^ (k<<15) ^ (k<<22)) & 0x6074041c;
 
     }
+    std::vector<uint32> q9mask(1<<16);
+	for (unsigned k = 0; k < q9mask.size(); ++k)
+		q9mask[k] = ((k<<1) ^ (k<<2) ^ (k<<5) ^ (k<<7) ^ (k<<8) ^ (k<<10) ^ (k<<11) ^ (k<<13)) & 0x0eb94f16;
+
+    vector<uint32> q9q10mask(1<<3);
+	for (unsigned k = 0; k < q9q10mask.size(); ++k)
+		q9q10mask[k] = ((k<<13) ^ (k<<4)) & 0x2060;
 
     while (true) //meh
 	{
@@ -115,6 +127,8 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                         q_2 = RL(q_2, 12); 
                         q_2 += Q[offset + 1];
                         block[5] = t_5 - q_2;
+
+                        something = false;
                     }
                 }
             }
@@ -125,7 +139,274 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
         Q[offset + 19] = q_19;
         Q[offset + 20] = q_20;
         reverse_md5(block, 2, AC(2), RC(2));
+    
+
+        // iterate over possible changes of q4 
+		// while keeping all conditions on q1-q20 intact
+		// this changes m3, m4, m5 and m7
+
+        uint32 q4 = Q[offset + 4];
+        const uint32 q9backup = Q[offset + 9]; // so we do not overwrite accidently
+        uint32 t_21 = f_t(Q[offset + 20], Q[offset + 19], Q[offset + 18],20) + Q[offset + 17] + AC(20);
+
+        something = true; // being honest, this needs work but I also need a base to work with
+        while(something)  // I choose this bad name intentional to force to rework this entire thing after it actually works, becuase I am afraid that I may leave the while (true)'s just as they are
+        {
+            //Q[offset + 4] = q4 ^ q4mask[counter2]; TBD
+			reverse_md5(block,5, AC(5), RC(5));
+			 q_21 = t_21 + W(block,20);
+			q_21 = RL(q_21,RC(20));
+            q_21 += Q[offset + 20];
+			if (0 != ((q_21^Q[offset + 20]) & 0x80020000))
+				continue;
+
+			Q[offset + 21] = q_21;
+			reverse_md5(block, 3, AC(3), RC(3));
+			reverse_md5(block, 4, AC(4), RC(4));
+			reverse_md5(block, 7, AC(7), RC(7));
+			
+			const uint32 t_22 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21);
+			const uint32 t_23 = Q[offset + 19] + AC(22) + W(block,22);
+			const uint32 t_24 = Q[offset + 20] + 0xe7d3fbc8 + block[4];
+
+			const uint32 t_9 = Q[offset + 6] + AC(9);
+			const uint32 t_10 = Q[offset + 7] + AC(10);
+			const uint32 t_8 = f_t(Q[offset + 8], Q[offset + 7], Q[offset + 6], 8) + Q[offset + 5] + AC(8);		
+			const uint32 t_12 = RR(Q[offset + 13] - Q[offset + 12],RC(12)) - AC(12); 
+			const uint32 t_13 = RR(Q[offset + 14] - Q[offset + 13],RC(13)) - f_t(Q[offset + 13], Q[offset + 12], Q[offset + 11], 13) - AC(13);
+
+			// iterate over possible changes of q9 and q10
+			// while keeping conditions on q1-q21 intact
+			// this changes m8, m9, m10, m12 and m13 (and not m11!)
+			// the possible changes of q9 that also do not change m10 are used below
+            // more helper values (for know) 
+            // notation close to Stevens
+            uint32 q_10;
+            uint32 m_10;
+			for (int counter3 = 0; counter3 < (1<<3);)
+			{
+                q_10 = Q[offset + 10] ^ (q9q10mask[counter3] & 0x60);
+				Q[offset + 9] = q9backup ^ (q9q10mask[counter3] & 0x2000);
+				++counter3;
+				m_10 = RR(Q[offset + 11]- q_10,RC(10));
+				m_10 -= f_t(q_10, Q[offset+9], Q[offset+8],10) + t_10;
+
+	             			
+                uint32 help_21 = Q[offset + 21];  //aa                   
+				uint32 help_22 = t_22 + m_10;      //dd
+                help_22 = RL(help_22, 9) + help_21;      //
+                uint32 help_20 = Q[offset + 20];  //bb
+				uint32 help_23 = t_23 + f_t(help_21, help_22, help_20,23);  //cc
+                uint32 t;
+
+                
+				if (0x80000000 != (help_22 & 0x80000000)) continue;
+
+
+				if (0 != (help_23 & 0x20000)) continue;
+				help_23 = RL(help_21, 14) + help_22;
+				if (0 != (help_23 & 0x80000000)) continue;
+
+				help_20 = t_24 + f_t(help_23, help_22, help_21, 23); 
+                help_20 = RL(help_20, RC(19)) + help_23;
+				if (0 == (help_20 & 0x80000000)) continue;
+
+				block[10] = m_10;
+				block[13] = t_13 - q_10;
+
+				// iterate over possible changes of q9
+				// while keeping intact conditions on q1-q24
+				// this changes m8, m9 and m12 (but not m10!)
+
+                //more helper values ..
+                uint32 q_9;
+                uint32 m_8;
+                uint32 m_9;
+				for (unsigned counter4 = 0; counter4 < (1<<16); ++counter4)
+				{
+                    q_9 = Q[offset + 9] ^ q9mask[counter4];
+					block[12] = t_12 - f_t(Q[offset + 12], Q[offset + 11], q_10,12) - q_9;
+					m_8 = q_9 - Q[offset + 8];
+					block[8] = RR(m_8, 7) - t_8; 					
+                    m_9 = q_10 - q_9;
+					block[9] = RR(m_9, 12) - f_t(q_9, Q[offset + 8], Q[offset + 7],9) - t_9; 
+
+					//uint32 a = aa, b = bb, c = cc, d = dd;
+                    uint32 IV[4] ={help_21,help_20,help_23,help_22};
+
+                    //doing steps for t \in {24,...,33}
+                    t =24;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    t =25;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    t =26;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    t =27;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
+                    t =28;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    t =29;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    t =30;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    t =31;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
+                    t =32;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    t =33;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+					IV[2] += f_t(IV[3], IV[0], IV[1],34) + block[11] + AC(34);
+					if (0 != (IV[2] & (1 << 15))) 
+						continue;
+					IV[2] = (IV[2]<<16 | IV[2]>>16) + IV[3];
+
+                    //doing steps for t \in {35,...,47}
+                    t =35;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    t =36;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    t =37;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    t =38;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    t =39;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    t =40;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    t =41;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    t =42;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    t =43;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    t =44;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    t =45;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    t =46;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    t =47;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+	                if (0 != ((IV[1]^IV[3]) & 0x80000000))
+						continue;
+                    // for t = 48 ... 63
+                    t = 48;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                    t = 49;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                    if (0 == ((IV[1] ^ IV[3]) >> 31)) continue;
+                    t = 50;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                    t = 51;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
+                    t = 52;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                    t = 53;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[1]^IV[3]) >> 31)) continue;
+                    t = 54;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                    t = 55;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
+                    t = 56;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                    t = 57;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
+                    t = 58;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                    t = 59;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+
+                    if (0 == ((IV[1] ^ IV[3]) >> 31)) continue;
+                    t = 60;
+                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
+                    t = 61;
+                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
+                    t = 62;
+                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+
+                    if (0 != ((IV[0]^IV[2]) >> 31)) continue;
+                    t = 63;
+                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+    
+
+                    std::cout << "." << std::flush;
+
+					uint32 block2[16];
+					uint32 IV1[4], IV2[4];
+					for (int t = 0; t < 4; ++t)
+					{
+						IV1[t] = IV[t];
+						IV2[t] = IV[t] + (1 << 31);
+					}
+					IV2[1] += (1 << 25);
+					IV2[2] += (1 << 25);
+					IV2[3] += (1 << 25);
+
+					for (int t = 0; t < 16; ++t)
+						block2[t] = block[t];
+					block2[4] += 1<<31;
+					block2[11] -= 1<<15;
+					block2[14] += 1<<31;
+
+                    ihv[0] = IV1[0];
+                    ihv[1] = IV1[1];
+                    ihv[2] = IV1[2];
+                    ihv[3] = IV1[3];
+                    md5_compress(block);
+
+                    ihv[0] = IV2[0];
+                    ihv[1] = IV2[1];
+                    ihv[2] = IV2[2];
+                    ihv[3] = IV2[3];
+                    md5_compress(block2);
+					if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
+						return 0; // not good!
+
+					if (IV2[0] != IV1[0])
+						std::cout << "!" << std::flush;
+
+                }
+
+            }         
+
+        }
     }
+
+
+
+
+
+
+
+
+
+
     return 0;
 }
 
@@ -140,7 +421,10 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
     for (unsigned k = 0; k < q9mask2.size(); ++k)
     {
 		q9mask2[k] = ((k<<1) ^ (k<<7) ^ (k<<14) ^ (k<<15) ^ (k<<22)) & 0x6074041c;
+        cout << "q9mask :" << endl;
+        cout << bitset<32>(q9mask2[k]) << endl;
     }
+
     while (true) //meh
 	{
 		Q[offset + 2] = (rand() & 0x71de7799) | 0x0c008840 | (0x80000000 ^ Q[offset] & 0x80000000);
@@ -341,12 +625,12 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                                 precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                                 if((IV[1] ^IV[3]) & 0x80000000 != 1)//checks wether IV[1] or IV[3] is 1 at pos.s of 0x80000000 
-                                {   // dunno how to sove this nicely just copyed it .. for pregress
+                                {   // do not know how to sove this nicely just copyed it .. for pregress
                                     // for t = 48 ... 63
                                     t = 48;
                                     precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
-                                    if (0 != ((IV[0] ^ IV[3]) >> 31)) continue;
+                                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 49;
                                     precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
@@ -354,7 +638,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                                     t = 50;
                                     precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
 
-                                    if (0 != ((IV[0] ^ IV[3]) >> 31)) continue;
+                                    if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 51;
                                     precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
@@ -642,20 +926,55 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 
 
 
-void find_coll(uint32 md5[4]) // MD5 is the IV or IHV, the names are not correct yet
+void find_coll() // MD5 is the IV or IHV, the names are not correct yet
 {   
-    uint32 block_0[16];
-    uint32 block_1[16];
+    uint32 block_10[16];
+    uint32 block_11[16];
+    uint32 block_20[16];
+    uint32 block_21[16];
+    cout << "try to find collsions" << endl;
+    cout << "Block1: " << endl;
 
-    find_block0(block_0, ihv);
-    find_block1_Wang(block_1, ihv);
+	find_block0(block_10, ihv);
+    cout << "Block1 ... " << endl;
+	md5_compress(block_10);
+    cout << "Block2: " << endl;
+	find_block1_Wang(block_11, ihv);
+    cout << "Block2 ... " << endl;
 
+	for (int t = 0; t < 16; ++t) {
+		block_20[t] = block_10[t];
+		block_21[t] = block_11[t];
+	}
+	block_20[4] += 1 << 31; 
+    block_20[11] += 1 << 15; 
+    block_20[14] += 1 << 31;
+	block_21[4] += 1 << 31; 
+    block_21[11] -= 1 << 15; 
+    block_21[14] += 1 << 31;
 
-
+    cout << "finish" << endl;
 }
 
     // determine bitconditions ( q_i )|_ i = -3 ^ 0
     // generate partial lower diff path 
     // generate partial upper diff path
     // connet both diff paths
+int main()
+{
+    string val_stevens = "abc\n";
+    string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
+    string val_2 ="Every day millions of people rely on our free all-in-one privacy solution. The DuckDuckGo app includes our Private Search, Web Tracking Protection, Smarter Encryption, Email Protection, Android App Tracking Protection, and more.";
+    string test = val;
+    cout << "Please enter a string" << endl;
+    getline(cin, test); 
+    
+    if ( test == "r") cout << process(to_string(rand() * 3.2)  )<< endl;
+    else cout << process(test)<< endl;
+
+    cout << "init coll finding" << endl;
+
+    find_coll();
+    return 0;
+}
     

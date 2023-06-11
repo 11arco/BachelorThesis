@@ -321,12 +321,12 @@ void md5_compress( uint32 block [16])
     {   
         Q[t+1] = step_foward((t ),W(block, t-3 ));
 
-        if(t<9) cout<<" ";                         //debug
+        if(t<9) cout<<" ";                      //debug
         cout << "Q[" + to_string(t) + "]: ";    //debug
         cout << bitset<32>(Q[t]) << endl;       //debug
-        if(t<9) cout<<" ";                         //debug
-        cout << "Q[" + to_string(t + 1) + "]: ";    //debug
-        cout << bitset<32>(Q[t + 1]) << endl;       //debug
+        if(t<9) cout<<" ";                       //debug
+        cout << "Q[" + to_string(t + 1) + "]: "; //debug
+        cout << bitset<32>(Q[t + 1]) << endl;    //debug
         cout << endl;
     }
     ihv[0] = a + Q[61 + 3];
@@ -370,20 +370,3 @@ string process( string input)
     return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
 }
 
-
-int main()
-{
-    string val_stevens = "abc\n";
-    string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
-    string val_2 ="Every day millions of people rely on our free all-in-one privacy solution. The DuckDuckGo app includes our Private Search, Web Tracking Protection, Smarter Encryption, Email Protection, Android App Tracking Protection, and more.";
-    string test = val;
-    cout << "Please enter a string" << endl;
-    getline(cin, test); 
-    
-    if ( test == "r") cout << process(to_string(rand() * 3.2)  )<< endl;
-    else cout << process(test)<< endl;
-
-   // collsion_search_algorithm();
-
-    return 0;
-}
