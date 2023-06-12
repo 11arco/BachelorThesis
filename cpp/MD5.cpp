@@ -296,9 +296,9 @@ uint32 step_foward( uint32 t, uint32 w_t) //if Q[] gloab => less
     */
 
     R = precise_step_foward(t - offset,R, Q[t - 2], Q[t - 1], Q[t ], w_t, AC(t - offset), RC(t - offset));
-    if(t<10) cout<<" ";                     //debug
-    cout << " R_" + to_string(t) + ": ";    //debug
-    cout << bitset<32>(R) << endl;          //debug
+    // if(t<10) cout<<" ";                     //debug
+    // cout << " R_" + to_string(t) + ": ";    //debug
+    // cout << bitset<32>(R) << endl;          //debug
 
     return  R; //altering the state of Q[t+1]
 }
@@ -321,13 +321,13 @@ void md5_compress( uint32 block [16])
     {   
         Q[t+1] = step_foward((t ),W(block, t-3 ));
 
-        if(t<9) cout<<" ";                      //debug
-        cout << "Q[" + to_string(t) + "]: ";    //debug
-        cout << bitset<32>(Q[t]) << endl;       //debug
-        if(t<9) cout<<" ";                       //debug
-        cout << "Q[" + to_string(t + 1) + "]: "; //debug
-        cout << bitset<32>(Q[t + 1]) << endl;    //debug
-        cout << endl;
+       // if(t<9) cout<<" ";                      //debug
+       // cout << "Q[" + to_string(t) + "]: ";    //debug
+       // cout << bitset<32>(Q[t]) << endl;       //debug
+       // if(t<9) cout<<" ";                       //debug
+       // cout << "Q[" + to_string(t + 1) + "]: "; //debug
+       // cout << bitset<32>(Q[t + 1]) << endl;    //debug
+       // cout << endl;
     }
     ihv[0] = a + Q[61 + 3];
     ihv[1] = b + Q[64 + 3];
@@ -361,7 +361,7 @@ string process( string input)
                 msg_block[j] += uint32( (unsigned char) (padded_input.at((h * 64 ) + (j * 4) + i)) << (i * 8)) ;
             }     
         }
-        show_bits(msg_block);
+        //show_bits(msg_block);
         md5_compress(msg_block);
     }
     cout << "last block calculated" << endl;
