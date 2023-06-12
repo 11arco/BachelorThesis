@@ -241,7 +241,6 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                 uint32 m_9;
 				for (unsigned counter4 = 0; counter4 < (1<<16); ++counter4)
 				{
-                    cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
 
                     q_9 = Q[offset + 9] ^ q9mask[counter4];
 					block[12] = t_12 - f_t(Q[offset + 12], Q[offset + 11], q_10,12) - q_9;
@@ -255,129 +254,133 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 
                     //doing steps for t \in {24,...,33}
                     t =24;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                     t =25;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                     t =26;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                     t =27;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
                     t =28;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                     t =29;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                     t =30;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                     t =31;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
                     t =32;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                     t =33;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                    //cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
 
                     
 					IV[2] += f_t(IV[3], IV[0], IV[1],34) + block[11] + AC(34);
 					if (0 != (IV[2] & (1 << 15))) 
 						continue;
 					IV[2] = (IV[2]<<16 | IV[2]>>16) + IV[3];
-                    cout << "progress 1 " + to_string(counter4) << endl;
+                    //cout << "progress 1 " + to_string(counter4) << endl;
 
 
                     //doing steps for t \in {35,...,47}
                     t =35;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
                     t =36;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                     t =37;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                     t =38;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                     t =39;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
                     t =40;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                     t =41;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                     t =42;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                     t =43;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
                     t =44;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                     t =45;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                     t =46;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                     t =47;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
-                    cout << "progress 1 " + to_string(counter4) << endl;
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
 	                if (0 != ((IV[1]^IV[3]) & 0x80000000))
 						continue;
                     // for t = 48 ... 63
+
                     t = 48;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                     t = 49;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
                     if (0 == ((IV[1] ^ IV[3]) >> 31)) continue;
                     t = 50;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                     t = 51;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
                     t = 52;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                     t = 53;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[1]^IV[3]) >> 31)) continue;
                     t = 54;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                     t = 55;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
                     t = 56;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                     t = 57;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
                     t = 58;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                     t = 59;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                     if (0 == ((IV[1] ^ IV[3]) >> 31)) continue;
                     t = 60;
-                    precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                     t = 61;
-                    precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+
+                    cout << "progress 61 " + to_string(counter4) << endl;
 
                     if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
                     t = 62;
-                    precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
 
                     if (0 != ((IV[0]^IV[2]) >> 31)) continue;
                     t = 63;
-                    precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
-    
+                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                    cout << "t = 63" << endl;
 
                     std::cout << "." << std::flush;
 
