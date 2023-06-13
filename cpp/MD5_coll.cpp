@@ -2,14 +2,20 @@
 #include <string>
 
 #include <bitset>
-#include <string.h>
 
-#include <bitset>
+#include <climits>
+
+#include <ctime>
 
 #include <cmath>
 #include <vector>
+#include <string.h>
+
+#include <sstream>
 
 #include "MD5.cpp"
+
+typedef unsigned int uint32; //actually u32 
 
 
 /* int collsion_search_algorithm()
@@ -33,7 +39,7 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 		q4mask[k] = ((k<<2) ^ (k<<26)) & 0x38000004;
 
 
-	vector<uint32> q9mask2(1<<10);
+	std::vector<uint32> q9mask2(1<<10);
     for (unsigned k = 0; k < q9mask2.size(); ++k)
     {
 
@@ -44,7 +50,7 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 	for (unsigned k = 0; k < q9mask.size(); ++k)
 		q9mask[k] = ((k<<1) ^ (k<<2) ^ (k<<5) ^ (k<<7) ^ (k<<8) ^ (k<<10) ^ (k<<11) ^ (k<<13)) & 0x0eb94f16;
 
-    vector<uint32> q9q10mask(1<<3);
+    std::vector<uint32> q9q10mask(1<<3);
 	for (unsigned k = 0; k < q9q10mask.size(); ++k)
 		q9q10mask[k] = ((k<<13) ^ (k<<4)) & 0x2060;
 
@@ -164,10 +170,10 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 			q_21 = RL(q_21,RC(20));
             q_21 += Q[offset + 20];
             /*        
-            cout << to_string(q_21) + (": ");
-            cout << bitset<32>(q_21) << endl;
-            cout << to_string(Q[20]) + (": ");
-            cout << bitset<32>(Q[20]) << endl; 
+            std::cout << to_string(q_21) + (": ");
+            std::cout << bitset<32>(q_21) << endl;
+            std::cout << to_string(Q[20]) + (": ");
+            std::cout << bitset<32>(Q[20]) << endl; 
             */
 
 			if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000))
@@ -198,7 +204,7 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
             uint32 m_10;
 			for (int counter3 = 0; counter3 < (1<<3);)
 			{
-                // cout << "for counter3 " << endl;
+                // std::cout << "for counter3 " << endl;
 
                 q_10 = Q[offset + 10] ^ (q9q10mask[counter3] & 0x60);
 				Q[offset + 9] = q9backup ^ (q9q10mask[counter3] & 0x2000);
@@ -272,7 +278,7 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                     t =33;
                     IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
-                    //cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
+                    //std::cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
 
                     
 					IV[2] += f_t(IV[3], IV[0], IV[1],34) + block[11] + AC(34);
@@ -403,16 +409,30 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                     ihv[2] = IV1[2];
                     ihv[3] = IV1[3];
                     md5_compress(block);
+                    IV1[0] = ihv[0];
+                    IV1[1] = ihv[1];
+                    IV1[2] = ihv[2];
+                    IV1[3] = ihv[3];
 
                     ihv[0] = IV2[0];
                     ihv[1] = IV2[1];
                     ihv[2] = IV2[2];
                     ihv[3] = IV2[3];
                     md5_compress(block2);
-					if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
-						return 0; // not good!
+                    IV2[0] = ihv[0];
+                    IV2[1] = ihv[1];
+                    IV2[2] = ihv[2];
+                    IV2[3] = ihv[3];
 
-					if (IV2[0] != IV1[0])
+
+                    std::cout << std::to_string(IV[0]) + " - " + std::to_string(IV[1]) + " - " + std::to_string(IV[2]) + " - " + std::to_string(IV[3]) << std::endl;
+				    if (	   (IV2[0] == IV1[0] + (1<<31))
+							&& (IV2[1] == IV1[1] + (1<<31) + (1<<25))
+							&& (IV2[2] == IV1[2] + (1<<31) + (1<<25))
+							&& (IV2[3] == IV1[3] + (1<<31) + (1<<25)))
+                        return 1;
+
+					if (IV2[0] != IV1[0] + (1<<31))
 						std::cout << "!" << std::flush;
 
                 }
@@ -421,19 +441,8 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 
         }
     }
-
-
-
-
-
-
-
-
-
-
-    return 0;
+	
 }
-
 
 uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
 {
@@ -441,12 +450,12 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
     uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
 
-	vector<uint32> q9mask2(1<<10);
+	std::vector<uint32> q9mask2(1<<10);
     for (unsigned k = 0; k < q9mask2.size(); ++k)
     {
 		q9mask2[k] = ((k<<1) ^ (k<<7) ^ (k<<14) ^ (k<<15) ^ (k<<22)) & 0x6074041c;
-        cout << "q9mask :" << endl;
-        cout << bitset<32>(q9mask2[k]) << endl;
+        std::cout << "q9mask :" << std::endl;
+        show_bits(&q9mask2[k]);
     }
 
     while (true) //meh
@@ -716,7 +725,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
 
                                     //cout << "b1t" << endl;
 
-                                    cout <<"." << flush;
+                                    std::cout <<"." << std::flush;
 
                                     uint32 block2[16];
                                     uint32 IV1[4];
@@ -750,11 +759,10 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                                     ihv[3] = IV2[3];
                                     md5_compress(block2);
                                     if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
-                                        cout << "success" << endl;
                                         return 0;
 
                                     if (IV2[0] != IV1[0])
-                                        cout << "!" << flush;
+                                        std::cout << "!" << std::flush;
                                 }
                             }
                         }
@@ -953,27 +961,30 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 
 void find_coll() // MD5 is the IV or IHV, the names are not correct yet
 {   
-    string a = "abcdefghijklmnopqrst";
-    string b = "bcdefghijklmnopqrstu";
+    std::string a = "abcdefghijklmnopqrst";
+    std::string b = "bcdefghijklmnopqrstu";
 
     uint32 block_10[16];
     uint32 block_11[16];
-    uint32 block_20[16];
-    uint32 block_21[16];
+    uint32* block_20;
+    uint32* block_21;
     to_block(a,block_10);
-    to_block(b,block_10);
+    std::cout << block_10[1] << std::endl;
+    to_block(b,block_11);
+    std::cout << block_10[1] << std::endl;
 
 
 
-    cout << "try to find collsions" << endl;
-    cout << "Block0: " << endl;
+
+    std::cout << "try to find collsions" << std::endl;
+    std::cout << "Block0: " << std::endl;
 
 	find_block0(block_10, ihv);
-    cout << "Block0 ... " << endl;
+    std::cout << "Block0 ... " << std::endl;
 	md5_compress(block_10);
-    cout << "Block1: " << endl;
+    std::cout << "Block1: " << std::endl;
 	find_block1_Wang(block_11, ihv);
-    cout << "Block1 ... " << endl;
+    std::cout << "Block1 ... " << std::endl;
 
 	for (int t = 0; t < 16; ++t) {
 		block_20[t] = block_10[t];
@@ -986,7 +997,7 @@ void find_coll() // MD5 is the IV or IHV, the names are not correct yet
     block_21[11] -= 1 << 15; 
     block_21[14] += 1 << 31;
 
-    cout << "finish" << endl;
+    std::cout << "finish" << std::endl;
 }
 
     // determine bitconditions ( q_i )|_ i = -3 ^ 0
@@ -995,20 +1006,21 @@ void find_coll() // MD5 is the IV or IHV, the names are not correct yet
     // connet both diff paths
 int main()
 {
-    string val_stevens = "abc\n";
-    string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
-    string val_2 ="Every day millions of people rely on our free all-in-one privacy solution. The DuckDuckGo app includes our Private Search, Web Tracking Protection, Smarter Encryption, Email Protection, Android App Tracking Protection, and more.";
-    string test = val;
-    cout << "Please enter a string" << endl;
-    getline(cin, test); 
+    srand(std::time(nullptr));
+
+    std::string val_stevens = "abc\n";
+    std::string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
+    std::string val_2 ="Every day millions of people rely on our free all-in-one privacy solution. The DuckDuckGo app includes our Private Search, Web Tracking Protection, Smarter Encryption, Email Protection, Android App Tracking Protection, and more.";
+    std::string test = val;
+    std::cout << "Please enter a string" << std::endl;
+    getline(std::cin, test); 
     
-    if ( test == "r") cout << process(to_string(rand() * 3.2)  )<< endl;
-    else cout << process(test)<< endl;
+    if ( test == "r") std::cout << process(std::to_string(rand() * 3.2)  ) << std::endl;
+    else std::cout << process(test)<< std::endl;
 
-    cout << "init coll finding" << endl;
+    //std::cout << "initilize collision finding" << std::endl;
 
-
-    find_coll();
+    //find_coll();
     return 0;
 }
     
