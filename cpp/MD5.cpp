@@ -92,7 +92,7 @@ void print_step(int step)
 {
     string calc = "calculating block ";
 
-    cout << calc + to_string(step + 1)  << " currect IHV: ";
+    cout << calc + to_string(step )  << " currect IHV: ";
 
     cout << to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]) << endl;
 }
@@ -296,9 +296,11 @@ uint32 step_foward( uint32 t, uint32 w_t) //if Q[] gloab => less
     */
 
     R = precise_step_foward(t - offset,R, Q[t - 2], Q[t - 1], Q[t ], w_t, AC(t - offset), RC(t - offset));
+/* 
     if(t<10) cout<<" ";                     //debug
     cout << " R_" + to_string(t) + ": ";    //debug
     cout << bitset<32>(R) << endl;          //debug
+ */
 
     return  R; //altering the state of Q[t+1]
 }
@@ -321,13 +323,15 @@ void md5_compress( uint32 block [16])
     {   
         Q[t+1] = step_foward((t ),W(block, t-3 ));
 
+        /* 
         if(t<9) cout<<" ";                      //debug
         cout << "Q[" + to_string(t) + "]: ";    //debug
         cout << bitset<32>(Q[t]) << endl;       //debug
         if(t<9) cout<<" ";                       //debug
         cout << "Q[" + to_string(t + 1) + "]: "; //debug
         cout << bitset<32>(Q[t + 1]) << endl;    //debug
-        cout << endl;
+        cout << endl; 
+        */
     }
     ihv[0] = a + Q[61 + 3];
     ihv[1] = b + Q[64 + 3];
@@ -391,6 +395,7 @@ uint32* to_block( string input, uint32 msg_block [16]) //only for msgs. with len
             }     
         }
     }
-
+    
+    //cout << to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]) << endl;
     return msg_block;
 }

@@ -424,9 +424,14 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                     IV2[2] = ihv[2];
                     IV2[3] = ihv[3];
 
+/* 
+                    std::cout << std::to_string(IV2[0]) + " - " + std::to_string(IV2[1]) + " - " + std::to_string(IV2[2]) + " - " + std::to_string(IV2[3]) << std::endl;
+                    std::cout << std::to_string(IV1[0] + (1<<31)) + " - " + std::to_string(IV1[1]+ (1<<31) +(1<<25)) + " - " + std::to_string(IV[2]+ (1<<31) + (1<<25)) + " - " + std::to_string(IV[3]+ (1<<31) + (1<<25)) << std::endl;
+                    std::cout << "__________________________________________________" << endl;  
+ */
+                
 
-                    std::cout << std::to_string(IV[0]) + " - " + std::to_string(IV[1]) + " - " + std::to_string(IV[2]) + " - " + std::to_string(IV[3]) << std::endl;
-				    if (	   (IV2[0] == IV1[0] + (1<<31))
+                    if (	   (IV2[0] == IV1[0] + (1<<31))
 							&& (IV2[1] == IV1[1] + (1<<31) + (1<<25))
 							&& (IV2[2] == IV1[2] + (1<<31) + (1<<25))
 							&& (IV2[3] == IV1[3] + (1<<31) + (1<<25)))
@@ -959,22 +964,18 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 
 
 
-void find_coll() // MD5 is the IV or IHV, the names are not correct yet
+void find_coll(std::string input,std::string input_2) // MD5 is the IV or IHV, the names are not correct yet
 {   
-    std::string a = "abcdefghijklmnopqrst";
-    std::string b = "bcdefghijklmnopqrstu";
+    std::string a = input;
+    std::string b = input_2;
 
     uint32 block_10[16];
     uint32 block_11[16];
     uint32* block_20;
     uint32* block_21;
+
     to_block(a,block_10);
-    std::cout << block_10[1] << std::endl;
     to_block(b,block_11);
-    std::cout << block_10[1] << std::endl;
-
-
-
 
     std::cout << "try to find collsions" << std::endl;
     std::cout << "Block0: " << std::endl;
@@ -1012,15 +1013,33 @@ int main()
     std::string val ="(Fast täglich lesen wir in den Nachrichten von Datenschutz-Skandalen oder Fällen von Datendiebstahl. Heute speichern wir gerne unsere persönlichen Daten in der Cloud.)";
     std::string val_2 ="Every day millions of people rely on our free all-in-one privacy solution. The DuckDuckGo app includes our Private Search, Web Tracking Protection, Smarter Encryption, Email Protection, Android App Tracking Protection, and more.";
     std::string test = val;
-    std::cout << "Please enter a string" << std::endl;
+    std::string test_2 = val_2;
+
+    std::cout << "Please enter a string for collision finding:" << std::endl;
+
+
     getline(std::cin, test); 
-    
-    if ( test == "r") std::cout << process(std::to_string(rand() * 3.2)  ) << std::endl;
-    else std::cout << process(test)<< std::endl;
+    if( test == "r" ) 
+    {
+        
+        std::cout << "initilize  finding" << std::endl;
+        find_coll(to_string(rand()),to_string(rand()));  
+      }
+    else if (test == "md5") 
+    {   
+        std::cout << "Input for md5 sum" << std::endl;
+        getline(std::cin, test); 
+        std::cout << process(test) << std::endl;
+    }
+    else{
+        std::cout << "second input:" << std::endl;
+        getline(std::cin, test_2); 
+        std::cout << "initilize  finding" << std::endl;
+        find_coll(test,test_2);
+    }
 
-    //std::cout << "initilize collision finding" << std::endl;
 
-    //find_coll();
+
     return 0;
 }
     
