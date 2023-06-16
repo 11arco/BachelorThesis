@@ -28,7 +28,7 @@ typedef unsigned int uint32; //actually u32
     return 0;
 } */
 
-uint32 find_block0(uint32 block[16], uint32 IHV[4])
+uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 {
     bool progress = false;
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
@@ -87,7 +87,7 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
         // T_t = F_t + Q[t−3} + AC_t + W_t ,
         // in general
         uint32 t_1 = f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + AC(1);
-        uint32 t_5 = f_t(Q[offset + 6], Q[offset + 5], 12, 6) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], RC(5)); // RC(6) = 12 but why?
+        uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(6)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], RC(5)); // RC(6) = 12 but why?
 
         uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + AC(16);
         uint32 t_18 = Q[offset + 14] + 0xc040b340 + W(block, 17);// why called t_18 t = 17 ?
@@ -103,50 +103,62 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
         uint32 q_20=0;
         uint32 q_21=0;
 
-        bool something = true;
+        int counter = 0;
         // t=16 - t=21
-        while( something )
+	    while (counter < (1 << 7))        
         {
             q_16 = Q[offset + 16];
-			q_17 = (((uint32)rand() & 0x3ffd7ff7) | (q_16 & 0xc0008008)) ^ 0x40000000;
-
+			q_17 = ((rand() & 0x3ffd7ff7) | (q_16 & 0xc0008008)) ^ 0x40000000;
+            counter ++;
 			q_18 = f_t(q_17, q_16, Q[offset + 15],17) + t_18;
-			q_18 = RL(q_18, 9); 
+			q_18 = RL(q_18, RC(18)); 
             q_18 += q_17;
 			if (0x00020000 != ((q_18 ^ q_17)&0xa0020000))
+				continue;
+            //std::cout << "16" << endl;
+
+        
+            q_19 = f_t(q_18, q_17, q_16, 18) + t_19;
+            q_19 = RL(q_19, 14); 
+            q_19 += q_18;
+            if (0x80000000 != (q_19 & 0x80020000))
+                continue;
+    
+            q_20 = f_t(q_19, q_18, q_17, 19) + t_20;
+            q_20 = RL(q_20, 20); 
+            q_20 += q_19;
+            if (0x00040000 != ((q_20 ^ q_19) & 0x80040000))
+                continue;
+            
+            block[1] = q_17 - q_16;
+            block[1] = RR(block[1], 5);
+            block[1] -= t_17;
+            q_2 = block[1] + t_1;
+            q_2 = RL(q_2, 12); 
+            q_2 += Q[offset + 1];
+            block[5] = t_5 - q_2;
+        
+            Q[offset + 2] = q_2;
+            Q[offset + 17] = q_17;
+            Q[offset + 18] = q_18;
+            Q[offset + 19] = q_19;
+            Q[offset + 20] = q_20;
+            reverse_md5(block,2,AC(2),RC(2));
+       /*      
+            for (int i = 0; i < 4; i++)
             {
-
-                q_19 = f_t(q_18, q_17, q_16, 18) + t_19;
-                q_19 = RL(q_19, 14); 
-                q_19 += q_18;
-                if (0x80000000 != (q_19 & 0x80020000))
-                {
-                     q_20 = f_t(q_19, q_18, q_17, 19) + t_20;
-                    q_20 = RL(q_20, 20); 
-                    q_20 += q_19;
-                    if (0x00040000 != ((q_20 ^ q_19) & 0x80040000))
-                    {    
-
-                        block[1] = q_17 - q_16;
-                        block[1] = RR(block[1], 5);
-                        block[1] -= t_17;
-                        q_2 = block[1] + t_1;
-                        q_2 = RL(q_2, 12); 
-                        q_2 += Q[offset + 1];
-                        block[5] = t_5 - q_2;
-
-                        something = false;
-                    }
-                }
+                std:: cout << "Q[" + to_string(i + 17) + "] = " + to_string(Q[offset + i + 17]) << std::endl;
             }
-        }
-        Q[offset + 2] = q_2;
-        Q[offset + 17] = q_17;
-        Q[offset + 18] = q_18;
-        Q[offset + 19] = q_19;
-        Q[offset + 20] = q_20;
-        reverse_md5(block, 2, AC(2), RC(2));
+            std::cout << "___________" << std::endl;
+         */
+	        counter = 0;
+			break;
 
+		}
+
+		if (counter != 0)
+
+			continue;
 
         // iterate over possible changes of q4 
 		// while keeping all conditions on q1-q20 intact
@@ -156,7 +168,6 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
         const uint32 q9backup = Q[offset + 9]; // so we do not overwrite accidently
         uint32 t_21 = f_t(Q[offset + 20], Q[offset + 19], Q[offset + 18],20) + Q[offset + 17] + AC(20);
 
-        something = true; // being honest, this needs work but I also need a base to work with
         unsigned counter2 = 0;
 
         while(counter2 < (1<<4))  // I choose this bad name intentional to force to rework this entire thing after it actually works, becuase I am afraid that I may leave the while (true)'s just as they are
@@ -169,12 +180,14 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 			q_21 = t_21 + W(block,20);
 			q_21 = RL(q_21,RC(20));
             q_21 += Q[offset + 20];
-            /*        
+            /*            
             std::cout << to_string(q_21) + (": ");
             std::cout << bitset<32>(q_21) << endl;
+            
             std::cout << to_string(Q[20]) + (": ");
             std::cout << bitset<32>(Q[20]) << endl; 
-            */
+             */
+
 
 			if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000))
 				continue;
@@ -384,22 +397,44 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
                     IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                     //cout << "b0t" << endl;
+					uint32 IHV1 = IV[1] + IHV[1];
+					uint32 IHV2 = IV[2] + IHV[2];
+					uint32 IHV3 = IV[3] + IHV[3];
+                    std:: cout << "x" << std::flush;
+					bool wang = true;
 
-                    std::cout << "." << std::flush;
+					if (0x02000000 != ((IHV2^IHV1) & 0x86000000)) wang = false;
+					if (0 != ((IHV1^IHV3) & 0x82000000)) wang = false;
+					if (0 != (IHV1 & 0x06000020)) wang = false;
+
+					
+
+					bool stevens = true;
+
+					if ( ((IHV1^IHV2)>>31)!=0 || ((IHV1^IHV3)>>31)!= 0 ) stevens = false;
+					if ( (IHV3&(1<<25))!=0 || (IHV2&(1<<25))!=0 || (IHV1&(1<<25))!=0 || ((IHV2^IHV1)&1)!=0) stevens = false;
+
+										
+
+					if (!(wang || stevens)) continue;
+
+
+					std::cout << "." << std::flush;
 
 					uint32 block2[16];
 					uint32 IV1[4], IV2[4];
 					for (int t = 0; t < 4; ++t)
-					{
-						IV1[t] = IV[t];
-						IV2[t] = IV[t] + (1 << 31);
-					}
+                    {
+						 IV1[t]= IHV[t];
+                         IV2[t] = IV1[t];
+                    }
 					IV2[1] += (1 << 25);
 					IV2[2] += (1 << 25);
 					IV2[3] += (1 << 25);
 
 					for (int t = 0; t < 16; ++t)
 						block2[t] = block[t];
+
 					block2[4] += 1<<31;
 					block2[11] -= 1<<15;
 					block2[14] += 1<<31;
@@ -441,13 +476,11 @@ uint32 find_block0(uint32 block[16], uint32 IHV[4])
 						std::cout << "!" << std::flush;
 
                 }
-
             }         
-
         }
     }
-	
 }
+
 
 uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
 {
@@ -1021,20 +1054,23 @@ int main()
     getline(std::cin, test); 
     if( test == "r" ) 
     {
-        
         std::cout << "initilize  finding" << std::endl;
+        std::cout << process(test) << std::endl;
         find_coll(to_string(rand()),to_string(rand()));  
       }
     else if (test == "md5") 
     {   
         std::cout << "Input for md5 sum" << std::endl;
-        getline(std::cin, test); 
+        getline(std::cin, test);         
         std::cout << process(test) << std::endl;
+
     }
-    else{
+    else
+    {
         std::cout << "second input:" << std::endl;
         getline(std::cin, test_2); 
         std::cout << "initilize  finding" << std::endl;
+        std::cout << process(test) << std::endl;
         find_coll(test,test_2);
     }
 
