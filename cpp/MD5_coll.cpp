@@ -28,6 +28,11 @@ typedef unsigned int uint32; //actually u32
     return 0;
 } */
 
+uint32 randX()
+{
+    return  (rand()^rand());
+}
+
 uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 {
     bool progress = false;
@@ -56,21 +61,21 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 
     while (true) //meh
 	{   
-		Q[offset + 1] = rand();
-		Q[offset + 3] = (rand() & 0xfe87bc3f) | 0x3e1f0966;
-		Q[offset + 4] = (rand() & 0x44000033)| 0x000002c0 | (Q[offset + 3] & 0x0287bc00);
+		Q[offset + 1] = randX();
+		Q[offset + 3] = (randX() & 0xfe87bc3f) | 0x3e1f0966;
+		Q[offset + 4] = (randX() & 0x44000033)| 0x000002c0 | (Q[offset + 3] & 0x0287bc00);
 		Q[offset + 5] =  0x41ffffc8 | (Q[offset + 4] & 0x04000033);
 		Q[offset + 6] = 0xb84b82d6;
-		Q[offset + 7] = (rand() & 0x68000084) | 0x02401b43;
-		Q[offset + 8] = (rand() & 0x2b8f6e04) | 0x005090d3 | (~Q[offset + 7] & 0x40000000);
+		Q[offset + 7] = (randX() & 0x68000084) | 0x02401b43;
+		Q[offset + 8] = (randX() & 0x2b8f6e04) | 0x005090d3 | (~Q[offset + 7] & 0x40000000);
 		Q[offset + 9] =  0x20040068 | (Q[offset + 8] & 0x00020000) | (~Q[offset + 8] & 0x40000000);
-		Q[offset + 10] = (rand() & 0x40000000) | 0x1040b089;
-		Q[offset + 11] = (rand() & 0x10408008) | 0x0fbb7f16 | (~Q[offset + 10] & 0x40000000);
-		Q[offset + 12] = (rand() & 0x1ed9df7f) | 0x00022080 | (~Q[offset + 11] & 0x40200000);
-		Q[offset + 13] = (rand() & 0x5efb4f77) | 0x20049008;
-		Q[offset + 14] = (rand() & 0x1fff5f77) | 0x0000a088 | (~Q[offset + 13] & 0x40000000);
-		Q[offset + 15] = (rand() & 0x5efe7ff7) | 0x80008000 | (~Q[offset + 14] & 0x00010000);
-		Q[offset + 16] = (rand() & 0x1ffdffff) | 0xa0000000 | (~Q[offset + 15] & 0x40020000);
+		Q[offset + 10] = (randX() & 0x40000000) | 0x1040b089;
+		Q[offset + 11] = (randX() & 0x10408008) | 0x0fbb7f16 | (~Q[offset + 10] & 0x40000000);
+		Q[offset + 12] = (randX() & 0x1ed9df7f) | 0x00022080 | (~Q[offset + 11] & 0x40200000);
+		Q[offset + 13] = (randX() & 0x5efb4f77) | 0x20049008;
+		Q[offset + 14] = (randX() & 0x1fff5f77) | 0x0000a088 | (~Q[offset + 13] & 0x40000000);
+		Q[offset + 15] = (randX() & 0x5efe7ff7) | 0x80008000 | (~Q[offset + 14] & 0x00010000);
+		Q[offset + 16] = (randX() & 0x1ffdffff) | 0xa0000000 | (~Q[offset + 15] & 0x40020000);
 	    
 		reverse_md5(block,0, AC(0), RC(0));
 		reverse_md5(block,6, AC(6), RC(6));
@@ -87,12 +92,12 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
         // T_t = F_t + Q[t−3} + AC_t + W_t ,
         // in general
         uint32 t_1 = f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + AC(1);
-        uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(6)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], RC(5)); // RC(6) = 12 but why?
+        uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(5)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], 5) - AC(5); // RC(6) = 12 but why?
 
-        uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + AC(16);
-        uint32 t_18 = Q[offset + 14] + 0xc040b340 + W(block, 17);// why called t_18 t = 17 ?
-        uint32 t_19 = Q[offset + 15] + 0x265e5a51 + W(block, 18);// why called t_19 t = 18 ?
-        uint32 t_20 = Q[offset + 16] + 0xe9b6c7aa + W(block, 19);// why called t_20 t = 19 ?
+        uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset + 13] + AC(16);
+        uint32 t_18 = Q[offset + 14] + AC(17) + W(block, 17);// why called t_18 t = 17 ?
+        uint32 t_19 = Q[offset + 15] + AC(18) + W(block, 18);// why called t_19 t = 18 ?
+        uint32 t_20 = Q[offset + 16] + AC(19) + W(block, 19);// why called t_20 t = 19 ?
 
         // prerparing next values for active work
         uint32 q_2=0;
@@ -103,7 +108,7 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
         uint32 q_20=0;
         uint32 q_21=0;
 
-        int counter = 0;
+        unsigned counter = 0;
         // t=16 - t=21
 	    while (counter < (1 << 7))        
         {
@@ -125,7 +130,7 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
                 continue;
     
             q_20 = f_t(q_19, q_18, q_17, 19) + t_20;
-            q_20 = RL(q_20, 20); 
+            q_20 = RL(q_20, RC(19)); 
             q_20 += q_19;
             if (0x00040000 != ((q_20 ^ q_19) & 0x80040000))
                 continue;
@@ -176,7 +181,7 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 			++counter2;
 
             //Q[offset + 4] = q4 ^ q4mask[counter2]; TBD
-			reverse_md5(block,5, AC(5), RC(5));
+			block = reverse_md5(block,5, AC(5), RC(5));
 			q_21 = t_21 + W(block,20);
 			q_21 = RL(q_21,RC(20));
             q_21 += Q[offset + 20];
@@ -193,19 +198,19 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 				continue;
 
 			Q[offset + 21] = q_21;
-			reverse_md5(block, 3, AC(3), RC(3));
-			reverse_md5(block, 4, AC(4), RC(4));
-			reverse_md5(block, 7, AC(7), RC(7));
+			block = reverse_md5(block, 3, AC(3), RC(3));
+			block = reverse_md5(block, 4, AC(4), RC(4));
+			block = reverse_md5(block, 7, AC(7), RC(7));
 			
-			const uint32 t_22 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21);
-			const uint32 t_23 = Q[offset + 19] + AC(22) + W(block,22);
-			const uint32 t_24 = Q[offset + 20] + 0xe7d3fbc8 + block[4];
+			uint32 t_22 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21);
+			uint32 t_23 = Q[offset + 19] + AC(22) + W(block,22);
+			uint32 t_24 = Q[offset + 20] + AC(23) + W(block,23);
 
-			const uint32 t_9 = Q[offset + 6] + AC(9);
-			const uint32 t_10 = Q[offset + 7] + AC(10);
-			const uint32 t_8 = f_t(Q[offset + 8], Q[offset + 7], Q[offset + 6], 8) + Q[offset + 5] + AC(8);		
-			const uint32 t_12 = RR(Q[offset + 13] - Q[offset + 12],RC(12)) - AC(12); 
-			const uint32 t_13 = RR(Q[offset + 14] - Q[offset + 13],RC(13)) - f_t(Q[offset + 13], Q[offset + 12], Q[offset + 11], 13) - AC(13);
+			uint32 t_9 = Q[offset + 6] + AC(9);
+			uint32 t_10 = Q[offset + 7] + AC(10);
+			uint32 t_8 = f_t(Q[offset + 8], Q[offset + 7], Q[offset + 6], 8) + Q[offset + 5] + AC(8);		
+			uint32 t_12 = RR(Q[offset + 13] - Q[offset + 12],RC(12)) - AC(12); 
+			uint32 t_13 = RR(Q[offset + 14] - Q[offset + 13],RC(13)) - f_t(Q[offset + 13], Q[offset + 12], Q[offset + 11], 13) - AC(13);
 
 			// iterate over possible changes of q9 and q10
 			// while keeping conditions on q1-q21 intact
@@ -223,14 +228,14 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 				Q[offset + 9] = q9backup ^ (q9q10mask[counter3] & 0x2000);
 				++counter3;
 				m_10 = RR(Q[offset + 11]- q_10,RC(10));
-				m_10 -= f_t(q_10, Q[offset+9], Q[offset+8],10) + t_10;
+				m_10 -= f_t(q_10, Q[offset + 9], Q[offset + 8],10) + t_10;
 
 	             			
                 uint32 help_21 = Q[offset + 21];  //aa                   
 				uint32 help_22 = t_22 + m_10;      //dd
-                help_22 = RL(help_22, 9) + help_21;      //
+                help_22 = RL(help_22, RC(21)) + help_21;      //
                 uint32 help_20 = Q[offset + 20];  //bb
-				uint32 help_23 = t_23 + f_t(help_21, help_22, help_20,23);  //cc
+				uint32 help_23 = t_23 + f_t(help_22, help_21, help_20,22);  //cc
                 uint32 t;
 
                 
@@ -238,7 +243,8 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 
 
 				if (0 != (help_23 & 0x20000)) continue;
-				help_23 = RL(help_21, 14) + help_22;
+				help_23 = RL(help_23, RC(22)) + help_22;
+
 				if (0 != (help_23 & 0x80000000)) continue;
 
 				help_20 = t_24 + f_t(help_23, help_22, help_21, 23); 
@@ -293,11 +299,11 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 
                     //std::cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
 
-                    
-					IV[2] += f_t(IV[3], IV[0], IV[1],34) + block[11] + AC(34);
+                    t=34;    
+					IV[2] += f_t(IV[3], IV[0], IV[1],t) + W(block,t) + AC(t);
 					if (0 != (IV[2] & (1 << 15))) 
 						continue;
-					IV[2] = (IV[2]<<16 | IV[2]>>16) + IV[3];
+					IV[2] = (IV[2]<<16 | IV[2]>>16) + IV[3]; // RL(16) bzw RR(16)
                     //cout << "progress 1 " + to_string(counter4) << endl;
 
 
@@ -400,9 +406,9 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 					uint32 IHV1 = IV[1] + IHV[1];
 					uint32 IHV2 = IV[2] + IHV[2];
 					uint32 IHV3 = IV[3] + IHV[3];
-                    std:: cout << "x" << std::flush;
 					bool wang = true;
 
+                    std::cout << "x" << std::flush;
 					if (0x02000000 != ((IHV2^IHV1) & 0x86000000)) wang = false;
 					if (0 != ((IHV1^IHV3) & 0x82000000)) wang = false;
 					if (0 != (IHV1 & 0x06000020)) wang = false;
@@ -425,12 +431,9 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 					uint32 IV1[4], IV2[4];
 					for (int t = 0; t < 4; ++t)
                     {
-						 IV1[t]= IHV[t];
-                         IV2[t] = IV1[t];
+						 IV1[t] = IHV[t];
+                         IV2[t] = IHV[t];
                     }
-					IV2[1] += (1 << 25);
-					IV2[2] += (1 << 25);
-					IV2[3] += (1 << 25);
 
 					for (int t = 0; t < 16; ++t)
 						block2[t] = block[t];
@@ -514,12 +517,12 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
 		Q[offset + 15] = (rand() & 0x00ff3ff7) | 0x7d000000;
 		Q[offset + 16] = (rand() & 0x4ffdffff) | 0x20000000 | (~Q[offset + 15] & 0x00020000);
 	    
-		reverse_md5(block,5, AC(5), RC(5));
-		reverse_md5(block,6, AC(6), RC(6));
-		reverse_md5(block,7, AC(22), RC(7));
-		reverse_md5(block,11, AC(11), RC(11));
-		reverse_md5(block,14, AC(14), RC(14));
-		reverse_md5(block,15, AC(15), RC(15));
+		block = reverse_md5(block,5, AC(5), RC(5));
+		block = reverse_md5(block,6, AC(6), RC(6));
+		block = reverse_md5(block,7, AC(22), RC(7));
+		block = reverse_md5(block,11, AC(11), RC(11));
+		block = reverse_md5(block,14, AC(14), RC(14));
+		block = reverse_md5(block,15, AC(15), RC(15));
 
         // prerparing next values for active work
         uint32 q_1;
@@ -583,11 +586,11 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                 
                 block[0] = m_0;
                 block[1] = m_1;
-                reverse_md5(block, 2, AC(2),RC(1));
+                block =reverse_md5(block, 2, AC(2),RC(1));
             }
         }        
     
-        reverse_md5(block, 2, AC(2), RC(2));
+        block= reverse_md5(block, 2, AC(2), RC(2));
         // prerparing next values for active work
         uint32 q_4 = Q[4];
         uint32 q_9 = Q[9];
@@ -627,7 +630,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                             block[10] = m_10;
                             Q[offset + 9] = q_9;
                             Q[offset + 10] = q_10;
-                            reverse_md5(block,13, AC(13), RC(13));
+                            block = reverse_md5(block,13, AC(13), RC(13));
 
                         }
                         for (uint32 k9 = 0; k9 < 1024;)
@@ -635,9 +638,9 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                             uint32 IV[4] ={help_cond_Q_21,help_cond_Q_20,help_cond_Q_22,help_cond_M_10};
                             Q[9] = q_9 ^ q9mask2[k9] ;
                             k9++;
-                            reverse_md5(block, 8, AC(8), RC(80));
-                            reverse_md5(block, 9, AC(9), RC(9));
-                            reverse_md5(block, 12, AC(12), RC(12));
+                            block = reverse_md5(block, 8, AC(8), RC(80));
+                            block = reverse_md5(block, 9, AC(9), RC(9));
+                            block = reverse_md5(block, 12, AC(12), RC(12));
 
                             //doing steps for t \in {24,...,33}
                             t =24;
@@ -894,12 +897,12 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
         Q[offset + 16]= ( rand() & 0x1ffdffff ) | 0xa0000000 | ( ~Q[offset + 15] & 0x40020000 );
 
         // we now claculate the massage m for t =0,6,...,15. For this we use the reverse md5 fuction.
-		reverse_md5(block, 0, AC(0), RC(0)); // reverse_md5 is a void altering the input: block
-		reverse_md5(block, 6, AC(6), RC(6)); // stevens hard codes the AC and the RC
-	    reverse_md5(block, 7, AC(7), RC(7));
-		reverse_md5(block, 11, AC(11), RC(11)); 
-		reverse_md5(block, 14, AC(14), RC(14)); 
-		reverse_md5(block, 15, AC(15), RC(15)); 
+		block = reverse_md5(block, 0, AC(0), RC(0)); // reverse_md5 is a void altering the input: block
+		block = reverse_md5(block, 6, AC(6), RC(6)); // stevens hard codes the AC and the RC
+	    block = reverse_md5(block, 7, AC(7), RC(7));
+		block = reverse_md5(block, 11, AC(11), RC(11)); 
+		block = reverse_md5(block, 14, AC(14), RC(14)); 
+		block = reverse_md5(block, 15, AC(15), RC(15)); 
 
         //preparation for next calculations
         uint32 q_1;

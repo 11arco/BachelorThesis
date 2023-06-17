@@ -266,12 +266,13 @@ uint32 AC(uint32 t)
 
 
 
-void reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
+uint32* reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
 {  
     uint32 offset = 3;
 
     block[t] = Q[offset + t + 1] - Q[offset + t];
 	block[t] = RR(block[t], RC) - f_t(Q[offset + t], Q[offset + t - 1], Q[offset + t - 2], t) - Q[offset + t - 3] - AC ;
+    return block;
 }
 
 uint32 precise_step_foward(uint32 t, uint32 r, uint32 q_2, uint32 q_1, uint32 q_0, uint32 w_t,uint32 ac, uint32 rc )
@@ -284,12 +285,13 @@ uint32 precise_step_foward(uint32 t, uint32 r, uint32 q_2, uint32 q_1, uint32 q_
 }
 
          
-uint32 step_foward( uint32 t, uint32 w_t) //if Q[] gloab => less 
+uint32 step_foward( uint32 t, uint32 w_t) //if Q[] global => less 
 {
     uint32 R = Q[t - 3];
     uint32 offset = 3;
 
-    /*AC_t = AC(t - offset );
+    /* old:
+    AC_t = AC(t - offset );
     *F = f_t( Q[t], Q[t - 1], Q[t - 2], (t - offset));
     *T_ = F + Q[t - 3] + AC_t + W_t;
     *R = RL(T_, RC(t - offset)) ;        
@@ -307,6 +309,7 @@ uint32 step_foward( uint32 t, uint32 w_t) //if Q[] gloab => less
 
 void md5_compress( uint32 block [16])   
 {
+    //uint32cout << "compress" << endl;
     uint32 a = ihv [0];
     uint32 b = ihv [1];
     uint32 c = ihv [2];
