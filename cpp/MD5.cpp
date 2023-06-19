@@ -307,15 +307,16 @@ uint32 step_foward( uint32 t, uint32 w_t) //if Q[] global => less
     return  R; //altering the state of Q[t+1]
 }
 
-void md5_compress( uint32 block [16])   
+
+uint32* md5_compress_f( uint32 block [16],uint32 IHV[4])   
 {
     //uint32cout << "compress" << endl;
-    uint32 a = ihv [0];
-    uint32 b = ihv [1];
-    uint32 c = ihv [2];
-    uint32 d = ihv [3];
+    uint32 a = IHV [0];
+    uint32 b = IHV [1];
+    uint32 c = IHV [2];
+    uint32 d = IHV [3];
 
-    uint32 help = 0;
+    
 
     fill_n(Q,68,0);
     Q[0] = a; // !
@@ -336,12 +337,23 @@ void md5_compress( uint32 block [16])
         cout << endl; 
         */
     }
-    ihv[0] = a + Q[61 + 3];
-    ihv[1] = b + Q[64 + 3];
-    ihv[2] = c + Q[63 + 3];
-    ihv[3] = d + Q[62 + 3];
+    IHV[0] = a + Q[61 + 3];
+    IHV[1] = b + Q[64 + 3];
+    IHV[2] = c + Q[63 + 3];
+    IHV[3] = d + Q[62 + 3];
     
-    return;
+    return IHV;
+}
+
+uint32* md5_compress (uint32 block [16])
+{
+
+
+    md5_compress_f(block,ihv);
+
+
+
+    return ihv;
 }
 
 
