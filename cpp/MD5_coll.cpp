@@ -308,12 +308,12 @@ uint32 randX()
     return  (rand()^rand());
 }
 
-uint32 find_block0(uint32 block[16], const uint32 IHV[4])
+uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 {
     bool progress = false;
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
    //uint32 Q[68];
-    fill_n(Q,68,0);
+    fill_n(Q,68,0); // !!!!!!!!!!!!
     
 
     Q[0] = IHV[0]; 
@@ -690,7 +690,7 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 					uint32 IHV3 = IV[3] + IHV[3];
 					bool wang = true;
 
-                    std::cout << "x" << std::flush;
+                    //std::cout << "x" << std::flush;
 					if (0x02000000 != ((IHV2^IHV1) & 0x86000000)) wang = false;
 					if (0 != ((IHV1^IHV3) & 0x82000000)) wang = false;
 					if (0 != (IHV1 & 0x06000020)) wang = false;
@@ -710,28 +710,33 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 					std::cout << "." << std::flush;
 
 					uint32 block2[16];
-					uint32* IV1;
-                    uint32* IV2;
-					for (int t = 0; t < 4; ++t)
+					uint32 IV1[4];
+                    uint32 IV2[4];
+
+                    for(int i = 0; i < 4 ; i++)
                     {
-						 IV1[t] = IHV[t];
-                         IV2[t] = IHV[t];
+						IV1[i] = IHV[i];
+                        IV2[i] = IHV[i];
                     }
 
-					for (int t = 0; t < 16; ++t)
-						block2[t] = block[t];
 
+                    for(int i =0; i<4 ; i++)
+                    {
+						block2[t] = block[t];
+                    }
 					block2[4] += 1<<31;
 					block2[11] -= 1<<15;
 					block2[14] += 1<<31;
 
       
-                    IV1 = md5_compress_f(block,IV1);    
+                     md5_compress_f(block,IV1);    
 
                  
-                    IV2 = md5_compress_f(block2,IV2);
+                     md5_compress_f(block2,IV2);
          
-
+                    std::cout << std::endl;
+                    show_bits(IV1,4);
+                    show_bits(IV2,4);
 /* 
                     std::cout << std::to_string(IV2[0]) + " - " + std::to_string(IV2[1]) + " - " + std::to_string(IV2[2]) + " - " + std::to_string(IV2[3]) << std::endl;
                     std::cout << std::to_string(IV1[0] + (1<<31)) + " - " + std::to_string(IV1[1]+ (1<<31) +(1<<25)) + " - " + std::to_string(IV[2]+ (1<<31) + (1<<25)) + " - " + std::to_string(IV[3]+ (1<<31) + (1<<25)) << std::endl;
@@ -743,7 +748,9 @@ uint32 find_block0(uint32 block[16], const uint32 IHV[4])
 							&& (IV2[1] == IV1[1] + (1<<31) + (1<<25))
 							&& (IV2[2] == IV1[2] + (1<<31) + (1<<25))
 							&& (IV2[3] == IV1[3] + (1<<31) + (1<<25)))
-                        return 1;
+                    {      
+                        return IV1;
+                    }
 
 					if (IV2[0] != IV1[0] + (1<<31))
 						std::cout << "!" << std::flush;
@@ -766,7 +773,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
     {
 		q9mask2[k] = ((k<<1) ^ (k<<7) ^ (k<<14) ^ (k<<15) ^ (k<<22)) & 0x6074041c;
         std::cout << "q9mask :" << std::endl;
-        show_bits(&q9mask2[k]);
+        show_bits(&q9mask2[k],q9mask2.size());
     }
 
     while (true) //meh
@@ -1095,7 +1102,9 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
     */
 
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
-    uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
+    fill_n(Q,68,0); // !!!!!!!!!!!!
+
+    //uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
 
     srand(std::time(nullptr));
 
@@ -1282,6 +1291,7 @@ void find_coll(std::string input,std::string input_2) // MD5 is the IV or IHV, t
     std::cout << "Block1: " << std::endl;
 	find_block1_Wang(block_11, ihv);
     std::cout << "Block1 ... " << std::endl;
+
 
 	for (int t = 0; t < 16; ++t) {
 		block_20[t] = block_10[t];

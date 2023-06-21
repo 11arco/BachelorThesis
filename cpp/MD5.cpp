@@ -18,11 +18,12 @@ typedef unsigned int uint32; //actually u32
 uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
 uint32 Q[68];   // core to algorythm and collf.
 
-void show_bits(uint32 block [16])
+void show_bits(uint32 * block, int len)
 {
-    for (int i = 0; i< 16 ; i++) //shows msg block as bin
+    for (int i = 0; i< (len) ; i++) //shows msg block as bin
     {
         if (i>0&&(i%4)==0) cout << " | " << endl;
+
 
         cout << " | ";
         cout << bitset<32> (block[i]);
@@ -380,7 +381,7 @@ string process( string input)
                 msg_block[j] += uint32( (unsigned char) (padded_input.at((h * 64 ) + (j * 4) + i)) << (i * 8)) ;
             }     
         }
-        show_bits(msg_block);
+        show_bits(msg_block,16);
         md5_compress(msg_block);
     }
     cout << "last block calculated" << endl;
