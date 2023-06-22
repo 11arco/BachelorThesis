@@ -309,7 +309,7 @@ uint32 step_foward( uint32 t, uint32 w_t) //if Q[] global => less
 }
 
 
-uint32* md5_compress_f( uint32 block [16],uint32 IHV[4])   
+void md5_compress_f( uint32 block [16],uint32 IHV[4])   
 {
     //uint32cout << "compress" << endl;
     uint32 a = IHV [0];
@@ -343,7 +343,7 @@ uint32* md5_compress_f( uint32 block [16],uint32 IHV[4])
     IHV[2] = c + Q[63 + 3];
     IHV[3] = d + Q[62 + 3];
     
-    return IHV;
+    return ;
 }
 
 uint32* md5_compress (uint32 block [16])

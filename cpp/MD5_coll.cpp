@@ -21,12 +21,14 @@ typedef unsigned int uint32; //actually u32
 
 
 
-uint32 randX()
+uint32 randX() //for 32 bits
 {
+    uint32 x = rand();
+	x ^= x << 13;
+	x ^= x >> 17;
+	x ^= x << 5;
 
-
-	return (uint32) rand() ^ rand() ;
-    
+  return  x ;
 }
 
 uint32* find_block0(uint32 block[16], const uint32 IHV[4])
@@ -90,9 +92,9 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
         
         //###DEBUG ONLY###
         //All conditions are from ~ Table B-6: New first block conditions
-        /*
+/*      
         std::cout << ".......1.1111....1....0111...... condition on Q[3]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 3]) << std::endl;
+        std::cout << bitset<32>(Q[offset + 3]) <<" Q[3]" <<std::endl;
         std::cout << "0.....^0^0000^^^^0^^^^1011..0... condition on Q[4]" << std::endl;
         std::cout << bitset<32>(Q[offset + 4]) << std::endl;
         std::cout << "01...^01111111111111111111^^1.^^ condition on Q[5]"  << std::endl;
@@ -104,7 +106,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
         std::cout << "0!.0.0...101....1..1...011010.11 condition on Q[8]" << std::endl;
         std::cout << bitset<32>(Q[offset + 8]) << std::endl;
         std::cout << "0!10...0.0...1^.0..0....011.1..0 condition on Q[9]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 9]) << std::endl;
+        std::cout << bitset<32>(Q[offset + 9]) << "Q [9]" <<std::endl;
         std::cout << "0.01...0.1...00.1..1....1...1..1 condition on Q[10]" << std::endl;
         std::cout << bitset<32>(Q[offset + 10]) << std::endl;
         std::cout << "0!0....1.....01...^1....00.....0 condition on Q[11]" << std::endl;
@@ -120,9 +122,10 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
         std::cout << "1!1...........!................. condition on Q[16]" << std::endl;
         std::cout << bitset<32>(Q[offset + 16]) << std::endl;
 
+
         std::cout << "__________________________________" << std::endl;
+          */
         
-        */
         // prepare some helper values which are not necassery, but useful
         // we refer to the T_t state of the MD5 sum without the word (W_t), when speaking about t_t
         // sometimes the helper value is having the word (W-t) but not Funktion (f_t)
@@ -318,6 +321,19 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     Q[21] = help_21;
                     Q[22] = help_22;
                     Q[23] = help_23;
+/*                      
+                    //### DEBUG ONLY ###
+                    std::cout << "             ..." << std::endl;
+                    std::cout << "1............!.................. condition on Q[20]" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 20]) << " Q[20]" << std::endl;
+                    std::cout << "1.............^................. condition on Q[21]" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 21]) << " Q[21]" << std::endl;
+                    std::cout << "0............................... condition on Q[22]" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 22]) << std::endl;
+                    std::cout << "1............................... condition on Q[23]" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 23]) << std::endl;
+ */
+
                     //doing steps for t \in {24,...,33}
                     /*          
                     t =24;
@@ -395,18 +411,18 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     */
 
                     Q[35] = step_foward(35,W(block,35));
-                    Q[36] = step_foward(35,W(block,35));
-                    Q[37] = step_foward(35,W(block,35));
-                    Q[38] = step_foward(35,W(block,35));
-                    Q[39] = step_foward(35,W(block,35));
+                    Q[36] = step_foward(36,W(block,36));
+                    Q[37] = step_foward(37,W(block,37));
+                    Q[38] = step_foward(38,W(block,38));
+                    Q[39] = step_foward(39,W(block,39));
                     Q[40] = step_foward(40,W(block,40));
                     Q[41] = step_foward(41,W(block,41));
                     Q[42] = step_foward(42,W(block,42));
                     Q[43] = step_foward(43,W(block,43));
                     Q[44] = step_foward(44,W(block,44));
-                    Q[45] = step_foward(43,W(block,43));
-                    Q[46] = step_foward(44,W(block,44));
-                    Q[47] = step_foward(44,W(block,44));
+                    Q[45] = step_foward(45,W(block,45));
+                    Q[46] = step_foward(46,W(block,46));
+                    Q[47] = step_foward(47,W(block,47));
 
 
 	                if (0 != ((Q[47]^Q[45]) & 0x80000000))
@@ -513,12 +529,10 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 					uint32 IHV3 = Q[61] + IHV[3];
 					bool wang = true;
 
-                    std::cout << "x" << std::flush;
+                   // std::cout << "x" << std::flush;
 					if (0x02000000 != ((IHV2^IHV1) & 0x86000000)) wang = false;
 					if (0 != ((IHV1^IHV3) & 0x82000000)) wang = false;
 					if (0 != (IHV1 & 0x06000020)) wang = false;
-
-					
 
 					bool stevens = true;
 
@@ -542,30 +556,33 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                         IV2[i] = IHV[i];
                     }
 
-
-                    for(int i =0; i<4 ; i++)
+                    for(int i =0; i<16 ; i++)
                     {
-						block2[t] = block[t];
-                    }
+						block2[i] = block[i];
+                    }                    
+
 					block2[4] += 1<<31;
 					block2[11] -= 1<<15;
 					block2[14] += 1<<31;
 
-      
-                     md5_compress_f(block,IV1);    
 
-                 
-                     md5_compress_f(block2,IV2);
-         
+                    md5_compress_f(block,IV1);    
+                    md5_compress_f(block2,IV2);
+
+
+        
                     std::cout << std::endl;
-           /*          
+                    show_bits(IV1,4);
+                    show_bits(IV2,4);
+
+                    /*          
                     show_bits(IV1,4);
                     show_bits(IV2,4);
 
                     std::cout << std::to_string(IV2[0]) + " - " + std::to_string(IV2[1]) + " - " + std::to_string(IV2[2]) + " - " + std::to_string(IV2[3]) << std::endl;
                     std::cout << std::to_string(IV1[0] + (1<<31)) + " - " + std::to_string(IV1[1]+ (1<<31) +(1<<25)) + " - " + std::to_string(IV[2]+ (1<<31) + (1<<25)) + " - " + std::to_string(IV[3]+ (1<<31) + (1<<25)) << std::endl;
                     std::cout << "__________________________________________________" << endl;  
- */
+                    */
                 
 
                     if (	   (IV2[0] == IV1[0] + (1<<31))
@@ -885,12 +902,13 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                                     {
                                         block2[t] = block[t];
                                     }
+
                                     block2[4] += 1<<31;
                                     block2[11] -= 1<<15;
                                     block2[14] += 1<<31;
                                     
-                                    IV1 = md5_compress_f(block,IV1);
-                                    IV2 = md5_compress_f(block2,IV2);
+                                    md5_compress_f(block,IV1);
+                                    md5_compress_f(block2,IV2);
                                     if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
                                         return 0;
 
