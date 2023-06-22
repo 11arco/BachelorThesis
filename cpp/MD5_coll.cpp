@@ -158,7 +158,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 			q_17 = ((randX() & 0x3ffd7ff7) | (q_16 & 0xc0008008)) ^ 0x40000000;
             counter ++;
 			q_18 = f_t(q_17, q_16, Q[offset + 15],17) + t_18;
-			q_18 = RL(q_18, RC(18)); 
+			q_18 = RL(q_18, RC(17)); 
             q_18 += q_17;
 			if (0x00020000 != ((q_18 ^ q_17)&0xa0020000))
 				continue;
@@ -166,7 +166,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
         
             q_19 = f_t(q_18, q_17, q_16, 18) + t_19;
-            q_19 = RL(q_19, 14); 
+            q_19 = RL(q_19, RC(18)); 
             q_19 += q_18;
             if (0x80000000 != (q_19 & 0x80020000))
                 continue;
@@ -190,6 +190,20 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
             Q[offset + 18] = q_18;
             Q[offset + 19] = q_19;
             Q[offset + 20] = q_20;
+/*                     
+            //### DEBUG ONLY ###
+            std::cout << "             ..." << std::endl;
+            std::cout << "1............!.................. condition on Q[17]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 17]) << " Q[17]" << std::endl;
+            std::cout << "1.............^................. condition on Q[18]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 18]) << " Q[18]" << std::endl;
+            std::cout << "0............................... condition on Q[19]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 19]) << std::endl;
+            std::cout << "1............................... condition on Q[20]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 20]) << std::endl;
+ 
+ */
+
             reverse_md5(block,2,AC(2),RC(2));
        /*      
             for (int i = 0; i < 4; i++)
@@ -321,7 +335,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     Q[21] = help_21;
                     Q[22] = help_22;
                     Q[23] = help_23;
-/*                      
+                     
                     //### DEBUG ONLY ###
                     std::cout << "             ..." << std::endl;
                     std::cout << "1............!.................. condition on Q[20]" << std::endl;
@@ -332,7 +346,6 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     std::cout << bitset<32>(Q[offset + 22]) << std::endl;
                     std::cout << "1............................... condition on Q[23]" << std::endl;
                     std::cout << bitset<32>(Q[offset + 23]) << std::endl;
- */
 
                     //doing steps for t \in {24,...,33}
                     /*          
