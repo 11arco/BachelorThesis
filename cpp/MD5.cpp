@@ -18,7 +18,7 @@ typedef unsigned int uint32; //actually u32
 uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
 uint32 Q[68];   // core to algorythm and collf.
 
-void show_bits(uint32 * block, int len)
+void show_bits(uint32 * block, int len) // uese carefully
 {
     for (int i = 0; i< (len) ; i++) //shows msg block as bin
     {
@@ -309,7 +309,7 @@ uint32 step_foward( uint32 t, uint32 w_t) //if Q[] global => less
 }
 
 
-void md5_compress_f( uint32 block [16],uint32 IHV[4])   
+uint32* md5_compress_f( uint32 block [16],uint32 IHV[4])   
 {
     //uint32cout << "compress" << endl;
     uint32 a = IHV [0];
@@ -342,19 +342,19 @@ void md5_compress_f( uint32 block [16],uint32 IHV[4])
     IHV[1] = b + Q[64 + 3];
     IHV[2] = c + Q[63 + 3];
     IHV[3] = d + Q[62 + 3];
+
+
     
-    return ;
+    return IHV ;
 }
 
-uint32* md5_compress (uint32 block [16])
+void md5_compress (uint32 block [16])
 {
 
-
-    md5_compress_f(block,ihv);
-
+   md5_compress_f(block,ihv);
 
 
-    return ihv;
+    return ;
 }
 
 
