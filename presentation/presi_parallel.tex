@@ -1,0 +1,343 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{graphicx}% Including graphics
+\setbeamertemplate{footline}[frame number]
+\newcommand{\tabitem}{%
+  \usebeamertemplate{itemize item}\hspace*{\labelsep}}
+  
+\usepackage[german]{babel}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage{wrapfig,lipsum,booktabs}
+\usetikzlibrary{arrows,automata}
+
+\title{Paralles-Hashing\\}
+\subtitle{\textcolor{gray}{\scriptsize { Sequential and Parallel Algorithms and Data Structures
+	von
+	Peter Sanders, Kurt Mehlhorn, Martin Dietzfelbinger, Roman Dementiev}}}
+
+\author{Marco Bellmann}
+\begin{document}
+
+\maketitle
+\begin{frame}[t]{Lineares Hashing}
+	\begin{center}
+	\begin{figure}[!h]
+ 		\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4.0cm, semithick]
+ 			\node (1) [draw, circle, minimum size = 30mm] at (0, 0) {}  (2,0) node[right] {Schlüsseluniversum mit Teilmenge $S$};
+ 			\node[state]         	(3) 			{S };
+ 			\pause
+  			\node(2)  [draw, rectangle,minimum width=3cm,  minimum height = 1.5cm] at(0,-3){$\vdots$} (0,-2.5)node{t}  (2,-3) node[right] {Hashtabelle };
+  			\path (1)	edge 			node			{h}(2)(2,-2) node[right] {Hashfunktion };	
+
+		\end{tikzpicture}
+		\\
+		\vfill
+
+	  \caption{\scriptsize \textcolor{gray}{MIT 6.006 Introduction to Algorithms, Fall 2011}}
+
+
+	\end{figure}
+
+	\end{center}
+\end{frame}
+
+\begin{frame}[t]{Datenstruktur }	
+%Hasgtabelle als Datenstruktur 
+	\center
+
+	
+	Hashtabelle
+	\pause
+	\vfill
+   	\begin{tabular}[h]{c|c c}
+		\hline
+		Funktionen 			&Sequentiel& \\
+						& Bedingung & Aktion \\
+		\hline
+		find(x)      			& $x = key(e)  $	& return e or return$\bot$   \\
+		insert(e)			& $e \not \in t$ 	& -  \\
+		remove(x)			& $e \in t$		& -  \\
+
+		\hline
+	\end{tabular}
+	\vfill
+	\pause
+   	$Element \: e :=(Key \: x ,Value \: v)$
+	 
+\end{frame}
+\begin{frame}[t]{Arten von Hashing}
+	\center
+	\begin{tabular}[h]{c |c}
+		Offenes Hashing		 	&	 Geschlossenes Hashing \\
+		Linear Probing			&	 Verkettetes Hahing   \\
+		\hline
+		\pause
+		Elemente können an einer	 	&	fixer Adressraum \\
+		anderen Adresse liegen		&	Erweiterung mit Liste\\
+		\pause
+							\\
+		Suche in ganzer Hashtabelle	&	Suche in Liste \\
+		(Grafik)				& 	(Grafik)
+		
+	\end{tabular}
+	 
+	 \hfil
+	 \pause
+	 \\
+		Suche: $O(n)$
+	
+ 
+\end{frame}
+
+\begin{frame}[t]{Parallel vs Sequentiell}%Funktionsvergleich
+
+
+	%echte Tabelle 
+	%|		| find()	|delete()	|		|
+	%|sequnziell	|arbeitsweise|
+	%|		|return	|	
+	%|parallel	|		|
+   	%|		|		|
+	
+  	\vfill
+  	 	
+   	\begin{tabular}[h]{c|c c|c c}
+		\hline
+		Funktionen 			&Sequentiel& & Parralell& \\
+							& Bedingung & Aktion& Bedingung &Aktion   \\
+		\hline
+		find(x)      				& $x = key(e)  $&{\small return e or $\bot$ }&$ x=key(e)$ &{\small return e.copy() or $\bot$ } \\
+		insert(e)				& $e \not \in t$ & - & $e \not \in t$  & -  \\
+		remove(x)				& $e \in t$& - & $e  \in t$ &  - \\
+		\hline
+		\pause
+		update(x,v,f)			& - & - & $(x,v') \in t$ & $f ( v',v) $ \\
+		{\small insertOrUpdate(x,v,f)}	& - & - & $e \not \in t$ & {\small $insert(x)$ or $f (v' , v)$ } \\
+		\hline
+
+	\end{tabular}
+	\\
+	\begin{flushright} {\scriptsize$Element \: e :=(Key \: x ,Value \: v)$} \end{flushright} 
+	\pause
+	\vfill
+	Achtung:\\
+	remove und insert nur einmal
+	% muss aber nicht, wenn die Aufgaben so verteilt werden, dass jedes PE einen Teil des Datenstatzes einsortiert bei gemiensamer Tabelle
+\end{frame}
+
+\begin{frame}[t]{Distributed-Memory Hashing }
+
+		
+	\begin{center}
+	Simuliere mehrere Tabellen\\
+	\pause
+	\textbf{PEs Adressraum:}\\
+	für ein$i \in0\hdots p-1 $\\
+
+		
+	\hfill
+	\pause
+	
+		\begin{figure}[!h]
+
+ 		\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4.0cm, semithick]%geschwungender pfeil
+  			\node(1)  [draw, rectangle,] at(0,0){
+  				
+  				\begin{tabular}{c| c c}
+                				
+                				
+                				0& &	\\
+                				\hline
+                				& &	\\
+                				\vdots&  &	\\
+                				& &	\\
+                				\hline
+                				m-1& &	\\
+              		  		
+            			\end{tabular}
+  				  			
+  			}  ;
+ 			\node(2)  [draw, rectangle,minimum width=1cm,  minimum height = 1.5cm] at(4,0){$0$} (4.6,0) node[right] {$\hdots$};
+  			\node(3)  [draw, rectangle,minimum width=1cm,  minimum height = 1.5cm] at(6,0){$p-1$};
+  			
+  			\path (5,-0.22)	edge [bend left =60] 			node			{}(1.1,-0.22);	
+
+		\end{tikzpicture}
+		\\
+		\pause
+		\vfill
+		$ i* m/p \hdots (i + 1)* m/p$\\
+		\label{fig:f1}
+	\end{figure}
+
+	\end{center}
+
+\end{frame}
+\begin{frame}[t]{Beispiel }
+	\center
+		$ i* m/p \hdots (i + 1)* m/p$\\
+		$m=40$, $p=5$\\
+		\pause
+		$\Rightarrow $ für $i=0$, Adressraum von $0$ bis 8\\
+		
+		\vfill
+	\pause
+	\begin{figure}[!h]
+	 	\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4.0cm, semithick] %ein pfeil auf 0..8
+  			\node(1)  [draw, rectangle,] at(0,0){
+  				
+  				\begin{tabular}{c| c c}
+                				
+                				
+                				0& &	\\
+					\hline
+                				\vdots & &	\\
+					\hline
+                				7& &	\\
+                				\hline
+
+                				\vdots&  &	\\
+
+                				\hline
+                				39& &	\\
+              		  		
+            			\end{tabular}
+  				  			
+  			}  ;
+ 			\node(2)  [draw, rectangle,minimum width=1cm,  minimum height = 1.5cm] at(4,0){$0$} (4.6,0) node[right] {$\hdots$};
+  			\node(3)  [draw, rectangle,minimum width=1cm,  minimum height = 1.5cm] at(6,0){$4$};
+  			\pause
+  			\path (2)	edge 			node			{}(1.1,0.55);	
+
+		\end{tikzpicture}
+		
+
+	\end{figure}
+	
+
+
+\end{frame}
+\begin{frame}{Distributed-Memory Hashing}
+	\center
+   	\begin{tabular}[h]{ c|c}
+		\hline
+		Funktionen				& Spezifizierung   \\
+		\hline
+		\pause
+		find()      				& \\
+		\hline
+		\pause
+		insert()				& \\
+		\hline
+		\pause
+		remove()				& \\
+		\hline
+		\pause
+		insertOrUpdate()			& \\
+		\hline
+		
+	\end{tabular}
+\end{frame}
+\begin{frame}[t]{Distributed-Memory Hashing }
+
+	Performance:\\
+	
+	\begin{itemize}
+	
+	\item Sei $o = \Omega (p\:log\:p)$ und o \textit{truly random}
+	\pause
+	\item  Sei $T_{all\rightarrow all}(x) $ \textit{all-to-all}  Datenaustausch und x maximale Nachrichtengöße
+	\pause
+	\item (Grafik)
+	\pause
+	\item  Zeige: max Nachrichtengröße $= O(o/p)$ 
+	\pause
+ 	\item $O( T _{all\rightarrow all}(log\: p)) = O( T _{all\rightarrow all}(o/p))$
+	\end{itemize}
+\end{frame}
+\begin{frame}[t]{Shared-Memory Hashing}
+	\center	%eine Tabelle wird eingteilt
+	\begin{itemize}
+		\item	Linear probing
+		\pause
+		\item Offenenes Hashing
+	\end{itemize}
+	\vfill
+	\pause
+	\begin{figure}[!h]
+		\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4.0cm, semithick]%pfeil von 0 auf gesammten Aressraum
+  			\node(1)  [draw, rectangle,] at(0,0){
+  				
+  				\begin{tabular}{c| c c}
+                				0& &	\\
+                				\hline
+                				& &	\\
+                				\vdots&  &	\\
+                				& &	\\
+                				\hline
+                				m-1& &	\\
+            			\end{tabular}
+  				  			
+  			}  ;
+ 			\node(2)  [draw, rectangle,minimum width=1cm,  minimum height = 1.5cm] at(4,0){$0$} (4.6,0) node[right] {$\hdots$};
+  			\node(3)  [draw, rectangle,minimum width=1cm,  minimum height = 1.5cm] at(6,0){$p-1$};
+  			
+  			\path (2)	edge 			node			{}(1.1,0);
+  				
+
+			\label{PE 0 hat Zuriff auf den kompletten Adressraum}
+		\end{tikzpicture}
+
+	\end{figure}
+	\vfill
+
+
+\end{frame}
+\begin{frame}{Datenstruktur}
+	\center
+	\textbf{ Leichte Änderungen im Vergleich zum Distributet-Hashing }
+	\vfill
+	\pause
+   	\begin{tabular}[h]{ c|c}
+		\hline
+		Funktionen				& Veränderung   \\
+		\hline
+		\pause
+		find()      				& gesamter Adressraum\\
+		\hline
+		\pause
+		insert()				& nur elementare Operationen, nächsten freien Platz automatisch finden \\
+		\hline
+		\pause
+		remove()				& markiere zu löschendes Element  \\
+							& scanne die gesamte Tabelle um echt zu löschen \\
+		\hline
+		\pause
+		insertOrUpdate()			& nur elementare Operationen\\
+		\hline
+		
+	\end{tabular}
+	\vfill
+	\pause
+	Skalierbarkeit der Tabelle und Löschen nicht effizeint\\
+\end{frame}
+
+
+\begin{frame}{Fazit}
+
+\begin{itemize}
+	\item linear gut für kleine Mengen
+	\pause
+	\item distributed meisten schlechter
+	\pause
+	\item distributed schneller bei vielen Zugriffen auf einen Key
+	\pause
+	\item häufigster Zugriff:\textbf{ update}
+	\pause
+	\item shared schnell, da Operationen zusammen gefasst werden
+\end{itemize}
+	
+	
+\end{frame}
+
+\end{document}
