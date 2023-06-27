@@ -351,8 +351,12 @@ uint32* md5_compress_f( uint32 block [16],uint32 IHV[4])
 void md5_compress (uint32 block [16])
 {
 
-   md5_compress_f(block,ihv);
-
+    uint32* temp;
+    temp = md5_compress_f(block,ihv);
+    for (int i =0; i<4;i++)
+    {
+        ihv[i] = temp[i];
+    }
 
     return ;
 }

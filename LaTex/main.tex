@@ -5,30 +5,37 @@
 \selectlanguage{usenglish}
 \include{kapitel/titelseite}
 %\blankpage
-\pagenumbering{roman}
+\pagenumbering{arabic}
+\include{kapitel/Acknowledgements}
 \tableofcontents
 %\cleardoublepage
-\pagenumbering{arabic}
+
 % Kapitellatex-workshop.addtexroot
 \include{kapitel/einleitung}
 \include{kapitel/kapitel2}
 \include{kapitel/kapitel3}
+\include{kapitel/Wang}
+\include{kapitel/Othercolls}
+\include{kapitel/SHA1}
+\include{kapitel/Conclusion}
+
 
 % Anhang
-\appendix
-\include{kapitel/anhang}
-% Abbildungsverzeichnis
-\listoffigures
-\addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
-\cleardoublepage
-% Algorithmenverzeichnis
-\listofalgorithms
-\addcontentsline{toc}{chapter}{Algorithmenverzeichnis}
-\cleardoublepage
+\pagenumbering{roman}
 % Literaturverzeichnis
 \bibliographystyle{gerplain}
 \bibliography{literatur/diplom}
 \addcontentsline{toc}{chapter}{\bibname}
+\appendix
+\include{kapitel/anhang}
+% Abbildungsverzeichnis
+\listoffigures
+\addcontentsline{toc}{chapter}{List of figures}
+\cleardoublepage
+% Algorithmenverzeichnis
+\listofalgorithms
+\addcontentsline{toc}{chapter}{List of algorithms}
+\cleardoublepage
 % Erklaerung
 
 \thispagestyle{myheadings}

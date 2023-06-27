@@ -36,8 +36,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
     bool progress = false;
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
    //uint32 Q[68];
-    fill_n(Q,68,0); // !!!!!!!!!!!!
-    
+    fill_n(Q,68,0); // !!!!!!!!!!!!    
 
     Q[0] = IHV[0]; 
     Q[1] = IHV[3];
@@ -133,17 +132,16 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
         // F_t = f_t(Q[t]], Q[t−1], Q[t−2], t) ,
         // T_t = F_t + Q[t−3} + AC_t + W_t ,
         // in general
-        uint32 t_1 = f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + AC(1);
-        uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(5)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], 5) - AC(5); // RC(6) = 12 but why?
+       const uint32 t_1 = f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + AC(1);
+       const uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(5)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], 5) - AC(5); // RC(6) = 12 but why?
 
-        uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset + 13] + AC(16);
-        uint32 t_18 = Q[offset + 14] + AC(17) + W(block, 17);// why called t_18 t = 17 ?
-        uint32 t_19 = Q[offset + 15] + AC(18) + W(block, 18);// why called t_19 t = 18 ?
-        uint32 t_20 = Q[offset + 16] + AC(19) + W(block, 19);// why called t_20 t = 19 ?
+       const uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset + 13] + AC(16);
+       const uint32 t_18 = Q[offset + 14] + AC(17) + W(block, 17);// why called t_18 t = 17 ?
+       const uint32 t_19 = Q[offset + 15] + AC(18) + W(block, 18);// why called t_19 t = 18 ?
+       const uint32 t_20 = Q[offset + 16] + AC(19) + W(block, 19);// why called t_20 t = 19 ?
 
         // prerparing next values for active work
         uint32 q_2 = 0;
-        const uint32 q_16 = Q[offset + 16];
 ;
         uint32 q_17 = 0;
         uint32 q_18 = 0;
@@ -155,6 +153,8 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
         // t=16 - t=21
 	    while (counter < (1 << 7))        
         {
+            const uint32 q_16 = Q[offset + 16];
+
 			q_17 = ((randX() & 0x3ffd7ff7) | (q_16 & 0xc0008008)) ^ 0x40000000;
             counter ++;
 			q_18 = f_t(q_17, q_16, Q[offset + 15],17) + t_18;
@@ -216,14 +216,8 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
             std::cout << bitset<32>(Q[offset + 20]) << std::endl;
              */
  
-             block = reverse_md5(block,2,AC(2),RC(2));
-       /*      
-            for (int i = 0; i < 4; i++)
-            {
-                std:: cout << "Q[" + to_string(i + 17) + "] = " + to_string(Q[offset + i + 17]) << std::endl;
-            }
-            std::cout << "___________" << std::endl;
-         */
+            block = reverse_md5(block,2,AC(2),RC(2));
+
 	        counter = 0;
 			break;
 
@@ -253,19 +247,14 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 			q_21 = t_21 + W(block,20);
 			q_21 = RL(q_21,RC(20));
             q_21 += Q[offset + 20];
-            /*            
-            std::cout << to_string(q_21) + (": ");
-            std::cout << bitset<32>(q_21) << endl;
-            
-            std::cout << to_string(Q[20]) + (": ");
-            std::cout << bitset<32>(Q[20]) << endl; 
-             */
 
-
-			if (0 != ((q_21 ^ Q[offset + 20]) & 0x00020000)) // diffrent than steven's
+/* 			if (0 != ((q_21 ^ Q[offset + 20]) & 0x00020000)) // diffrent than steven's
 				continue;
-                q_21;
+
             if (0 == (q_21  & 0x80000000))
+				continue; */
+            if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000))
+
 				continue;
 
 			Q[offset + 21] = q_21;
@@ -276,6 +265,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 			const uint32 t_22 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21);
 			const uint32 t_23 = Q[offset + 19] + AC(22) + W(block,22);
 			const uint32 t_24 = Q[offset + 20] + AC(23) + W(block,23);
+
             const uint32 t_8 = f_t(Q[offset + 8], Q[offset + 7], Q[offset + 6], 8) + Q[offset + 5] + AC(8);		
 			const uint32 t_9 = Q[offset + 6] + AC(9);
 			const uint32 t_10 = Q[offset + 7] + AC(10);
@@ -293,9 +283,58 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
 			for (int counter3 = 0; counter3 < (1<<3);)
 			{
+/* 
+            //###DEBUG
+            std::cout << "             ..." << std::endl;
 
-                // std::cout << "for counter3 " << endl;
-
+            std::cout << ".......1.1111....1....0111...... condition on Q[3]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 3]) <<" Q[3]" <<std::endl;
+            std::cout << "0.....^0^0000^^^^0^^^^1011..0... condition on Q[4]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 4]) << std::endl;
+            std::cout << "01...^01111111111111111111^^1.^^ condition on Q[5]"  << std::endl;
+            std::cout << bitset<32>(Q[offset + 5]) << std::endl;
+            std::cout << "10.1.000010010111000001011010.10 condition on Q[6]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 6]) << std::endl;
+            std::cout << "0..0.0100100000000011011.1000.11 condition on Q[7]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 7]) << std::endl;
+            std::cout << "0!.0.0...101....1..1...011010.11 condition on Q[8]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 8]) << std::endl;
+            std::cout << "0!10...0.0...1^.0..0....011.1..0 condition on Q[9]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 9]) << "Q [9]" <<std::endl;
+            std::cout << "0.01...0.1...00.1..1....1...1..1 condition on Q[10]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 10]) << std::endl;
+            std::cout << "0!0....1.....01...^1....00.....0 condition on Q[11]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 11]) << std::endl;
+            std::cout << "0!0....0..!..01...1.....1....... condition on Q[12]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 12]) << std::endl;
+            std::cout << "0.1....0.....1..1.01....0...1... condition on Q[13]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 13]) << std::endl;
+            std::cout << "0!0.............1.1.....1...1... condition on Q[14]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 14]) << std::endl;
+            std::cout << "1.0....0.......!1...........0... condition on Q[15]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 15]) << std::endl;
+            std::cout << "1!1...........!................. condition on Q[16]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 16]) << std::endl;
+            std::cout << "1!............0.^...........^... condition on Q[17]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 17]) << " Q[17]" << std::endl;
+            std::cout << "1.^...........1................. condition on Q[18]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 18]) << " Q[18]" << std::endl;
+            std::cout << "1.............0................. condition on Q[19]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 19]) << std::endl;
+            std::cout << "1............!................. condition on Q[20]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 20]) << std::endl;
+            std::cout << "1.............^................ condition on Q[21]" << std::endl;
+            std::cout << bitset<32>(Q[offset + 21]) << std::endl;
+            //td::cout << "1.............................. condition on Q[22]" << std::endl;
+            //std::cout << bitset<32>(Q[offset + 22]) << std::endl;
+            //std::cout << "0.............................. condition on Q[23]" << std::endl;
+            //std::cout << bitset<32>(Q[offset + 23]) << std::endl;
+            //std::cout << "1............................... condition on Q[24]" << std::endl;
+            //std::cout << bitset<32>(Q[offset + 24]) << std::endl;
+            // condidtions are sometime wrong. Not at the first but at the 9th it. oe.
+            // conditions for Q[20] are always wrong
+                                                         
+             */
                 q_10 = Q[offset + 10] ^ (q9q10mask[counter3] & 0x60);
 				Q[offset + 9] = q9backup ^ (q9q10mask[counter3] & 0x2000);
 				++counter3;
@@ -338,33 +377,6 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                 uint32 m_9;
 
 
-/*             //###DEBUG
-            std::cout << "             ..." << std::endl;
-            std::cout << bitset<32>(Q[offset + 14]) << std::endl;
-            std::cout << "1.0....0.......!1...........0... condition on Q[15]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 15]) << std::endl;
-            std::cout << "1!1...........!................. condition on Q[16]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 16]) << std::endl;
-            std::cout << "1!............0.^...........^... condition on Q[17]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 17]) << " Q[17]" << std::endl;
-            std::cout << "1.^...........1................. condition on Q[18]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 18]) << " Q[18]" << std::endl;
-            std::cout << "1.............0................. condition on Q[19]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 19]) << std::endl;
-            std::cout << "1............!................. condition on Q[20]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 20]) << std::endl;
-            std::cout << "1.............^................ condition on Q[21]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 21]) << std::endl;
-            std::cout << "1.............................. condition on Q[22]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 22]) << std::endl;
-            std::cout << "0.............................. condition on Q[23]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 23]) << std::endl;
-            std::cout << "1............................... condition on Q[24]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 24]) << std::endl;
-            // condidtions are sometime wrong. Not at the first but at the 9th it. oe.
-            // conditions for Q[20] are always wrong
-                                                         
-             */
                                                             
 				for (unsigned counter4 = 0; counter4 < (1<<16); ++counter4)
 				{
@@ -398,15 +410,14 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     //offset + std::cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
 
                     t=34;    
-					Q[35] += f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + W(block,t) + AC(t);
-					if (0 != (Q[offset + t-4] & (1 << 15))) 
+					Q[35] = Q[t-4] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + W(block,t-1) + AC(t);
+					if (0 != (Q[35] & (1 << 15)))  // again confusing because of steven's 4-values juggling 
 						continue;
-					Q[offset + 30] = (Q[offset + 30] << 16 | Q[offset + 30]>>16) + Q[offset + t]; // RL(16) bzw RR(16)
+					Q[offset + 35] = (Q[offset + 35] << 16 | Q[offset + 35]>>16) + Q[offset + t]; // RL(16) bzw RR(16)
                     //cout << "progress 1 " + to_string(counter4) << endl;
 
 
                     //doing steps for t \in {35,...,47}
-
                     Q[offset + 36] = step_foward(35,W(block,35));
                     Q[offset + 37] = step_foward(36,W(block,36));
                     Q[offset + 38] = step_foward(37,W(block,37));
@@ -423,72 +434,71 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
 
 
-	                if (0 != ((Q[offset + 47]^Q[offset + 45]) & 0x80000000))
+	                if (0 != ((Q[offset + 48] ^ Q[offset + 46]) & 0x80000000))
 						continue;
                     // for t = 48 ... 63
 
                     t = 48; // calculations are always for Q at t+1, this is quite confusing right now. Fix inc.
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue; // place we wrote t+1; place two  before t-1
 
                     t = 49;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 50;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
-
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
+                    
                     t = 51;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 52;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 53;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 54;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 55;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 56;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 57;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 58;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 59;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 60;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 61;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 62;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
-                    if (0 != ((Q[offset + t] ^ Q[offset + t-2]) >> 31)) continue;
-                                      
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;                                      
                     t = 63;
-                    Q[offset + t + 1] = step_foward(t,W(block,t));
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
 
                     //cout << "b0t" << endl;
 					uint32 IHV1 = Q[offset + 64] + IHV[1];
@@ -528,18 +538,30 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     }                    
 
 					block2[4] += 1<<31;
-					block2[11] -= 1<<15;
+					block2[11] += 1<<15;
 					block2[14] += 1<<31;
 
 
-                    uint32* temp1 = md5_compress_f(block,IV1); 
-                    uint32* temp2 = md5_compress_f(block2,IV2);
-                    for(int i =0; i<16 ; i++)
-                    {
-						IV1[i] = temp1[i];
-                        IV2[i] = temp2[i];
 
-                    }                                 
+
+                    md5_compress_f(block,IV1);     
+                    md5_compress_f(block2,IV2);
+
+                    std::cout << std::endl;
+                    std::cout << " | " << bitset<32>( IV1[0] + (1<<31));
+                    std::cout << " | " << bitset<32>( IV1[1] + (1<<31) + (1<<25));
+                    std::cout << " | " << bitset<32>( IV1[2] + (1<<31) + (1<<25));
+                    std::cout << " | " << bitset<32>( IV1[3] + (1<<31) + (1<<25));
+
+
+                    
+                    std::cout << std::endl;
+                    show_bits(IV2,4);
+
+
+
+
+                        
 
                     if (	   (IV2[0] == IV1[0] + (1<<31))
 							&& (IV2[1] == IV1[1] + (1<<31) + (1<<25))
@@ -550,6 +572,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     }
 
 					if (IV2[0] != IV1[0] + (1<<31))
+
 						std::cout << "!" << std::endl;
 
                 }

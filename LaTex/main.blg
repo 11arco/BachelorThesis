@@ -3,24 +3,34 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
 Reallocating 'name_of_file' (item size: 1) to 23 items.
 A level-1 auxiliary file: kapitel/titelseite.aux
+Reallocating 'name_of_file' (item size: 1) to 29 items.
+A level-1 auxiliary file: kapitel/Acknowledgements.aux
 Reallocating 'name_of_file' (item size: 1) to 23 items.
 A level-1 auxiliary file: kapitel/einleitung.aux
 Reallocating 'name_of_file' (item size: 1) to 21 items.
 A level-1 auxiliary file: kapitel/kapitel2.aux
 Reallocating 'name_of_file' (item size: 1) to 21 items.
 A level-1 auxiliary file: kapitel/kapitel3.aux
-Reallocating 'name_of_file' (item size: 1) to 19 items.
-A level-1 auxiliary file: kapitel/anhang.aux
+Reallocating 'name_of_file' (item size: 1) to 17 items.
+A level-1 auxiliary file: kapitel/Wang.aux
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+A level-1 auxiliary file: kapitel/Othercolls.aux
+Reallocating 'name_of_file' (item size: 1) to 17 items.
+A level-1 auxiliary file: kapitel/SHA1.aux
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+A level-1 auxiliary file: kapitel/Conclusion.aux
 Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: gerplain.bst
 Reallocating 'name_of_file' (item size: 1) to 17 items.
+Reallocating 'name_of_file' (item size: 1) to 19 items.
+A level-1 auxiliary file: kapitel/anhang.aux
 Reallocating 'name_of_file' (item size: 1) to 23 items.
 A level-1 auxiliary file: kapitel/erklaerung.aux
 I found no \citation commands---while reading file main.aux
 Database file #1: literatur/diplom.bib
 You've used 0 entries,
             2343 wiz_defined-function locations,
-            548 strings with 4738 characters,
+            553 strings with 4842 characters,
 and the built_in function-call counts, 20 in all, are:
 = -- 0
 > -- 0
