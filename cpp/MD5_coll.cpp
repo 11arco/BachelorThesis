@@ -81,12 +81,12 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 		Q[offset + 15] = (randX() & 0x5efe7ff7) | 0x80008000 | (~Q[offset + 14] & 0x00010000);
 		Q[offset + 16] = (randX() & 0x1ffdffff) | 0xa0000000 | (~Q[offset + 15] & 0x40020000);
 	    
-        block = reverse_md5(block,0, AC(0), RC(0));
-		block = reverse_md5(block,6, AC(6), RC(6));
-		block = reverse_md5(block,7, AC(22), RC(7));
-		block = reverse_md5(block,11, AC(11), RC(11));
-		block = reverse_md5(block,14, AC(14), RC(14));
-		block = reverse_md5(block,15, AC(15), RC(15));
+        block[0] = reverse_md5(block,0, AC(0), RC(0));
+		block[6] = reverse_md5(block,6, AC(6), RC(6));
+		block[7] = reverse_md5(block,7, AC(22), RC(7));
+		block[13] = reverse_md5(block,11, AC(11), RC(11));
+		block[14] = reverse_md5(block,14, AC(14), RC(14));
+		block[15] = reverse_md5(block,15, AC(15), RC(15));
 
         
         //###DEBUG ONLY###
@@ -136,9 +136,9 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
        const uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(5)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], 5) - AC(5); // RC(6) = 12 but why?
 
        const uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset + 13] + AC(16);
-       const uint32 t_18 = Q[offset + 14] + AC(17) + W(block, 17);// why called t_18 t = 17 ?
-       const uint32 t_19 = Q[offset + 15] + AC(18) + W(block, 18);// why called t_19 t = 18 ?
-       const uint32 t_20 = Q[offset + 16] + AC(19) + W(block, 19);// why called t_20 t = 19 ?
+       const uint32 t_18 = Q[offset + 14] + AC(17) + W(block, 17);
+       const uint32 t_19 = Q[offset + 15] + AC(18) + W(block, 18);
+       const uint32 t_20 = Q[offset + 16] + AC(19) + W(block, 19);
 
         // prerparing next values for active work
         uint32 q_2 = 0;
@@ -157,12 +157,12 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
 			q_17 = ((randX() & 0x3ffd7ff7) | (q_16 & 0xc0008008)) ^ 0x40000000;
             counter ++;
+
 			q_18 = f_t(q_17, q_16, Q[offset + 15],17) + t_18;
 			q_18 = RL(q_18, RC(17)); 
             q_18 += q_17;
-			if (0x00020000 != ((q_18 ^ q_17)&0xa0020000))
+			if (0x00020000 != ((q_18 ^ q_17) & 0xa0020000))
 				continue;
-
         
             q_19 = f_t(q_18, q_17, q_16, 18) + t_19;
             q_19 = RL(q_19, RC(18)); 
@@ -176,8 +176,8 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 			if (0x00040000 != ((q_20 ^ q_19) & 0x00040000)) // xor q_20 and q_19 gives where they are diffrent, take bit 18 with &0x00040000, if this is not set on 1 continue the while loop and do not process further
                 continue;
             
-            if (0x80000000 != (q_20 & 0x80000000))
-                continue;
+   /*          if (0x80000000 != (q_20 & 0x80000000))
+                continue; */
 
                         
 /* 
@@ -186,7 +186,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
             std::cout << bitset<32>(q_20) << std::endl; // here is not q_20 correct
   */
             block[1] = q_17 - q_16;
-            block[1] = RR(block[1], 5);
+            block[1] = RR(block[1], 5); //RC(16) = 5
             block[1] -= t_17;
             q_2 = block[1] + t_1;
             q_2 = RL(q_2, 12); 
@@ -216,7 +216,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
             std::cout << bitset<32>(Q[offset + 20]) << std::endl;
              */
  
-            block = reverse_md5(block,2,AC(2),RC(2));
+            block[2] = reverse_md5(block,2,AC(2),RC(2));
 
 	        counter = 0;
 			break;
@@ -243,7 +243,9 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 			++counter2;
 
             //Q[offset + 4] = q4 ^ q4mask[counter2]; TBD
-			block = reverse_md5(block,5, AC(5), RC(5));
+
+            block[5] = reverse_md5(block,5, AC(5), RC(5));
+ 
 			q_21 = t_21 + W(block,20);
 			q_21 = RL(q_21,RC(20));
             q_21 += Q[offset + 20];
@@ -258,9 +260,9 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 				continue;
 
 			Q[offset + 21] = q_21;
-			block = reverse_md5(block, 3, AC(3), RC(3));
-			block = reverse_md5(block, 4, AC(4), RC(4));
-			block = reverse_md5(block, 7, AC(7), RC(7));
+			block[3] = reverse_md5(block, 3, AC(3), RC(3));
+			block[4] = reverse_md5(block, 4, AC(4), RC(4));
+			block[7] = reverse_md5(block, 7, AC(7), RC(7));
 			
 			const uint32 t_22 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21);
 			const uint32 t_23 = Q[offset + 19] + AC(22) + W(block,22);
@@ -387,10 +389,17 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 					block[8] = RR(m_8, RC(8)) - t_8; 					
                     m_9 = q_10 - q_9;
 					block[9] = RR(m_9, RC(9)) - f_t(q_9, Q[offset + 8], Q[offset + 7],9) - t_9; 
+
+                    for (int i = offset + 21; i <68; i++) // maybe remove this later
+                    {
+                        Q[i] = 0;
+                    }
+
                     Q[offset + 21] = help_21;
                     Q[offset + 22] = help_22;
                     Q[offset + 23] = help_23;
                     Q[offset + 24] = help_24;
+
                     //uint32 IV[4] ={help_21,help_20,help_23,help_22};
 
                     //doing steps for t \in {24,...,33}
@@ -410,10 +419,10 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     //offset + std::cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
 
                     t=34;    
-					Q[35] = Q[t-4] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + W(block,t-1) + AC(t);
+					Q[35] = Q[t-4] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + W(block,t) + AC(t);
 					if (0 != (Q[35] & (1 << 15)))  // again confusing because of steven's 4-values juggling 
 						continue;
-					Q[offset + 35] = (Q[offset + 35] << 16 | Q[offset + 35]>>16) + Q[offset + t]; // RL(16) bzw RR(16)
+					Q[offset + 35] = (Q[offset + 35] << 16 | Q[offset + 35] >> 16) + Q[offset + t]; // RL(16) bzw RR(16)
                     //cout << "progress 1 " + to_string(counter4) << endl;
 
 
@@ -541,27 +550,18 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 					block2[11] += 1<<15;
 					block2[14] += 1<<31;
 
-
-
-
                     md5_compress_f(block,IV1);     
                     md5_compress_f(block2,IV2);
-
+                    
                     std::cout << std::endl;
                     std::cout << " | " << bitset<32>( IV1[0] + (1<<31));
                     std::cout << " | " << bitset<32>( IV1[1] + (1<<31) + (1<<25));
                     std::cout << " | " << bitset<32>( IV1[2] + (1<<31) + (1<<25));
                     std::cout << " | " << bitset<32>( IV1[3] + (1<<31) + (1<<25));
-
-
-                    
+               
                     std::cout << std::endl;
-                    show_bits(IV2,4);
-
-
-
-
-                        
+                    show_bits(IV2,4);       
+                           
 
                     if (	   (IV2[0] == IV1[0] + (1<<31))
 							&& (IV2[1] == IV1[1] + (1<<31) + (1<<25))
@@ -576,11 +576,12 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 						std::cout << "!" << std::endl;
 
                 }
-            }         
+            }
         }
     }
 }
 
+//####################################################################################################
 
 //##end block 0 star block 1
 
@@ -615,13 +616,13 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
 		Q[offset + 14] = (randX() & 0x00701f77) | 0x408be088 | (Q[offset] & 0x80000000);
 		Q[offset + 15] = (randX() & 0x00ff3ff7) | 0x7d000000;
 		Q[offset + 16] = (randX() & 0x4ffdffff) | 0x20000000 | (~Q[offset + 15] & 0x00020000);
-	    
-		block = reverse_md5(block,5, AC(5), RC(5));
-		block = reverse_md5(block,6, AC(6), RC(6));
-		block = reverse_md5(block,7, AC(22), RC(7));
-		block = reverse_md5(block,11, AC(11), RC(11));
-		block = reverse_md5(block,14, AC(14), RC(14));
-		block = reverse_md5(block,15, AC(15), RC(15));
+
+		block[5] = reverse_md5(block,5, AC(5), RC(5));
+		block[6] = reverse_md5(block,6, AC(6), RC(6));
+		block[7] = reverse_md5(block,7, AC(22), RC(7));
+		block[11] = reverse_md5(block,11, AC(11), RC(11));
+		block[14] = reverse_md5(block,14, AC(14), RC(14));
+		block[15] = reverse_md5(block,15, AC(15), RC(15));
 
         // prerparing next values for active work
         uint32 q_1;
@@ -685,11 +686,11 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                 
                 block[0] = m_0;
                 block[1] = m_1;
-                block =reverse_md5(block, 2, AC(2),RC(1));
+                block[2] =reverse_md5(block, 2, AC(2),RC(1));
             }
         }        
     
-        block= reverse_md5(block, 2, AC(2), RC(2));
+        block [2]= reverse_md5(block, 2, AC(2), RC(2));
         // prerparing next values for active work
         uint32 q_4 = Q[offset + 4];
         uint32 q_9 = Q[offset + 9];
@@ -729,7 +730,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                             block[10] = m_10;
                             Q[offset + 9] = q_9;
                             Q[offset + 10] = q_10;
-                            block = reverse_md5(block,13, AC(13), RC(13));
+                            block[13] = reverse_md5(block,13, AC(13), RC(13));
 
                         }
                         for (uint32 k9 = 0; k9 < 1024;)
@@ -737,10 +738,9 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                             uint32 IV[4] ={help_cond_Q_21,help_cond_Q_20,help_cond_Q_22,help_cond_M_10};
                             Q[offset + 9] = q_9 ^ q9mask2[k9] ;
                             k9++;
-                            block = reverse_md5(block, 8, AC(8), RC(80));
-                            block = reverse_md5(block, 9, AC(9), RC(9));
-                            block = reverse_md5(block, 12, AC(12), RC(12));
-
+                            block[8] = reverse_md5(block, 8, AC(8), RC(80));
+                            block[9] = reverse_md5(block, 9, AC(9), RC(9));
+                            block[12] = reverse_md5(block, 12, AC(12), RC(12));
                             //doing steps for t \in {24,...,33}
                             t =24;
                             IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
@@ -991,12 +991,12 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
         Q[offset + 16]= ( randX() & 0x1ffdffff ) | 0xa0000000 | ( ~Q[offset + 15] & 0x40020000 );
 
         // we now claculate the massage m for t =0,6,...,15. For this we use the reverse md5 fuction.
-		block = reverse_md5(block, 0, AC(0), RC(0)); // reverse_md5 is a void altering the input: block
-		block = reverse_md5(block, 6, AC(6), RC(6)); // stevens hard codes the AC and the RC
-	    block = reverse_md5(block, 7, AC(7), RC(7));
-		block = reverse_md5(block, 11, AC(11), RC(11)); 
-		block = reverse_md5(block, 14, AC(14), RC(14)); 
-		block = reverse_md5(block, 15, AC(15), RC(15)); 
+		block[0] = reverse_md5(block, 0, AC(0), RC(0)); // reverse_md5 is a void altering the input: block
+		block[6] = reverse_md5(block, 6, AC(6), RC(6)); // stevens hard codes the AC and the RC
+	    block[7] = reverse_md5(block, 7, AC(7), RC(7));
+		block[11] = reverse_md5(block, 11, AC(11), RC(11)); 
+		block[14] = reverse_md5(block, 14, AC(14), RC(14)); 
+		block[15] = reverse_md5(block, 15, AC(15), RC(15)); 
 
         //preparation for next calculations
         uint32 q_1;

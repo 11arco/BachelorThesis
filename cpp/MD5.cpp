@@ -267,13 +267,14 @@ uint32 AC(uint32 t)
 
 
 
-uint32* reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
+uint32 reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
 {  
     uint32 offset = 3;
 
     block[t] = Q[offset + t + 1] - Q[offset + t];
 	block[t] = RR(block[t], RC) - f_t(Q[offset + t], Q[offset + t - 1], Q[offset + t - 2], t) - Q[offset + t - 3] - AC ;
-    return block;
+
+    return block[t];
 }
 
 uint32 precise_step_foward(uint32 t, uint32 r, uint32 q_2, uint32 q_1, uint32 q_0, uint32 w_t,uint32 ac, uint32 rc )
