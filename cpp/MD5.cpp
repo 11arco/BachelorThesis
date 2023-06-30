@@ -16,13 +16,13 @@ using namespace std;
 typedef unsigned int uint32; //actually u32 
 
 uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
-uint32 Q[68];   // core to algorythm and collf.
+uint32 Q[67];   // core to algorythm and collf.
 
 void show_bits(uint32 * block, int len) // uese carefully
 {
     for (int i = 0; i< (len) ; i++) //shows msg block as bin
     {
-        if (i>0&&(i%4)==0) cout << " | " << endl;
+        if (i > 0 && (i % 4) == 0) cout << " | " << endl;
 
 
         cout << " | ";
@@ -67,6 +67,8 @@ string to_hex(uint32 u) // converts a uint32 into a hexadecimal vlaue
 {   
     stringstream temp_0 ;
     temp_0.str("");
+
+
     if (((u << 24) >> 24) < 0x10 ) (temp_0 <<  '0');  
     temp_0 << hex << ((u << 24) >> 24);
     if (((u << 16) >> 24) < 0x10 ) (temp_0 <<  '0');  
@@ -75,7 +77,7 @@ string to_hex(uint32 u) // converts a uint32 into a hexadecimal vlaue
     temp_0 << hex << ((u << 8) >> 24);
     if (((u << 0) >> 24) < 0x10 ) (temp_0 <<  '0');  
     temp_0 << hex << ((u << 0) >> 24);
-    
+
     //temp << hex << u;
 
     return temp_0.str();
@@ -95,7 +97,7 @@ void print_step(int step)
 
     cout << calc + to_string(step )  << " currect IHV: ";
 
-    cout << to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]) << endl;
+    cout << to_hex(ihv[0]) << to_hex(ihv[1]) << to_hex( ihv[2]) << to_hex( ihv[3]) << endl;
 }
 
 
@@ -145,6 +147,40 @@ string pad(string msg) // pad an imput massage into the correct lgenth + correct
 
     return msg;
 }
+
+string pad_stv(string msg) // pad an imput massage into the correct lgenth + correct format (adds a 1 at the start and length at the end)
+{
+    msg+= "\n"; // Wichtig! Endline wir immer mit verabreitet (bei Stevens). Enweder hier, oder vorhermitgeben.
+    int l = msg.length();
+
+    int counter = 0;
+    //int  length_for_adding = 0;
+
+    cout << "input: " + msg  << endl;
+    cout << "length: " ;
+    cout << l << endl;
+    
+    char end = 0; //8bit
+    char one = 1 << 7; //8bit
+
+    //msg += one; // stevens does not do this part of padding
+    
+    
+    while ( ((msg.length()*8 % (64*8)) != 0) || (counter  == 0 )) //8bit * 64 = 512 bit // 16 * 32 = 512 // 8 * 56 = 448 // depends on the maybes
+    {
+        msg = msg + end;
+        counter++;
+    }
+
+    //msg += from_64(length_for_adding);  // stevens does not do this part of padding
+
+    cout << "stv: " <<"final:" + msg + "|";
+    cout << msg.length() << endl;
+
+    return msg;
+}
+
+
 
 
 uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t ) 
@@ -223,7 +259,7 @@ uint32 RC (int t) // return the roataion constat
 
 
 
-uint32 RL (uint32 T, int RC) // shifting being cyclict
+uint32 RL (uint32 T, unsigned int RC) // shifting being cyclict
 {
     uint32 temp = T;
     T = T << RC;
@@ -244,7 +280,7 @@ void test_RL()
     return;
 }
 
-uint32 RR (uint32 T, int RC) // shifting being cyclict
+uint32 RR (uint32 T, unsigned int RC) // shifting being cyclict
 {
     uint32 temp = T;
 
@@ -262,6 +298,7 @@ uint32 AC(uint32 t)
     double sin_t =abs(sin(t+1));
     double pow_2 = pow(2,32);
     result = floor(sin_t * pow_2);
+
     return result;
 }
 
@@ -277,40 +314,27 @@ uint32 reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
     return block[t];
 }
 
-uint32 precise_step_foward(uint32 t, uint32 r, uint32 q_2, uint32 q_1, uint32 q_0, uint32 w_t,uint32 ac, uint32 rc )
+
+uint32 precise_step_foward(uint32 t, uint32 r, uint32 q_0, uint32 q_1, uint32 q_2, uint32 w_t,uint32 ac, uint32 rc )
 {
-    // q_0 = Q[t-0]; q_1 = Q[t-1] ..
     r += f_t(q_0,q_1,q_2, t) + ac + w_t;
     r = RL(r, rc) + q_0;
+
     return r;
-
 }
-
          
 uint32 step_foward( uint32 t, uint32 w_t) //if Q[] global => less 
 {
     uint32 R = Q[t - 3];
     uint32 offset = 3;
 
-    /* old:
-    AC_t = AC(t - offset );
-    *F = f_t( Q[t], Q[t - 1], Q[t - 2], (t - offset));
-    *T_ = F + Q[t - 3] + AC_t + W_t;
-    *R = RL(T_, RC(t - offset)) ;        
-    */
-
-    R = precise_step_foward(t - offset,R, Q[t - 2], Q[t - 1], Q[t ], w_t, AC(t - offset), RC(t - offset));
-/* 
-    if(t<10) cout<<" ";                     //debug
-    cout << " R_" + to_string(t) + ": ";    //debug
-    cout << bitset<32>(R) << endl;          //debug
- */
+    R = precise_step_foward(t - offset,R, Q[t - 0], Q[t - 1], Q[t - 2], w_t, AC(t - offset), RC(t - offset));
 
     return  R; //altering the state of Q[t+1]
 }
 
 
-uint32* md5_compress_f( uint32 block [16],uint32 IHV[4])   
+void md5_compress_f( uint32 block [16],uint32 IHV[4])   
 {
     //uint32cout << "compress" << endl;
     uint32 a = IHV [0];
@@ -318,46 +342,28 @@ uint32* md5_compress_f( uint32 block [16],uint32 IHV[4])
     uint32 c = IHV [2];
     uint32 d = IHV [3];
 
-    
-
-    fill_n(Q,68,0);
+    fill_n(Q,67,0);
     Q[0] = a; // !
     Q[1] = d; // !
     Q[2] = c; // !
     Q[3] = b; // !
     for ( int t = 3; t < 67; t++)  
     {   
-        Q[t+1] = step_foward((t ),W(block, t-3 ));
-
-        /* 
-        if(t<9) cout<<" ";                      //debug
-        cout << "Q[" + to_string(t) + "]: ";    //debug
-        cout << bitset<32>(Q[t]) << endl;       //debug
-        if(t<9) cout<<" ";                       //debug
-        cout << "Q[" + to_string(t + 1) + "]: "; //debug
-        cout << bitset<32>(Q[t + 1]) << endl;    //debug
-        cout << endl; 
-        */
+        Q[t + 1] = step_foward(t, W(block, t-3 ));
     }
-    IHV[0] = a + Q[61 + 3];
-    IHV[1] = b + Q[64 + 3];
-    IHV[2] = c + Q[63 + 3];
-    IHV[3] = d + Q[62 + 3];
-
-
-    
-    return IHV ;
+    IHV[0] += Q[3 + 61 ];
+    IHV[1] += Q[3 + 64 ];
+    IHV[2] += Q[3 + 63 ];
+    IHV[3] += Q[3 + 62 ];
+ 
+    return ;
 }
 
 void md5_compress (uint32 block [16])
 {
 
     uint32* temp;
-    temp = md5_compress_f(block,ihv);
-    for (int i =0; i<4;i++)
-    {
-        ihv[i] = temp[i];
-    }
+    md5_compress_f(block,ihv);
 
     return ;
 }
@@ -368,9 +374,18 @@ string process( string input)
     cout << "starting" << endl;
     string output;
     uint32 l = input.length();
+    bool stv = true;
+    string padded_input;
+    if(stv)
+    {
+        padded_input = pad_stv(input);
+    } 
+    else 
+    {        
+        padded_input = pad(input);
 
-    string padded_input = pad(input);
-    cout << "padding complete" << endl;
+    }
+
     int size = padded_input.size();
 
     uint32 msg_block [16] ;// N blocks each block contains 32bit uint 16 * 32 = 512
