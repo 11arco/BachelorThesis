@@ -315,10 +315,10 @@ uint32 reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
 }
 
 
-uint32 precise_step_foward(uint32 t, uint32 r, uint32 q_0, uint32 q_1, uint32 q_2, uint32 w_t,uint32 ac, uint32 rc )
+uint32 precise_step_foward(uint32 t, uint32 r, uint32 b, uint32 c, uint32 d, uint32 w_t,uint32 ac, uint32 rc )
 {
-    r += f_t(q_0,q_1,q_2, t) + ac + w_t;
-    r = RL(r, rc) + q_0;
+    r += f_t(b, c, d, t) + ac + w_t;
+    r = RL(r, rc) + b;
 
     return r;
 }
@@ -374,7 +374,7 @@ string process( string input)
     cout << "starting" << endl;
     string output;
     uint32 l = input.length();
-    bool stv = false;
+    bool stv = false; // enable padding like it is in Steven's code
     string padded_input;
     if(stv)
     {

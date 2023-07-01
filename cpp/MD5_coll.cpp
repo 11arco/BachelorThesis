@@ -26,7 +26,7 @@ uint32 x32 = 314159265;
 uint32 randX() //for 32 bits
 {
     //x32 = 0xf000f000; //11110000000000001111000000000000
-    //x32 ^= rand();
+    x32 ^= rand();
     x32 ^= x32 << 13;
     x32 ^= x32 >> 17;
     x32 ^= x32 << 5;
@@ -86,8 +86,6 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
         
 	    
         block[0] = reverse_md5(block,0, AC(0), RC(0));
-        //std::cout << bitset<32>(block[0]) << std::endl;
-
 		block[6] = reverse_md5(block,6, AC(6), RC(6));
 		block[7] = reverse_md5(block,7, AC(22), RC(7));
 		block[13] = reverse_md5(block,11, AC(11), RC(11));
@@ -150,7 +148,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
        const uint32 t_18 = Q[offset + 14] + AC(17) + W(block, 17);
        const uint32 t_19 = Q[offset + 15] + AC(18) + W(block, 18);
        const uint32 t_20 = Q[offset + 16] + AC(19) + W(block, 19);
-    const uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(5)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], 5) - AC(5); // RC(6) = 12 but why?
+        const uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(5)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], 5) - AC(5); // RC(6) = 12 but why?
 
 
         // prerparing next values for active work
@@ -231,13 +229,13 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
         unsigned counter2 = 0;
 
+
         while(counter2 < (1<<4))  // I choose this bad name intentional to force to rework this entire thing after it actually works, becuase I am afraid that I may leave the while (true)'s just as they are
         {            
             Q[offset + 4] = q4 ^ q4mask[counter2];
 			++counter2;
 
             block[5] = reverse_md5(block,5, AC(5), RC(5));
- 
 			uint32 q_21 = t_21 + W(block,20);
 			q_21 = RL(q_21,RC(20));
             q_21 += Q[offset + 20];
@@ -252,10 +250,11 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 				continue;
 
 			Q[offset + 21] = q_21;
+
 			block[3] = reverse_md5(block, 3, AC(3), RC(3));
 			block[4] = reverse_md5(block, 4, AC(4), RC(4));
 			block[7] = reverse_md5(block, 7, AC(7), RC(7));
-			
+
 			const uint32 t_22 = f_t(Q[offset + 21], Q[offset + 20], Q[offset + 19],21) + Q[offset + 18] + AC(21);
 			const uint32 t_23 = Q[offset + 19] + AC(22) + W(block,22);
 			const uint32 t_24 = Q[offset + 20] + AC(23) + W(block,23);
@@ -276,6 +275,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 			for (int counter3 = 0; counter3 < (1<<3);)
 			{
 
+            // block[0] is initial corrcet (line 89), but gets wrong over the code. My version does not change at all, Steven's does.
         /*    //###DEBUG
             std::cout << "             ..." << std::endl;
 
@@ -336,7 +336,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 	             			
                 uint32 help_21 = Q[offset + 21];  //aa                   
 				uint32 help_22 = t_22 + m_10;     //dd
-                help_22 = RL(help_22, RC(21)) + help_21;     //
+                help_22 = RL(help_22, RC(21)) + help_21;     
 
 				if (0x80000000 != (help_22 & 0x80000000)) continue;
 
@@ -344,11 +344,11 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 				uint32 help_23 = t_23 + f_t(help_22, help_21, help_20,22);  //cc
                 uint32 t;
 
-				if (0 != (help_23 & 0x20000)) continue; // not correct. 0x80000000 not fullfilled
+				if (0 != (help_23 & 0x20000)) continue;
 				help_23 = RL(help_23, RC(22)) + help_22;
 
 
-				if (0 != (help_23 & 0x80000000)) continue; // not correct. 0x80000000 == 0 not fullfilled
+				if (0 != (help_23 & 0x80000000)) continue;
 
 				uint32 help_24 = t_24 + f_t(help_23, help_22, help_21, 23); // help_20 becomes help_24, maybe rename (renamed)
                 help_24 = RL(help_24, RC(23)) + help_23;
@@ -378,20 +378,19 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     m_9 = q_10 - q_9;
 					block[9] = RR(m_9, RC(9)) - f_t(q_9, Q[offset + 8], Q[offset + 7],9) - t_9; 
 
-                    for (int i = offset + 21; i <68; i++) // maybe remove this later
+/*                     for (int i = offset + 21; i <68; i++) // maybe remove this later
                     {
                         Q[i] = 0;
-                    }
+                    } */
 
                     Q[offset + 21] = help_21;
                     Q[offset + 22] = help_22;
                     Q[offset + 23] = help_23;
                     Q[offset + 24] = help_24;
                     
-                    std::cout << bitset<32>(block[0]) << std::endl; // blocks differ here
- 
+                    //std::cout << bitset<32>(block[0]) << std::endl; // block[0] is initial corrcet (line 89), but gets wrong over the code. My version does not change at all, Steven's does.
 
-            /*std::cout << "1............!................. condition on Q[20]" << std::endl;
+/*             std::cout << "1............!................. condition on Q[20]" << std::endl;
             std::cout << bitset<32>(Q[offset + 20]) << std::endl;
             std::cout << "1.............^................ condition on Q[21]" << std::endl;
             std::cout << bitset<32>(Q[offset + 21]) << std::endl;
@@ -400,7 +399,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
             std::cout << "0.............................. condition on Q[23]" << std::endl;
             std::cout << bitset<32>(Q[offset + 23]) << std::endl;
             std::cout << "1............................... condition on Q[24]" << std::endl;
-            std::cout << bitset<32>(Q[offset + 24]) << std::endl;*/
+            std::cout << bitset<32>(Q[offset + 24]) << std::endl; */
 
                     //uint32 IV[4] ={help_21,help_20,help_23,help_22};
                     
@@ -408,16 +407,16 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     //doing steps for t \in {24,...,33}
                     
                     //Q[24] = step_foward(24,W(block,24));
-                    Q[offset + 25] = step_foward(24,W(block,24));
-                    Q[offset + 26] = step_foward(25,W(block,25));
-                    Q[offset + 27] = step_foward(26,W(block,26));
-                    Q[offset + 28] = step_foward(27,W(block,27));
-                    Q[offset + 29] = step_foward(28,W(block,28));
-                    Q[offset + 30] = step_foward(29,W(block,29));
-                    Q[offset + 31] = step_foward(30,W(block,30));
-                    Q[offset + 32] = step_foward(31,W(block,31));
-                    Q[offset + 33] = step_foward(32,W(block,32));
-                    Q[offset + 34] = step_foward(33,W(block,33));
+                    Q[offset + 25] = step_foward(offset + 24,W(block,24));
+                    Q[offset + 26] = step_foward(offset + 25,W(block,25));
+                    Q[offset + 27] = step_foward(offset + 26,W(block,26));
+                    Q[offset + 28] = step_foward(offset + 27,W(block,27));
+                    Q[offset + 29] = step_foward(offset + 28,W(block,28));
+                    Q[offset + 30] = step_foward(offset + 29,W(block,29));
+                    Q[offset + 31] = step_foward(offset + 30,W(block,30));  
+                    Q[offset + 32] = step_foward(offset + 31,W(block,31));
+                    Q[offset + 33] = step_foward(offset + 32,W(block,32));
+                    Q[offset + 34] = step_foward(offset + 33,W(block,33));
 
                     //offset + std::cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
 
@@ -429,22 +428,27 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
 					Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + t]; // RL(16) bzw RR(16)
                     //cout << "progress 1 " + to_string(counter4) << endl;
+                    
+
+
 
                     //doing steps for t \in {35,...,47}
-                    Q[offset + 36] = step_foward(35,W(block,35));
-                    Q[offset + 37] = step_foward(36,W(block,36));
-                    Q[offset + 38] = step_foward(37,W(block,37));
-                    Q[offset + 39] = step_foward(38,W(block,38));
-                    Q[offset + 40] = step_foward(39,W(block,39));
-                    Q[offset + 41] = step_foward(40,W(block,40));
-                    Q[offset + 42] = step_foward(41,W(block,41));
-                    Q[offset + 43] = step_foward(42,W(block,42));
-                    Q[offset + 44] = step_foward(43,W(block,43));
-                    Q[offset + 45] = step_foward(44,W(block,44));
-                    Q[offset + 46] = step_foward(45,W(block,45));
-                    Q[offset + 47] = step_foward(46,W(block,46));
-                    Q[offset + 48] = step_foward(47,W(block,47));
-
+                    Q[offset + 36] = step_foward(offset + 35,W(block,35));
+                    Q[offset + 37] = step_foward(offset + 36,W(block,36));
+                    Q[offset + 38] = step_foward(offset + 37,W(block,37));
+                    Q[offset + 39] = step_foward(offset + 38,W(block,38));
+                    Q[offset + 40] = step_foward(offset + 39,W(block,39));
+                    Q[offset + 41] = step_foward(offset + 40,W(block,40));
+                    Q[offset + 42] = step_foward(offset + 41,W(block,41));
+                    Q[offset + 43] = step_foward(offset + 42,W(block,42));
+                    Q[offset + 44] = step_foward(offset + 43,W(block,43));
+                    Q[offset + 45] = step_foward(offset + 44,W(block,44));
+                    Q[offset + 46] = step_foward(offset + 45,W(block,45));
+                    Q[offset + 47] = step_foward(offset + 46,W(block,46));
+                    Q[offset + 48] = step_foward(offset + 47,W(block,47));
+                   /* std::cout << std::endl;
+                     std::cout << bitset<32>(Q[offset + 47]) << " | 47" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 48]) << " | 48" << std::endl */;
 	                if (0 != ((Q[offset + 48] ^ Q[offset + 46]) & 0x80000000))
 						continue;
                     // for t = 48 ... 63
@@ -455,7 +459,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
                     t = 49;
                     Q[offset + t + 1] = step_foward(t + offset,W(block,t));
-                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
+                    if (0 == ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 50;
                     Q[offset + t + 1] = step_foward(t + offset,W(block,t));
@@ -463,6 +467,14 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     
                     t = 51;
                     Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+
+                                        /*
+                    std::cout << bitset<32>(Q[offset + 49]) << " | 49" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 50]) << " | 50" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 51]) << " | 51" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 52]) << " | 52" << std::endl; 
+                    */
+
                     if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 52;
@@ -479,7 +491,13 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
                     t = 55;
                     Q[offset + t + 1] = step_foward(t + offset,W(block,t));
-                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
+
+/*                     std::cout << bitset<32>(Q[offset + 53]) << " | 53" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 54]) << " | 54" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 55]) << " | 55" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 56]) << " | 56" << std::endl;  */
+
+                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;                    
 
                     t = 56;
                     Q[offset + t + 1] = step_foward(t + offset,W(block,t));
@@ -495,10 +513,18 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
                     t = 59;
                     Q[offset + t + 1] = step_foward(t + offset,W(block,t));
-                    if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
+                    /*                     
+                    std::cout << bitset<32>(Q[offset + 57]) << " | 57" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 58]) << " | 58" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 59]) << " | 59" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 60]) << " | 60" << std::endl; 
+                    */
+
+                    if (0 == ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
+                    
                     t = 60;
-                    Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+                    Q[offset + t + 1] = step_foward(t + offset,W(block,t)); // Q[61]
                     if (0 != ((Q[offset + t + 1] ^ Q[offset + t - 1]) >> 31)) continue;
 
                     t = 61;
@@ -511,6 +537,14 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
                     t = 63;
                     Q[offset + t + 1] = step_foward(t + offset,W(block,t));
+
+
+
+/*                     std::cout << bitset<32>(Q[offset + 61]) << " | 61" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 62]) << " | 62" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 63]) << " | 63" << std::endl;
+                    std::cout << bitset<32>(Q[offset + 64]) << " | 64" << std::endl;
+                    std::cout << "                    ..." << std::endl;    */
 
                     //cout << "b0t" << endl;
 					uint32 IHV1 = Q[offset + 64] + IHV[1];
@@ -574,11 +608,11 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     md5_compress_f(block,IV1);      //changes the given IV1
                     md5_compress_f(block2,IV2);     //changes the given IV2
                     
-                    std::cout << std::endl;
+/*                     std::cout << std::endl;
                     std::cout << " | " << bitset<32>( IV1[0] + (1<<31));
                     std::cout << std::endl;
                     std::cout << " | " << bitset<32>( IV2[0]);
-                    std::cout << std::endl;
+                    std::cout << std::endl; */
 
 /*    
                     std::cout << " | " << bitset<32>( IV1[1] + (1<<31) + (1<<25));
@@ -770,25 +804,25 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
                             block[12] = reverse_md5(block, 12, AC(12), RC(12));
                             //doing steps for t \in {24,...,33}
                             t =24;
-                            IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                            IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                             t =25;
-                            IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                            IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                             t =26;
-                            IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                            IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                             t =27;
-                            IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
+                            IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
                             t =28;
-                            IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                            IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                             t =29;
-                            IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                            IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                             t =30;
-                            IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                            IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                             t =31;
-                            IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
+                            IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[4],W(block,t),AC(t),RC(t));
                             t =32;
-                            IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                            IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                             t =33;
-                            IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                            IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
                             IV[2] += f_t(IV[3],IV[0],IV[1],34); //t = 34
 
@@ -798,97 +832,97 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4])
 
                                 //doing steps for t \in {35,...,47}
                                 t =35;
-                                IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
                                 t =36;
-                                IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                                 t =37;
-                                IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                                 t =38;
-                                IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                                 t =39;
-                                IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
                                 t =40;
-                                IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                                 t =41;
-                                IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                                 t =42;
-                                IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                                 t =43;
-                                IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
                                 t =44;
-                                IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
                                 t =45;
-                                IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
                                 t =46;
-                                IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
                                 t =47;
-                                IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                                 if((IV[1] ^IV[3]) & 0x80000000 != 1)//checks wether IV[1] or IV[3] is 1 at pos.s of 0x80000000 
                                 {   // do not know how to sove this nicely just copyed it .. for pregress
                                     // for t = 48 ... 63
                                     t = 48;
-                                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                    IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 49;
-                                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                    IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
                                     if (0 == ((IV[1] ^ IV[3]) >> 31)) continue;
                                     t = 50;
-                                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                    IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 51;
-                                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                    IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
                                     t = 52;
-                                    IV[1] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                    IV[1] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 53;
-                                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                    IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[1]^IV[3]) >> 31)) continue;
                                     t = 54;
-                                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                    IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
     
                                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 55;
-                                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                    IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
                                     t = 56;
-                                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                    IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 57;
-                                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                    IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
                                     t = 58;
-                                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                    IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 59;
-                                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                    IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                                     if (0 == ((IV[1] ^ IV[3]) >> 31)) continue;
                                     t = 60;
-                                    IV[0] = precise_step_foward(t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
+                                    IV[0] = precise_step_foward(offset + t,IV[0],IV[1],IV[2],IV[3],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[0] ^ IV[2]) >> 31)) continue;
                                     t = 61;
-                                    IV[3] = precise_step_foward(t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
+                                    IV[3] = precise_step_foward(offset + t,IV[3],IV[0],IV[1],IV[2],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[1] ^ IV[3]) >> 31)) continue;
                                     t = 62;
-                                    IV[2] = precise_step_foward(t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
+                                    IV[2] = precise_step_foward(offset + t,IV[2],IV[3],IV[0],IV[1],W(block,t),AC(t),RC(t));
 
                                     if (0 != ((IV[0]^IV[2]) >> 31)) continue;
                                     t = 63;
-                                    IV[1] = precise_step_foward(t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
+                                    IV[1] = precise_step_foward(offset + t,IV[1],IV[2],IV[3],IV[0],W(block,t),AC(t),RC(t));
 
                                     //cout << "b1t" << endl;
 
@@ -1135,6 +1169,7 @@ void find_coll(uint32 block_10[16],uint32 block_11[16],uint32 block_20[16],uint3
 
     std::cout << "try to find collsions. IHV: " << std::flush;
     std::cout << hex << ihv[0] << hex << ihv[1] << hex << ihv[2] << hex << ihv[3] << std::endl;
+    std::cout << to_hex(ihv[0]) << to_hex(ihv[1]) << to_hex(ihv[2]) << to_hex(ihv[3]) << std::endl;
     std::cout << "Block0: " << std::endl;
 	find_block0(block_10, ihv);
     std::cout << "Block0 ... " << std::endl;
