@@ -374,7 +374,7 @@ string process( string input)
     cout << "starting" << endl;
     string output;
     uint32 l = input.length();
-    bool stv = true;
+    bool stv = false;
     string padded_input;
     if(stv)
     {
