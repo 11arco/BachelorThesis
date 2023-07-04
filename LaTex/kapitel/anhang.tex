@@ -5,3 +5,39 @@
 +---+
 \chapter{Code}
 a +=a;\\
+
+
+\section*{Notes}
+
+
+
+
+\section{Notation Helper and Ideas}
+
+
+\begin{table}[]
+    \caption*{\large Notation}
+    \begin{tabular}{ c | c | c }
+    Stevens & Wang  & Definition  \\
+    \hline 
+    $h(m) = H$ &  & the hash $H$ of some message $m$\\
+    $ RL \left(X , Y \right) $  & $ ROTL^{Y} \left( X\right) $  & cyclic left shift $X$ by $Y$ (mod 31) \\
+    $ RR \left(X , Y \right) $  & -                             & cyclic right shift $X$ by $Y$ (mod 31) \\
+    $ RC \left(t \right) $      &$ S \left(t \right) $          & rotation Constant of $t$ \\
+    Block 1, Block 2 & Block N, Block M & pair of first blocks for collisions finding   \\
+    Block 0, Block 1 & Block N, Block M & same pair but im Code\\
+    \end{tabular}
+    \label{notation}
+\end{table}
+
+$RR\left(X,Y\right) :\equiv X  \circled{>>} Y$\\
+$RL\left(X,Y\right) :\equiv X  \circled{<<} Y$\\
+$X \oplus Y :\equiv X "XOR"  Y$
+
+
+\begin{align*}
+10000000000000000000000000000001  \circled{<<} 7 &\equiv 00000000000000000000000011000000
+\end{align*}
+  
+
+

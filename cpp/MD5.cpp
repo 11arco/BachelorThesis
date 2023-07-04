@@ -210,7 +210,8 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
 
 uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 { 
-    int pos=-1;
+    //int pos=-1;
+    /*
     if (t < 16) pos = t ;
     else if (t < 32){ 
         pos = (1+(5*t)) % 16;
@@ -220,11 +221,16 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
     }
     else if (t < 64){ 
         pos = (7*t) % 16;
-    }
+    } 
+    */
 
-    if (pos <= -1 || pos >= 16) cout << "something went wrong un W. t is:" + to_string(t)<< endl;
+    //easy speed up
+    int t_pos[64] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1,6,11,0,5,10,15,4,9,14,3,8,13,2,7,12,5,8,11,14,1,4,7,10,13,0,3,6,9,12,15,2,0,7,14,5,12,3,10,1,8,15,6,13,4,11,2,9};
 
-    return m[pos]; 
+
+    if (t <= -1 || t >= 64) cout << "something went wrong un W. t is:" + to_string(t)<< endl;
+
+    return m[t_pos[t]]; 
 
 }
 
@@ -235,6 +241,7 @@ uint32 RC (int t) // return the roataion constat
     uint32 RC1[4] ={5,9,14,20};
     uint32 RC2[4] ={4,11,16,23};
     uint32 RC3[4] ={6,10,15,21};
+    if (t > 64 || t < 0) (cout << " RC: something went wrong. t = " << t << endl);
 
     if (t < 16)
     {
@@ -253,7 +260,6 @@ uint32 RC (int t) // return the roataion constat
         c = RC3[t % 4];
     }
     
-    if (t > 64 || t < 0) (cout << "RC: something went wrong. c = " + to_string(c));
     return c;
 }
 
@@ -264,9 +270,7 @@ uint32 RL (uint32 T, unsigned int RC) // shifting being cyclict
     uint32 temp = T;
     T = T << RC;
     temp = temp >> (32-RC);
-    T = T | temp;
-
-    return T;
+    return T | temp;
 }
 
 void test_RL()
@@ -286,18 +290,15 @@ uint32 RR (uint32 T, unsigned int RC) // shifting being cyclict
 
     T = T >> RC;
     temp = temp << (32-RC);
-    T = T | temp;
-
-    return T;
+    return  T | temp;
 }
 
 
 uint32 AC(uint32 t)
 {
     uint32 result ;
-    double sin_t =abs(sin(t+1));
-    double pow_2 = pow(2,32);
-    result = floor(sin_t * pow_2);
+    double sin_t = abs(sin(t+1));
+    result = floor(sin_t * (0x100000000));
 
     return result;
 }

@@ -3,24 +3,27 @@
 \babel@toc {ngerman}{}\relax 
 \babel@toc {ngerman}{}\relax 
 \babel@toc {usenglish}{}\relax 
+\contentsline {chapter}{Acknowledgements}{2}{chapter*.1}%
 \contentsline {chapter}{\numberline {1}Introduction}{4}{chapter.1}%
-\contentsline {section}{\numberline {1.1}May Contains}{4}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Notation Helper and Ideas}{5}{section.1.2}%
-\contentsline {chapter}{\numberline {2}About MD5}{6}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Definition}{6}{section.2.1}%
-\contentsline {section}{\numberline {2.2}On Code}{6}{section.2.2}%
-\contentsline {chapter}{\numberline {3} Collision Finding}{8}{chapter.3}%
-\contentsline {section}{\numberline {3.1}About collisions }{8}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Differential Path}{8}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Bit Conditions}{9}{section.3.3}%
-\contentsline {section}{\numberline {3.4}About Code}{11}{section.3.4}%
-\contentsline {chapter}{\numberline {4}Wang}{13}{chapter.4}%
-\contentsline {chapter}{\numberline {5}Othercolls}{14}{chapter.5}%
-\contentsline {chapter}{\numberline {6}SHA1}{15}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Conclusion}{16}{chapter.7}%
-\contentsline {chapter}{Bibliography}{i}{chapter*.11}%
+\contentsline {section}{\numberline {1.1}Hash Function}{4}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Notation / Preliminaries}{4}{section.1.2}%
+\contentsline {chapter}{\numberline {2}About MD5}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Definition}{5}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Algorithm}{5}{section.2.2}%
+\contentsline {chapter}{\numberline {3} Collision Finding}{10}{chapter.3}%
+\contentsline {section}{\numberline {3.1}About collisions }{10}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Differential Path}{10}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Bit Conditions}{11}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Second Preimage Resistance}{13}{section.3.4}%
+\contentsline {section}{\numberline {3.5}About Code}{13}{section.3.5}%
+\contentsline {chapter}{\numberline {4}Differences between Steven and Wang}{16}{chapter.4}%
+\contentsline {chapter}{\numberline {5}Othercolls}{25}{chapter.5}%
+\contentsline {chapter}{\numberline {6}SHA1}{29}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Conclusion}{33}{chapter.7}%
+\contentsline {chapter}{Bibliography}{i}{chapter*.9}%
 \contentsline {chapter}{\numberline {A}Tables}{ii}{appendix.A}%
 \contentsline {chapter}{\numberline {B}Code}{iii}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Notation Helper and Ideas}{iii}{section.B.1}%
 \contentsline {chapter}{List of figures}{iv}{appendix*.12}%
 \contentsline {chapter}{List of algorithms}{v}{appendix*.13}%
 \contentsline {chapter}{Erklärung}{vii}{appendix*.13}%

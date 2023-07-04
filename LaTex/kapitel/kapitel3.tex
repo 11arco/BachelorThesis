@@ -11,7 +11,10 @@ Hash functions have resistance:
 
 
 \section{Differential Path}
-Stevens starts with Wangs attack, which trys to finde to pairs of blocks:
+Explain the genereal idea of the bit conditions first. There is a part I want to talk about the diffeces of Wang and Steven. In this part I can tear the details of the differential paths apart.
+
+
+Stevens starts with Wang's attack, which tries to find to pairs of blocks:
 \( \left(B_0 , B_0' \right) \)  and \( \left(B_1 , B_1' \right) \) that \( IHV = IHV' \),
  with the goal to create two massages $ M $ and $ M' $, with the same hash value:
 
@@ -22,54 +25,26 @@ Stevens starts with Wangs attack, which trys to finde to pairs of blocks:
 \end{align*} 
 The idea to manipulate a block $B$ such that $Q_1 \dots Q_{16}$ maintain their conditions and that $Q_17$ to some $Q_k$ do not change at all. We try to make k as large as possible.
 \section{Bit Conditions}
+
+Again, try to keep it theoretical, give an overview what we want to do with the bit conditions and safe the details for the comparison between Steven and Wang.
+
+
+
 Bit conditions describe the differential path on bits. 
 We need the bit conditions to avoid a carry, so a manipulation in step $t$ stays in step $t$ and does not propagate beyond the $31$st bit.
 We look at conditions and restrictions. The restrictions leads to conditions, which we calculate in the following.
 A restriction e.g. $\Delta T_2 \left[\ 31 \right] = +1 $ leads to conditions $ Q_1\left[ 16 \right] Q_2\left[ 16 \right] = Q_3\left[ 15 \right] = 0 $ and $ Q_2[15] = 1$.
 Notice, conditions are on $\Delta T_t[i]$ a state in md5-algorithm before the rotation and restrictions are on $Q_t[i]$ states of the md5-algorithm after the rotation.\\ 
 We calculate the bit conditions by using the Add-Difference for two massage blocks containing tow blocks $N|M$ and $N'|M'$. The XOR-Difference is useful, too.
-\begin{align*}
-    \delta X &= X' - X \left( mod32 \right) \text{ Add-Difference}\\
-    \Delta X &= X' \oplus X \text{ XOR-Difference}\\
-    \lambda \left[i\right] &= \text{ our guess for the ith bit: } X\left[i\right] \\
-    \\
-    \text{if } \Delta X = \lambda &\Rightarrow \delta x \text{ can be determined}
-\end{align*}
-For $\lambda \left[i\right]$ we only need to consider $i < 31$, since $X \left[ 31 \right]$ as msb always creates a add difference of $2^{31}$.\\
-\begin{wrapfigure}[]{r}{0.2\textwidth}
-    %\caption*{\textcolor{red}{fix writing}}
-    %\begin{table}[]
-        \begin{tabular}{| c | c |}
-            \hline
-            $t$ & $RC(t)$    \\
-            \hline
-            \hline
-            0  & 7 \\
-            1  & 12 \\
-            2  & 17 \\
-            3  & 22 \\
-            4  & 7 \\
-            5  & 12 \\
-            6  & 17 \\
-            7  & 22 \\
-            8  & 7 \\
-            9  & 12 \\
-            10 & 17 \\
-            11 & 22 \\
-            12 & 7 \\
-            13 & 12 \\
-            14 & 17 \\
-            15 & 22 \\
-            \hline
-        \end{tabular}
-        \label{RC}
-    %\end{table}
-    \end{wrapfigure}
-We calculate a $\delta$ for each $f_t$, $Q_t$, $T_t$ and $R_t$ for our add difference, to calculate $Q_{t+1}$ .
-Additional we need the rotation constant $RC$ for each $t$. 
-In general we begin with the $f_t$ since we want $f_t$ to be in a particular state.
-Since we want to avoid a carries in our calculation 
+    \begin{align*}
+        \delta X &= X' - X \left( mod32 \right) \text{ Add-Difference}\\
+        \Delta X &= X' \oplus X \text{ XOR-Difference}\\
+        \lambda \left[i\right] &= \text{ our guess for the ith bit: } X\left[i\right] \\
+        \\
+        \text{if } \Delta X = \lambda &\Rightarrow \delta x \text{ can be determined}
+    \end{align*}
 
+For $\lambda \left[i\right]$ we only need to consider $i < 31$, since $X \left[ 31 \right]$ as msb always creates a add difference of $2^{31}$.\\
 \begin{figure}
     \begin{align*}
         \delta F_t &= f \left( Q'_t,Q'_{t-1},Q'_{t-2} \right) \\
@@ -80,6 +55,42 @@ Since we want to avoid a carries in our calculation
     \caption[short]{Add difference}
     \label{md5delta}
 \end{figure}
+\newpage
+\begin{wrapfigure}[]{r}{0.3\textwidth}
+    %\begin{table}[]
+        \begin{tabular}{| c | c | c |}
+            \hline
+            $t$ & $RC(t)$ & $AC(t)$    \\
+            \hline
+            \hline
+            0  & 7  & \\
+            1  & 12 & \\
+            2  & 17 & \\
+            3  & 22 & \\
+            4  & 7  & \\
+            5  & 12 & \\
+            6  & 17 & \\
+            7  & 22 & \\
+            8  & 7  & \\
+            9  & 12 & \\
+            10 & 17 & \\
+            11 & 22 & \\
+            12 & 7  & \\
+            13 & 12 & \\
+            14 & 17 & \\
+            15 & 22 & \\
+            \hline
+        \end{tabular}
+        \caption{Overview of each rounds constants}
+        \label{RC}
+
+    %\end{table}
+    \end{wrapfigure}
+We calculate a $\delta$ for each $f_t$, $Q_t$, $T_t$ and $R_t$ for our add difference, to calculate $Q_{t+1}$ .
+Additional we need the rotation constant $RC$ for each $t$. 
+In general we begin with the $f_t$ since we want $f_t$ to be in a particular state.
+Since we want to avoid a carries in our calculation 
+
 
 \begin{enumerate}
     \item $t \in \{0,1,2,3\}$:\\
@@ -88,10 +99,22 @@ Since we want to avoid a carries in our calculation
     $\Delta T_4 = -2^{31}$, because we must not have a carry, we \textit{lock} the last bit.
     Since  $RL(T_4, RC_4) = RL(-2^{31}, 7) = -2^6 $ and $\delta Q_4 = 0 \Rightarrow  \delta Q_5 = -2^6$  
 \end{enumerate}
-Something\\
+for an example we can use the detailed calculations of Wang's or maybe used our own, for a first understanding Wang's might be better.
+Again, explain the bit conditions and not the differences between Steven's and Wang's Code.
+
+\vfill
+input 
 \newpage
+
+\section{Second Preimage Resistance}
+Wang's attack of the MD5 bases on two algorithms. One processes the first and the other the second block of an arbitrary massage, without loss of generality (w.l.o.g.). We call it first block.
+The first algorithm finds to the given first input block's IHV another IHV so that both blocks have the same new IHV.
+Again it is important to notice that both blocks differ only a little form each other.     
+In our approach we reconstructed the algorithm of Wang fitting our implementation of the \textit{MD5-Algorithm} and the code of Steven's attack.
+We managed to provoke a second preimage resistance failure.  
+
 \section{About Code}
-There are multiple approaches to find the first block, Stevens used in his code five. Four written by himself.
+There are multiple approaches to find the second block. Stevens used in his code five. Four written by himself.
 They all have similarities, especially in the beginnings. 
 The first \textit{find-first-block} algorithm though, is the algorithm by Wang. His additional algorithms are "just" improvements, if the algorithm of Wang does not success.
 Since the similarities we only go in Wang's algorithm with a deeper view and explain some improvements eventually.\\
@@ -106,10 +129,10 @@ We follow Stevens approach but generate "normal" random values and alter these s
 Improvements for random number generation are possible. \\
 Example for Stevens bit manipulation for $Q_t$ with $t = 3$ :\\
 \\
-$1.$ the val to set the zeros (bitwise-and with $0xfe87bc3f$)\\
-$2.$ the val to set the ones ( bitwise-or with $0x017841c0$)\\
-$3.$ the new bit Conds\\
-$4.$ the old bit Conds
+$1.$ the values to set the zeros (bitwise-and with $0xfe87bc3f$)\\
+$2.$ the values to set the ones ( bitwise-or with $0x017841c0$)\\
+$3.$ the new bit conditions\\
+$4.$ the old bit conditions
 
 \begin{align*}    
     1.& \text{ AND} & 11111110 & & 10000111 & & 10111100 & & 00111111 & & 0xfe87bc3f \\
@@ -158,3 +181,5 @@ We can solve this by looping about the calculation as long as the conditions are
     \label{demepndeces}
 \end{wrapfigure}
 For a good pick for $Q_{17}$ we just generate a random value and force the conditions manual.
+\newpage
+6
