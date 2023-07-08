@@ -74,7 +74,8 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "climits": "cpp"
     },
     "files.maxMemoryForLargeFilesMB": 16.384
 }

@@ -4,13 +4,14 @@
 #include <bitset>
 
 #include <climits>
-#include <sstream>
-#include <string.h>
-
 
 #include <ctime>
 
 #include <cmath>
+#include <vector>
+#include <string.h>
+
+#include <sstream>
 
 using namespace std;
 typedef unsigned int uint32; //actually u32 
