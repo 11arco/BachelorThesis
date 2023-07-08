@@ -160,12 +160,12 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
             uint32 q_20 = f_t(q_19, q_18, q_17, 19) + t_20;
             q_20 = RL(q_20, RC(19)); 
             q_20 += q_19;
-			if (0x00040000 != ((q_20 ^ q_19) & 0x00040000)) // xor q_20 and q_19 gives where they are diffrent, take bit 18 with &0x00040000, if this is not set on 1 continue the while loop and do not process further
+			if (0x00040000 != ((q_20 ^ q_19) & 0x80040000)) // xor q_20 and q_19 gives where they are diffrent, take bit 18 with &0x00040000, if this is not set on 1 continue the while loop and do not process further
                 continue;
             
-             if (0x80000000 != (q_20 & 0x80000000))
+/*              if (0x80000000 != (q_20 & 0x80000000))
                 continue; 
-
+ */
             block[1] = q_17 - q_16;
             block[1] = RR(block[1], 5); //RC(16) = 5
             block[1] -= t_17;
@@ -278,18 +278,16 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 				// this changes m8, m9 and m12 (but not m10!)
 
                 //more helper values ..
-                uint32 q_9;
-                uint32 m_8;
-                uint32 m_9;
+       
                                                             
 		        for (unsigned counter4 = 0; counter4 < (1<<16); ++counter4)
 				{
 
-                    q_9 = Q[offset + 9] ^ q9mask[counter4];
+                    uint32 q_9 = Q[offset + 9] ^ q9mask[counter4];
 					block[12] = t_12 - f_t(Q[offset + 12], Q[offset + 11], q_10, 12) - q_9;
-					m_8 = q_9 - Q[offset + 8];
+					uint32 m_8 = q_9 - Q[offset + 8];
 					block[8] = RR(m_8, RC(8)) - t_8; 					
-                    m_9 = q_10 - q_9;
+                    uint32 m_9 = q_10 - q_9;
 					block[9] = RR(m_9, RC(9)) - f_t(q_9, Q[offset + 8], Q[offset + 7],9) - t_9; 
 
 /*                     for (int i = offset + 21; i <68; i++) // maybe remove this later
@@ -478,11 +476,13 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     md5_compress_f(block,IV1);      //changes the given IV1
                     md5_compress_f(block2,IV2);     //changes the given IV2
 
-                    if (	   (IV2[0] == IV1[0] + (1<<31))
-							&& (IV2[1] == IV1[1] + (1<<31) + (1<<25))
-							&& (IV2[2] == IV1[2] + (1<<31) + (1<<25))
-							&& (IV2[3] == IV1[3] + (1<<31) + (1<<25)))
-                    {      
+
+                    if ((IV2[0] == IV1[0] + (1<<31)) && (IV2[1] == IV1[1] + (1<<31) + (1<<25)) && (IV2[2] == IV1[2] + (1<<31) + (1<<25))	&& (IV2[3] == IV1[3] + (1<<31) + (1<<25)))
+                    {       
+                        std::cout << ihv[0] << std::endl;
+                        std::cout << ihv[1] << std::endl;
+                        std::cout << ihv[2] << std::endl;
+                        std::cout << ihv[3] << std::endl;
                         return 0;
                     }
 
@@ -514,6 +514,10 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
     Q[1] = IHV[3];
     Q[2] = IHV[2];
     Q[3] = IHV[1];
+    std::cout << Q[0] << std::endl;
+	std::cout << Q[1] << std::endl;
+	std::cout << Q[2] << std::endl;
+	std::cout << Q[3] << std::endl;
 
 	std::vector<uint32> q9q10mask(1<<5);
 
