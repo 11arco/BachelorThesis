@@ -74,47 +74,6 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 		block[14] = reverse_md5(block,14, AC(14), RC(14));
 		block[15] = reverse_md5(block,15, AC(15), RC(15));
 
-         
-/*         //###DEBUG ONLY###
-        //All conditions are from ~ Table B-6: New first block conditions
-        std::cout << bitset<32>(Q[offset + 1]) <<" Q[1]" <<std::endl;
-        std::cout << bitset<32>(Q[offset + 2]) <<" Q[2]" <<std::endl;
-
-
-        std::cout << "                    ......." << std::endl;
-
-        std::cout << ".......1.1111....1....0111...... condition on Q[3]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 3]) <<" Q[3]" <<std::endl;
-        std::cout << "0.....^0^0000^^^^0^^^^1011..0... condition on Q[4]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 4]) << std::endl;
-        std::cout << "01...^01111111111111111111^^1.^^ condition on Q[5]"  << std::endl;
-        std::cout << bitset<32>(Q[offset + 5]) << std::endl;
-        std::cout << "10.1.000010010111000001011010.10 condition on Q[6]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 6]) << std::endl;
-        std::cout << "0..0.0100100000000011011.1000.11 condition on Q[7]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 7]) << std::endl;
-        std::cout << "0!.0.0...101....1..1...011010.11 condition on Q[8]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 8]) << std::endl;
-        std::cout << "0!10...0.0...1^.0..0....011.1..0 condition on Q[9]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 9]) << "Q [9]" <<std::endl;
-        std::cout << "0.01...0.1...00.1..1....1...1..1 condition on Q[10]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 10]) << std::endl;
-        std::cout << "0!0....1.....01...^1....00.....0 condition on Q[11]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 11]) << std::endl;
-        std::cout << "0!0....0..!..01...1.....1....... condition on Q[12]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 12]) << std::endl;
-        std::cout << "0.1....0.....1..1.01....0...1... condition on Q[13]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 13]) << std::endl;
-        std::cout << "0!0.............1.1.....1...1... condition on Q[14]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 14]) << std::endl;
-        std::cout << "1.0....0.......!1...........0... condition on Q[15]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 15]) << std::endl;
-        std::cout << "1!1...........!................. condition on Q[16]" << std::endl;
-        std::cout << bitset<32>(Q[offset + 16]) << std::endl;
-
-
-        std::cout << "__________________________________" << std::endl;  */
-           
         
         // prepare some helper values which are not necassery, but useful
         // we refer to the T_t state of the MD5 sum without the word (W_t), when speaking about t_t
@@ -124,12 +83,12 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
         // T_t = F_t + Q[t−3} + AC_t + W_t ,
         // in general
 
-       const uint32 t_1 = f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + Q[offset - 2] + AC(1);
+        const uint32 t_1 = f_t(Q[offset + 1], Q[offset + 0], Q[offset - 1], 1) + Q[offset - 2] + AC(1);
 
-       const uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset + 13] + AC(16);
-       const uint32 t_18 = Q[offset + 14] + AC(17) + W(block, 17);
-       const uint32 t_19 = Q[offset + 15] + AC(18) + W(block, 18);
-       const uint32 t_20 = Q[offset + 16] + AC(19) + W(block, 19);
+        const uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14], 16) + Q[offset + 13] + AC(16);
+        const uint32 t_18 = Q[offset + 14] + 0xc040b340 + block[6];
+        const uint32 t_19 = Q[offset + 15] + 0x265e5a51 + block[11];
+        const uint32 t_20 = Q[offset + 16] + 0xe9b6c7aa + block[0];
         const uint32 t_5 = RR(Q[offset + 6] - Q[offset + 5], RC(5)) - f_t(Q[offset + 5], Q[offset + 4], Q[offset + 3], 5) - AC(5); // RC(6) = 12 but why?
 
 
@@ -187,8 +146,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
 		}
 
-		if (counter != 0)
-			continue;
+		if (counter != 0)continue;
 
         // iterate over possible changes of q4 
 		// while keeping all conditions on q1-q20 intact
@@ -206,13 +164,11 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 			++counter2;
 
             block[5] = reverse_md5(block,5, AC(5), RC(5));
-			uint32 q_21 = t_21 + W(block,20);
+			uint32 q_21 = t_21 + block[5];
 			q_21 = RL(q_21,RC(20));
             q_21 += Q[offset + 20];
 
-            if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000))
-
-				continue;
+            if (0 != ((q_21 ^ Q[offset + 20]) & 0x80020000)) continue;
 
 			Q[offset + 21] = q_21;
 
@@ -224,9 +180,10 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 			const uint32 t_23 = Q[offset + 19] + AC(22) + W(block,22);
 			const uint32 t_24 = Q[offset + 20] + AC(23) + W(block,23);
 
-            const uint32 t_8 = f_t(Q[offset + 8], Q[offset + 7], Q[offset + 6], 8) + Q[offset + 5] + AC(8);		
 			const uint32 t_9 = Q[offset + 6] + AC(9);
 			const uint32 t_10 = Q[offset + 7] + AC(10);
+
+            const uint32 t_8 = f_t(Q[offset + 8], Q[offset + 7], Q[offset + 6], 8) + Q[offset + 5] + AC(8);		
 			const uint32 t_12 = RR(Q[offset + 13] - Q[offset + 12], RC(12)) - AC(12); 
 			const uint32 t_13 = RR(Q[offset + 14] - Q[offset + 13], RC(13)) - f_t(Q[offset + 13], Q[offset + 12], Q[offset + 11], 13) - AC(13);
 
@@ -262,12 +219,10 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 				if (0 != (help_23 & 0x20000)) continue;
 				help_23 = RL(help_23, RC(22)) + help_22;
 
-
 				if (0 != (help_23 & 0x80000000)) continue;
 
 				uint32 help_24 = t_24 + f_t(help_23, help_22, help_21, 23); // help_20 becomes help_24, maybe rename (renamed)
                 help_24 = RL(help_24, RC(23)) + help_23;
-
 
 				if (0 == (help_24 & 0x80000000)) continue; //
 
@@ -278,8 +233,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 				// this changes m8, m9 and m12 (but not m10!)
 
                 //more helper values ..
-       
-                                                            
+                                            
 		        for (unsigned counter4 = 0; counter4 < (1<<16); ++counter4)
 				{
 
@@ -327,7 +281,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     //offset + std::cout << " for counter2: " + to_string(counter2) + " for counter3: " + to_string(counter3) + " for counter4: " + to_string(counter4) << endl;
 
                     t=34;    
-					Q[offset + 35] = Q[offset + t-3] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + W(block,t) + AC(t);
+					Q[offset + 35] = Q[offset + t-3] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + block[11] + AC(t);
 
 					if (0 != (Q[offset + 35] & (1 << 15))) 
 						continue;
@@ -451,7 +405,6 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                         continue;
                     }
 
-
 					std::cout << "." << std::flush;
 
 					uint32 block2[16];
@@ -479,12 +432,13 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
                     if ((IV2[0] == IV1[0] + (1<<31)) && (IV2[1] == IV1[1] + (1<<31) + (1<<25)) && (IV2[2] == IV1[2] + (1<<31) + (1<<25))	&& (IV2[3] == IV1[3] + (1<<31) + (1<<25)))
                     {       
-                        std::cout << ihv[0] << std::endl;
-                        std::cout << ihv[1] << std::endl;
-                        std::cout << ihv[2] << std::endl;
-                        std::cout << ihv[3] << std::endl;
+/*                         std::cout << std::endl;
+                        std::cout << bitset<32>(ihv[0]) << std::endl;
+                        std::cout << bitset<32>(ihv[1]) << std::endl;
+                        std::cout << bitset<32>(ihv[2]) << std::endl;
+                        std::cout << bitset<32>(ihv[3]) << std::endl; */
                         return 0;
-                    }
+                   }
 
 					if (IV2[0] != IV1[0] + (1<<31))
 						std::cout << "!" << std::flush;
@@ -501,8 +455,8 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 //########################################## end block 0 start block 1 #####################################################################
 //##########################################################################################################################################
 //##########################################################################################################################################
-void find_block1_01 (uint32 block [16], uint32 IHV[4] ); // Stevens Style
-void find_block1_10 (uint32 block [16], uint32 IHV[4] ); // Stevens Style
+
+
 
 
 void find_block1_11(uint32 block[16], uint32 IHV[4])
@@ -510,14 +464,11 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
     uint32 t = 0;
     fill_n(Q,68,0); // !!!!!!!!!!!!
+
     Q[0] = IHV[0]; 
     Q[1] = IHV[3];
     Q[2] = IHV[2];
     Q[3] = IHV[1];
-    std::cout << Q[0] << std::endl;
-	std::cout << Q[1] << std::endl;
-	std::cout << Q[2] << std::endl;
-	std::cout << Q[3] << std::endl;
 
 	std::vector<uint32> q9q10mask(1<<5);
 
@@ -564,7 +515,6 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 
 //correct
 
-
 		const uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14],16) + Q[offset + 13] + 0xf61e2562;
 		const uint32 t_18 = Q[offset + 14] + 0xc040b340 + block[6];
 		const uint32 t_19 = Q[offset + 15] + 0x265e5a51 + block[11];
@@ -576,45 +526,40 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 
 		unsigned counter = 0;
 		while (counter < (1 << 12))
-		{ 
+		{
 			++counter;
 
 			uint32 q1 = q1a | (randX() & 0x7dfff79e);
-			uint32 m1 = Q[offset + 2] - q1;
-			m1 = RR(m1, RC(1)) - f_t(q1, Q[offset + 0], Q[offset - 1],1) - t_1;
+			uint32 m1 = Q[offset+2] - q1;
+			m1 = RR(m1, 12) - f_t(q1, Q[offset+0], Q[offset-1],1) - t_1;
 
-			const uint32 q16 = Q[offset + 16];
+			const uint32 q16 = Q[offset+16];
 			uint32 q17 = t_17 + m1;
 			q17 = RL(q17, 5) + q16;
 			if (0x40000000 != ((q17^q16) & 0xc0008008)) continue;
 			if (0 != (q17 & 0x00020000)) continue;
 
-			uint32 q18 = f_t(q17, q16, Q[offset + 15],17) + t_18;
-			q18 = RL(q18, 9); 
-            q18 += q17;
+			uint32 q18 = f_t(q17, q16, Q[offset+15],17) + t_18;
+			q18 = RL(q18, 9); q18 += q17;
 			if (0x80020000 != ((q18^q17) & 0xa0020000)) continue;
 
 			uint32 q19 = f_t(q18, q17, q16,18) + t_19;
-			q19 = RL(q19, 14);
-            q19 += q18;
+			q19 = RL(q19, 14); q19 += q18;
 			if (0x80000000 != (q19 & 0x80020000)) continue;
 
 			uint32 m0 = q1 - Q[offset + 0];
 			m0 = RR(m0, 7) - t_0;
 
-			uint32 q20 = f_t(q19, q18, q17,19) + q16 + AC(19) + m0;
-			q20 = RL(q20, 20);
-            q20 += q19;
+			uint32 q20 = f_t(q19, q18, q17,19) + q16 + 0xe9b6c7aa + m0;
+			q20 = RL(q20, 20); q20 += q19;
 			if (0x00040000 != ((q20^q19) & 0x80040000))	continue;
-		
+			
+			Q[offset + 1] = q1;
+			Q[offset + 17] = q17;
+			Q[offset + 18] = q18;
+			Q[offset + 19] = q19;
+			Q[offset + 20] = q20;
 
-			Q[offset+ 1] = q1;
-			Q[offset+ 17] = q17;
-			Q[offset+ 18] = q18;
-			Q[offset+ 19] = q19;
-			Q[offset+ 20] = q20;
-
-/*         
             std::cout << bitset<32>(Q[offset + 1]) << " - 4]" << std::endl;
 			std::cout << bitset<32>(Q[offset + 17]) << " - 6]" << std::endl;
 			std::cout << bitset<32>(Q[offset + 18]) << " - 7]" << std::endl;
@@ -623,7 +568,7 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 
             			std::cout <<"______" << std::endl; 
 
- */
+ 
 			block[0] = m0;
 			block[1] = m1;
 
@@ -643,8 +588,7 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 
 		}
 
-		if (counter != 0)
-			continue;
+		if (counter != 0)continue;
 
 		const uint32 q9b = Q[offset + 9];
 		const uint32 q10b = Q[offset + 10];
@@ -661,11 +605,9 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 
 	 	for (unsigned k10 = 0; k10 < (1<<5); ++k10)
 		{ 
-
 			uint32 q_10 = q10b | (q9q10mask[k10]&0x08000040);
 			uint32 m_10 = RR(Q[offset+11] - q_10,RC(10));
 			uint32 q_9 = q9b | (q9q10mask[k10]&0x80000280);
-
 
 			m_10 -= f_t(q_10, q_9, Q[offset+8],10) + t_10;
 
@@ -673,7 +615,6 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 			uint32 help_22 = t_22 + m_10; //dd
             help_22 = RL(help_22, 9) + help_21;
 			if (0 == (help_22 & 0x80000000)) continue;			
-
 
 			uint32 help_20 = Q[offset + 20];//bb
 			uint32 help_23 = t_23 + f_t(help_22, help_21, help_20,22); //cc
@@ -695,13 +636,12 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 
             for (unsigned k9 = 0; k9 < (1<<9); ++k9) //tunnel
             {   
-                fill_n(Q,68,0); // !!!!!!!!!!!!
-                      
+               // fill_n(Q,68,0); // !!!!!!!!!!!!
+
                 Q[offset + 21] = help_21;
                 Q[offset + 22] = help_22;
                 Q[offset + 23] = help_23;
                 Q[offset + 24] = help_24;
-
 				Q[offset + 9] = q_9 ^ q9mask[k9]; //tunnel
 
                 block[8] = reverse_md5(block, 8, AC(8), RC(8));
@@ -838,12 +778,14 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 				md5_compress_f(block,IV1);
 				md5_compress_f(block2,IV2);
 
-               std::cout << bitset<32>(IV1[0]) << std::endl;
-                std::cout << bitset<32>(IV2[0]) << std::endl;
+/*                std::cout << bitset<32>(IV1[0]) << std::endl;
+                std::cout << bitset<32>(IV2[0]) << std::endl; */
  
 
 				if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
                 {
+                    std::cout << "^^" << std::flush;
+
 					return;
                 }
 				if (IV2[0] != IV1[0])
@@ -851,20 +793,18 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 						std::cout << "!" << std::flush;
                 }
 			}
-
 		}
-
 	}
 }
 
 
 void find_block1(uint32 block[], const uint32 IV[])
 {    
-    uint32 IV1[4] = {IV[0],IV[1],IV[2],IV[3]};
 
 	if ( ((IV[1]^IV[2])&(1<<31))==0 && ((IV[1]^IV[3])&(1<<31))==0 && (IV[3]&(1<<25))==0 && (IV[2]&(1<<25))==0 && (IV[1]&(1<<25))==0 && ((IV[2]^IV[1])&1)==0 )
 	{
 		uint32 IV2[4] = { IV[0]+(1<<31), IV[1]+(1<<31)+(1<<25), IV[2]+(1<<31)+(1<<25), IV[3]+(1<<31)+(1<<25) };
+
 		if ((IV[1]&(1<<6))!=0 && (IV[1]&1)!=0) {
 
 			std::cout << "S11" << std::flush;
@@ -875,13 +815,13 @@ void find_block1(uint32 block[], const uint32 IV[])
 
 			std::cout << "S10" << std::flush;
 
-			//find_block1_10(block, IV2);
+			find_block1_10(block, IV2);
 
-		} else if ((IV[1]&(1<<6))==0 && (IV[1]&1)!=0) {
+		} else if ((IV[1]&(1<<6))==0 && (IV[1]&1)!=0) {     
 
 			std::cout << "S01" << std::flush;
 
-			//find_block1_01(block, IV2);
+			find_block1_01(block, IV2);
 
 		} else {
 
@@ -891,8 +831,6 @@ void find_block1(uint32 block[], const uint32 IV[])
 
 		}
 
-
-
 		block[4] += 1<<31;
 
 		block[11] += 1<<15;
@@ -900,6 +838,8 @@ void find_block1(uint32 block[], const uint32 IV[])
 		block[14] += 1<<31;
 
 	} else {
+        
+        uint32 IV1[4] = {IV[0],IV[1],IV[2],IV[3]};
 
 		std::cout << "W" << std::flush;
 		find_block1_Wang(block, IV1);
@@ -912,27 +852,30 @@ void find_block1(uint32 block[], const uint32 IV[])
 
 void find_coll(uint32 block_10[16],uint32 block_11[16],uint32 block_20[16],uint32 block_21[16]) // MD5 is the IV or IHV, the names are not correct yet
 {   
-
-
+    uint32 IV[4];
+    IV[0] = ihv[0];
+    IV[1] = ihv[1];
+    IV[2] = ihv[2];
+    IV[3] = ihv[3];
 
     std::cout << "try to find collsions. IHV: " << std::flush;
-    std::cout << hex << ihv[0] << hex << ihv[1] << hex << ihv[2] << hex << ihv[3] << std::endl;
-    std::cout << to_hex(ihv[0]) << to_hex(ihv[1]) << to_hex(ihv[2]) << to_hex(ihv[3]) << std::endl;
+    std::cout << hex << IV[0] << hex << IV[1] << hex << IV[2] << hex << IV[3] << std::endl;
+    //std::cout << to_hex(IV[0]) << to_hex(IV[1]) << to_hex(IV[2]) << to_hex(IV[3]) << std::endl;
     std::cout << "Block0: " << std::endl;
 
- 	find_block0(block_10, ihv);
+ 	find_block0(block_10, IV);
 
     std::cout << "Block0 ... " << std::endl;
-    std::cout << hex << ihv[0] << hex << ihv[1] << hex << ihv[2] << hex << ihv[3] << std::endl;
-    std::cout << to_hex(ihv[0]) << to_hex(ihv[1]) << to_hex(ihv[2]) << to_hex(ihv[3]) << std::endl;
+    std::cout << hex << IV[0] << hex << IV[1] << hex << IV[2] << hex << IV[3] << std::endl;
+    //std::cout << to_hex(IV[0]) << to_hex(IV[1]) << to_hex(IV[2]) << to_hex(IV[3]) << std::endl;
     std::cout << "compressing" << endl;
 
-	uint32 IHV[4] = { ihv[0], ihv[1], ihv[2], ihv[3] };
+	uint32 IHV[4] = { IV[0], IV[1], IV[2], IV[3] };
 
  	md5_compress_f(block_10,IHV);
 
-    std::cout << hex << ihv[0] << hex << ihv[1] << hex << ihv[2] << hex << ihv[3] << std::endl;
-    std::cout << to_hex(ihv[0]) << to_hex(ihv[1]) << to_hex(ihv[2]) << to_hex(ihv[3]) << std::endl;
+    std::cout << hex << IHV[0] << hex << IHV[1] << hex << IHV[2] << hex << IHV[3] << std::endl;
+    std::cout << to_hex(IHV[0]) << to_hex(IHV[1]) << to_hex(IHV[2]) << to_hex(IHV[3]) << std::endl;
     std::cout << "Block1: " << std::endl;
     find_block1(block_11, IHV);
 
@@ -944,6 +887,7 @@ void find_coll(uint32 block_10[16],uint32 block_11[16],uint32 block_20[16],uint3
 		block_20[t] = block_10[t];
 		block_21[t] = block_11[t];
 	}
+
 	block_20[4] += 1 << 31; 
     block_20[11] += 1 << 15; 
     block_20[14] += 1 << 31;
