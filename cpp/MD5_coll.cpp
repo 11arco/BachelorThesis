@@ -560,7 +560,7 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 			Q[offset + 19] = q19;
 			Q[offset + 20] = q20;
 
-            std::cout << bitset<32>(Q[offset + 1]) << " - 4]" << std::endl;
+/*             std::cout << bitset<32>(Q[offset + 1]) << " - 4]" << std::endl;
 			std::cout << bitset<32>(Q[offset + 17]) << " - 6]" << std::endl;
 			std::cout << bitset<32>(Q[offset + 18]) << " - 7]" << std::endl;
 			std::cout << bitset<32>(Q[offset + 19]) << " - 11]" << std::endl; 
@@ -568,7 +568,7 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 
             			std::cout <<"______" << std::endl; 
 
- 
+  */
 			block[0] = m0;
 			block[1] = m1;
 
@@ -853,21 +853,21 @@ void find_block1(uint32 block[], const uint32 IV[])
 void find_coll(uint32 block_10[16],uint32 block_11[16],uint32 block_20[16],uint32 block_21[16]) // MD5 is the IV or IHV, the names are not correct yet
 {   
     uint32 IV[4];
-    IV[0] = ihv[0];
-    IV[1] = ihv[1];
-    IV[2] = ihv[2];
-    IV[3] = ihv[3];
+    IV[0] = ihv_g[0];
+    IV[1] = ihv_g[1];
+    IV[2] = ihv_g[2];
+    IV[3] = ihv_g[3];
 
     std::cout << "try to find collsions. IHV: " << std::flush;
     std::cout << hex << IV[0] << hex << IV[1] << hex << IV[2] << hex << IV[3] << std::endl;
-    //std::cout << to_hex(IV[0]) << to_hex(IV[1]) << to_hex(IV[2]) << to_hex(IV[3]) << std::endl;
+    std::cout << to_hex(IV[0]) << to_hex(IV[1]) << to_hex(IV[2]) << to_hex(IV[3]) << std::endl;
     std::cout << "Block0: " << std::endl;
 
  	find_block0(block_10, IV);
 
     std::cout << "Block0 ... " << std::endl;
     std::cout << hex << IV[0] << hex << IV[1] << hex << IV[2] << hex << IV[3] << std::endl;
-    //std::cout << to_hex(IV[0]) << to_hex(IV[1]) << to_hex(IV[2]) << to_hex(IV[3]) << std::endl;
+    std::cout << to_hex(IV[0]) << to_hex(IV[1]) << to_hex(IV[2]) << to_hex(IV[3]) << std::endl;
     std::cout << "compressing" << endl;
 
 	uint32 IHV[4] = { IV[0], IV[1], IV[2], IV[3] };

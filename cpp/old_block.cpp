@@ -89,6 +89,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 		block[5] = reverse_md5(block,5, AC(5), RC(5));
 		block[6] = reverse_md5(block,6, AC(6), RC(6));
 		block[7] = reverse_md5(block,7, AC(22), RC(7));
+
 		block[11] = reverse_md5(block,11, AC(11), RC(11));
 		block[14] = reverse_md5(block,14, AC(14), RC(14));
 		block[15] = reverse_md5(block,15, AC(15), RC(15));
@@ -394,12 +395,12 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 
                     if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
                     {
-                                            std::cout << "^^" << std::flush;
+                        std::cout << "^^" << std::flush;
 
                         return 0;
                     }
                     if (IV2[0] != IV1[0])
-                        std::cout << "!" << std::endl;
+                        std::cout << "!" << std::flush;
                     
                 }  
             }
@@ -685,8 +686,9 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
                 //t=34
                 Q[offset + 35] = Q[offset + 31] + f_t(Q[offset + 34],Q[offset + 33],Q[offset + 32],34) + AC(34) + block[11]; 
 
-                if(( Q[offset + 35] & (1 << 15)) != 0) continue; // if bit at pos 15 is zero
-                Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + 34];
+				if (0 != (Q[offset + 35] & (1 << 15)))
+					continue;
+                 Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + 34];
 
                 //doing steps for t \in {35,...,47}
                 Q[offset + 36] = step_foward(offset + 35,W(block,35));
@@ -820,6 +822,9 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
     }
 }
 
+//##########################################################################################################################################
+//##########################################################################################################################################
+//##########################################################################################################################################
 
 void find_block1_01 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 {
@@ -1035,7 +1040,7 @@ void find_block1_01 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
                 //t=34
                 Q[offset + 35] = Q[offset + 31] + f_t(Q[offset + 34],Q[offset + 33],Q[offset + 32],34) + AC(34) + W(block,34); 
 
-                if(( Q[offset + 35] & (1 << 15)) != 0) continue; // if bit at pos 15 is zero
+                if (0 != (Q[offset + 35] & (1 << 15))) continue; // if bit at pos 15 is zero
                 Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + 34];
 
                 //doing steps for t \in {35,...,47}
@@ -1168,6 +1173,12 @@ void find_block1_01 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
             
     }
 }
+
+//##########################################################################################################################################
+//##########################################################################################################################################
+//##########################################################################################################################################
+
+
 void find_block1_10 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 {
     uint32 offset = 3; //offset is 3

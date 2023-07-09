@@ -30,5 +30,5 @@ uint32 randX() //for 32 bits
     x32 ^= x32 >> 17;
     x32 ^= x32 << 5;
 
-    return x32; //^ rand();
+    return x32 ^ rand();
 }

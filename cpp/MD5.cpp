@@ -15,9 +15,11 @@
 
 using namespace std;
 typedef unsigned int uint32; //actually u32 
-
-uint32 ihv[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
+uint32 ihv_g[4] = {0x67452301,0xEFCDAB89,0x98BADCFE,0x10325476} ;     // (67452301,EFCDAB89,98BADCFE,10325476)
 uint32 Q[67];   // core to algorythm and collf.
+
+
+// can't handle äöü
 
 void show_bits(uint32 * block, int len) // uese carefully
 {
@@ -98,7 +100,7 @@ void print_step(int step)
 
     cout << calc + to_string(step )  << " currect IHV: ";
 
-    cout << to_hex(ihv[0]) << to_hex(ihv[1]) << to_hex( ihv[2]) << to_hex( ihv[3]) << endl;
+    cout << to_hex(ihv_g[0]) << to_hex(ihv_g[1]) << to_hex( ihv_g[2]) << to_hex( ihv_g[3]) << endl;
 }
 
 
@@ -363,9 +365,11 @@ void md5_compress_f( uint32 block [16],uint32 IHV[4])
 
 void md5_compress (uint32 block [16])
 {
-
-    uint32* temp;
-    md5_compress_f(block,ihv);
+    md5_compress_f(block,ihv_g);
+    std::cout << to_hex(ihv_g[0]) << " ";
+    std::cout << to_hex(ihv_g[1]) << " ";
+    std::cout << to_hex(ihv_g[2]) << " ";
+    std::cout << to_hex(ihv_g[3]) << std::endl;
 
     return ;
 }
@@ -409,7 +413,7 @@ string process( string input)
     cout << "last block calculated" << endl;
     cout << endl;
 
-    return to_hex(ihv[0]) + to_hex(ihv[1]) + to_hex(ihv[2]) + to_hex(ihv[3]);
+    return to_hex(ihv_g[0]) + to_hex(ihv_g[1]) + to_hex(ihv_g[2]) + to_hex(ihv_g[3]);
 }
 
 uint32* to_block( string input, uint32 msg_block [16]) //only for msgs. with len < 17
