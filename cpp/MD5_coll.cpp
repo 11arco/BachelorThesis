@@ -189,6 +189,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 
 			// iterate over possible changes of q9 and q10
 			// while keeping conditions on q1-q21 intact
+            
 			// this changes m8, m9, m10, m12 and m13 (and not m11!)
 			// the possible changes of q9 that also do not change m10 are used below
             // more helper values (for know) 
@@ -560,15 +561,6 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 			Q[offset + 19] = q19;
 			Q[offset + 20] = q20;
 
-/*             std::cout << bitset<32>(Q[offset + 1]) << " - 4]" << std::endl;
-			std::cout << bitset<32>(Q[offset + 17]) << " - 6]" << std::endl;
-			std::cout << bitset<32>(Q[offset + 18]) << " - 7]" << std::endl;
-			std::cout << bitset<32>(Q[offset + 19]) << " - 11]" << std::endl; 
-			std::cout << bitset<32>(Q[offset + 20]) << " - 14]" << std::endl;
-
-            			std::cout <<"______" << std::endl; 
-
-  */
 			block[0] = m0;
 			block[1] = m1;
 
@@ -647,6 +639,7 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
                 block[8] = reverse_md5(block, 8, AC(8), RC(8));
                 block[9] = reverse_md5(block, 9, AC(9), RC(9));
                 block[12] = reverse_md5(block, 12, AC(12), RC(12));
+
                 //doing steps for t \in {24,...,33}
                 Q[offset + 25] = step_foward(offset + 24,W(block,24));
                 Q[offset + 26] = step_foward(offset + 25,W(block,25));
@@ -659,11 +652,13 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
                 Q[offset + 33] = step_foward(offset + 32,W(block,32));
                 Q[offset + 34] = step_foward(offset + 33,W(block,33));
 
-                //t=34
-                Q[offset + 35] = Q[offset + 31] + f_t(Q[offset + 34],Q[offset + 33],Q[offset + 32],34) + AC(34) + W(block,34); 
+                t=34;    
+                Q[offset + 35] = Q[offset + t-3] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + block[11] + AC(t);
 
-                if(( Q[offset + 35] & (1 << 15)) != 0) continue; // if bit at pos 15 is zero
-                Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + 34];
+                if (0 != (Q[offset + 35] & (1 << 15))) 
+                    continue;
+
+                Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + t]; // RL(16) bzw RR(16)
 
                 //doing steps for t \in {35,...,47}
                 Q[offset + 36] = step_foward(offset + 35,W(block,35));
@@ -778,9 +773,9 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 				md5_compress_f(block,IV1);
 				md5_compress_f(block2,IV2);
 
-/*                std::cout << bitset<32>(IV1[0]) << std::endl;
-                std::cout << bitset<32>(IV2[0]) << std::endl; */
- 
+/*                 std::cout << bitset<32>(IV1[0]) << std::endl;
+                std::cout << bitset<32>(IV2[0]) << std::endl; 
+  */
 
 				if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
                 {
@@ -804,6 +799,7 @@ void find_block1(uint32 block[], const uint32 IV[])
 	if ( ((IV[1]^IV[2])&(1<<31))==0 && ((IV[1]^IV[3])&(1<<31))==0 && (IV[3]&(1<<25))==0 && (IV[2]&(1<<25))==0 && (IV[1]&(1<<25))==0 && ((IV[2]^IV[1])&1)==0 )
 	{
 		uint32 IV2[4] = { IV[0]+(1<<31), IV[1]+(1<<31)+(1<<25), IV[2]+(1<<31)+(1<<25), IV[3]+(1<<31)+(1<<25) };
+
 
 		if ((IV[1]&(1<<6))!=0 && (IV[1]&1)!=0) {
 

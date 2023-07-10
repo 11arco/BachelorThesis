@@ -45,46 +45,24 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 
     while (true) //meh
 	{
-        uint32 help_0 = Q[offset + 0] & 0x80000000;
-		uint32 help_01 = 0x80000000 ^ help_0;
+        uint32 aa = Q[offset + 0] & 0x80000000;
+		uint32 bb = 0x80000000 ^ aa;
 
-		Q[offset + 2] = (randX() & 0x71de7799) | 0x0c008840 | help_01;
+		Q[offset + 2] = (randX() & 0x71de7799) | 0x0c008840 | bb;
 		Q[offset + 3] = (randX() & 0x01c06601) | 0x3e1f0966 | (Q[offset + 2] & 0x80000018);
 		Q[offset + 4] = 0x3a040010 | (Q[offset +3 ] & 0x80000601);
-		Q[offset + 5] = (randX() & 0x03c0e000) | 0x482f0e50 | help_0;
-		Q[offset + 6] = (randX() & 0x600c0000) | 0x05e2ec56 | help_0;
-		Q[offset + 7] = (randX() & 0x604c203e) | 0x16819e01 | help_01 | (Q[offset + 6] & 0x01000000);
+		Q[offset + 5] = (randX() & 0x03c0e000) | 0x482f0e50 | aa;
+		Q[offset + 6] = (randX() & 0x600c0000) | 0x05e2ec56 | aa;
+		Q[offset + 7] = (randX() & 0x604c203e) | 0x16819e01 | bb | (Q[offset + 6] & 0x01000000);
 		Q[offset + 8] = (randX() & 0x604c7c1c) | 0x043283e0 | (Q[offset + 7] & 0x80000002);
 		Q[offset + 9] = (randX() & 0x00002800) | 0x1c0101c1 | (Q[offset + 8] & 0x80001000);
-		Q[offset + 10] = 0x078bcbc0 | help_01;
-		Q[offset + 11] = (randX() & 0x07800000) | 0x701FD040 | help_01;// changed 701FD040
+		Q[offset + 10] = 0x078bcbc0 | bb;
+		Q[offset + 11] = (randX() & 0x07800000) | 0x701FD040 | bb;// changed 701FD040
 		Q[offset + 12] = (randX() & 0x00f00f7f) | 0x00081080 | (Q[offset + 11] & 0xe7000000);
-		Q[offset + 13] = (randX() & 0x00701f77) | 0x3f0fe008 | help_0;
-		Q[offset + 14] = (randX() & 0x00701f77) | 0x408be088 | help_0;
+		Q[offset + 13] = (randX() & 0x00701f77) | 0x3f0fe008 | aa;
+		Q[offset + 14] = (randX() & 0x00701f77) | 0x408be088 | aa;
 		Q[offset + 15] = (randX() & 0x00ff3ff7) | 0x7d000000;
 		Q[offset + 16] = (randX() & 0x1ffdffff) | 0x20000000 | (~Q[offset + 15] & 0x40020000); // changed 0x4ffdffff and 0x00020000
-
-/* 
-        std::cout << "Q[10]: " << bitset<32>(Q[offset + 10]) << std::endl;
-        std::cout << "       0111....0..111111101...001....00" << std::endl;
-        std::cout << "Q[11]: " << bitset<32>(Q[offset + 11]) << std::endl;
-        std::cout << "       0010........00011100...011....10" << std::endl;
-        std::cout << "Q[12]: " << bitset<32>(Q[offset + 12]) << std::endl;
-        std::cout << "       000...^^....10000001...10......." << std::endl;
-
-
-        std::cout << "Q[13]: " << bitset<32>(Q[offset + 13]) << std::endl;
-        std::cout << "       0.0...00....1011111....11...1..." << std::endl;
-
-        std::cout << "Q[14]: " << bitset<32>(Q[offset + 14]) << std::endl;
-        std::cout << "       0.1...01.......01...........0..." << std::endl;
-
-        std::cout << "Q[15]: " << bitset<32>(Q[offset + 15]) << std::endl;
-        std::cout << "       0!1...........!................." << std::endl;
-
-        std::cout << "Q[16]: " << bitset<32>(Q[offset + 16]) << std::endl;
-        std::cout << "_____________________________ " << std::endl; */
-
 
 		block[5] = reverse_md5(block,5, AC(5), RC(5));
 		block[6] = reverse_md5(block,6, AC(6), RC(6));
@@ -119,20 +97,13 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 
             const uint32 q_16 = Q[offset + 16];
             uint32 q_17 = t_17 +  m_1;
-            q_17 = RL(q_17, RC(16)) + q_16;
-            
-         /*    std::cout << "Q15 " << bitset<32>(Q[15]) << std::endl;
-            std::cout << "Q16 " << bitset<32>(Q[16]) << std::endl;
-            std::cout << "Q17 " << bitset<32>(q_17) << std::endl; */
- 
+            q_17 = RL(q_17, RC(16)) + q_16; 
             if (0x40000000 != ((q_17 ^ q_16) & 0xc0008008))continue; //!! changed to 0x40008008
-
             if (0 != (q_17 & 0x00020000)) continue; //!! changed to 0x80020000
             
             uint32 q_18 = f_t( q_17, q_16,Q[offset + 15], 17) + t_18;
             q_18 = RL(q_18, RC(17));
             q_18 += q_17;
-
             if (0x00020000 != ((q_18 ^ q_17) & 0xa0020000)) continue;
 
             uint32 q_19 = f_t( q_18, q_17,q_16, 18) + t_19;
@@ -142,6 +113,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
             
             uint32 m_0 = q_1 - Q[0 + offset];
             m_0 = RR(m_0, RC(0)) - t_0;
+
             uint32 q_20 = f_t(q_19, q_18,q_17,19) + q_16 + AC(19) + m_0;
             q_20 = RL(q_20,RC(19));
             q_20 += q_19;
@@ -228,15 +200,14 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 
 				uint32 help_20 = Q[offset + 20];//bb
 				uint32 help_23 = t_23 + f_t(help_22, help_21, help_20,22);//cc 
-
 				if (0 != (help_23 & 0x20000)) continue;
-
 				help_23 = RL(help_23, RC(22)) + help_22;
 				if (0 != (help_23 & 0x80000000)) continue;
 
 				uint32 help_24 = t_24 + f_t(help_23, help_22, help_21,23);//bb 
                 help_24 = RL(help_24, RC(23)) + help_23;
 				if (0 == (help_24 & 0x80000000)) continue;
+
 				block[10] = m_10;
 				Q[offset + 9] = q_9;
 				Q[offset + 10] = q_10;
@@ -271,12 +242,14 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
                     Q[offset + 32] = step_foward(offset + 31,W(block,31));
                     Q[offset + 33] = step_foward(offset + 32,W(block,32));
                     Q[offset + 34] = step_foward(offset + 33,W(block,33));
+                   
+                    t=34;    
+					Q[offset + 35] = Q[offset + t-3] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + block[11] + AC(t);
 
-                    //t=34
-                    Q[offset + 35] = Q[offset + 31] + f_t(Q[offset + 34],Q[offset + 33],Q[offset + 32],34) + AC(34) + W(block,34); 
+					if (0 != (Q[offset + 35] & (1 << 15))) 
+						continue;
 
-                    if(( Q[offset + 35] & (1 << 15)) == 0) continue; // if bit at pos 15 is zero
-                    Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + 34];
+					Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + t]; // RL(16) bzw RR(16)
 
                     //doing steps for t \in {35,...,47}
                     Q[offset + 36] = step_foward(offset + 35,W(block,35));
@@ -370,7 +343,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 					uint32 IV1[4];
                     uint32 IV2[4];
 
-                    for(int i = 0; i < 4 ; i++)
+                    for(int i = 0; i < 4 ; ++i)
                     {
 						IV1[i] = IHV[i];
                         IV2[i] = IHV[i] + (1 << 31);
@@ -380,7 +353,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 					IV2[2] += (1 << 25);
 					IV2[3] += (1 << 25);
 
-                    for(int i =0; i<16 ; i++)
+                    for(int i =0; i<16 ; ++i)
                     {
 						block2[i] = block[i];
                     }                    
@@ -389,9 +362,13 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 					block2[11] -= 1<<15;
 					block2[14] += 1<<31;
 
+                    
+                    
                     md5_compress_f(block,IV1);      //changes the given IV1
                     md5_compress_f(block2,IV2);     //changes the given IV2
-
+                    
+                    std::cout << bitset<32>(IV1[0]) << std::endl;
+                    std::cout << bitset<32>(IV2[0]) << std::endl; 
 
                     if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
                     {
@@ -418,66 +395,9 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
 uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 {//MD5 is the IV or IHV, the names are not correct yet
 
-    /* 
-    * Stevens works a lot with voids, which overwrites varibale on an upper, or even global level.
-    * There could be multiple values which get alterd.
-    * We try to actually return the value we work with for clarity.
-    *
-    * Here, we get two empty uint32-array handed.
-    * Since we don't want to return local adreses, but also do not want to alter global values,
-    * we fill the first after we found the first 'block', with this 'block'.
-    * 
-    * There is a confusion with the block numbering in the paper and the code.
-    * In the code the block are number from 0 to 1.
-    * In the paper the numbering starts with 1 and end with 2
-    * 
-    */
 
     uint32 offset = 3; //offset is 3 because the "last" pos for calculation is -3 (+3 = 0) 
     fill_n(Q,68,0); // !!!!!!!!!!!!
-
-    //uint32 Q [68] = {IHV[0], IHV[1], IHV[2], IHV[3]};
-
-
-        // choose Q_1 ...
-        // clac m0 ...
-
-        /* 
-        * Exp. for Stevens vlaues for Q_t with t = 3 
-        *   01010101 00110011 00001111 00000000  some Example
-        * & 11111110 10000111 10111100 00111111  0xfe87bc3f
-        * _________________________________________________  
-        *   01010100 00000011 00001100 00000000  zwischen Ergebniss	
-        * | 00000001 01111000 01000001 11000000  0x017841c0
-        * _________________________________________________
-        * = 01010101 01111011 01001101 11000000  Ergebniss
-        *   .......1 .1111... .1....01 11......  new bit conds für t = 3
-        *   ........ ....0... ....0... .0......  old bit conds für t = 3
-        * 
-        *   00000000 00001111 00110011 01010101  some other Example
-        * & 11111110 10000111 10111100 00111111  0xfe87bc3f
-        * _________________________________________________  
-        *   00000000 00000111 00110000 00010101  zwischen Ergebniss	
-        * | 00000001 01111000 01000001 11000000  0x017841c0
-        * _________________________________________________
-        * = 00000001 01111111 01110001 11010101  Ergebniss
-        *   ........ ....0... ....0... .0......  bit conds für t = 3
-        *   .......1 .1111... .1....01 11...... new bit conds
-        *
-        * => matches with the new bit conds
-        *    Stevens is building a u32 with the bits that has to be one and or it with the val after he ands the oposite value:
-        *    & 11111110 10000111 10111100 00111111  0xfe87bc3f
-        *    | 00000001 01111000 01000001 11000000  0x017841c0
-        * 
-        *   the & flips the 0 correct, the | flips the 1 correct
-        * 
-        */
-
-        // The first 16 Qs can be choosen abretary, as long as we fullfill the conditions.
-        // Stevens does this by generating really good ramdom values.
-        // After this he alters the random values so thy fullfill conditions.
-        // We follow Stevens appoache but genereate "normal" random vlaues and alter these so they fullfill the condidtions
-        // Improvement for rng is possible.
     Q[0] = IHV[0]; 
     Q[1] = IHV[3];
     Q[2] = IHV[2];
@@ -490,7 +410,6 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 		q9q10mask[k] = ((k<<5) ^ (k<<12) ^ (k<<25)) & 0x08002020;
 
 	
-
 	std::vector<uint32> q9mask(1<<9);
 
 	for (unsigned k = 0; k < q9mask.size(); ++k)
@@ -511,14 +430,13 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 		Q[offset + 7] = (randX() & 0x00200806) | 0x950430b0;
 		Q[offset + 8] = (randX() & 0x60050110) | 0x1bd29ca2 | (Q[offset + 7] & 0x00000004);
 		Q[offset + 9] = (randX() & 0x40044000) | 0xb8820004;
-		Q[offset + 10] = 0xf288b209| (Q[offset + 9] & 0x00044000);
+		Q[offset + 10] = 0xf288b209 | (Q[offset + 9] & 0x00044000);
         Q[offset + 11] = (randX() & 0x12888008) | 0x85712f57;
 		Q[offset + 12] = (randX() & 0x1ed98d7f) | 0xc0023080 | (~Q[offset + 11] & 0x00200000);
 		Q[offset + 13] = (randX() & 0x0efb1d77) | 0x1000c008;
 		Q[offset + 14] = (randX() & 0x0fff5d77) | 0xa000a288;
 		Q[offset + 15] = (randX() & 0x0efe7ff7) | 0xe0008000 | (~Q[offset + 14] & 0x00010000);
 		Q[offset + 16] = (randX() & 0x0ffdffff) | 0xf0000000 | (~Q[offset + 15] & 0x00020000); // 0x00020000
-
 
 		block[5] = reverse_md5(block,5, AC(5), RC(5));
 		block[6] = reverse_md5(block,6, AC(6), RC(6));
@@ -575,6 +493,7 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 
             uint32 m_0 = q_1 - Q[0 + offset];
             m_0 = RR(m_0, RC(0)) - t_0;
+
             uint32 q_20 = f_t(q_19, q_18,q_17,19) + q_16 + AC(19) + m_0;
             q_20 = RL(q_20,RC(19));
             q_20 += q_19;
@@ -636,9 +555,7 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 
             uint32 help_20 = Q[offset + 20];//bb
             uint32 help_23 = t_23 + f_t(help_22, help_21, help_20,22);//cc 
-
             if (0 != (help_23 & 0x20000)) continue;
-
             help_23 = RL(help_23, RC(22)) + help_22;
             if (0 != (help_23 & 0x80000000)) continue;
 
@@ -683,12 +600,13 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
                 Q[offset + 33] = step_foward(offset + 32,W(block,32));
                 Q[offset + 34] = step_foward(offset + 33,W(block,33));
 
-                //t=34
-                Q[offset + 35] = Q[offset + 31] + f_t(Q[offset + 34],Q[offset + 33],Q[offset + 32],34) + AC(34) + block[11]; 
+                t=34;    
+                Q[offset + 35] = Q[offset + t-3] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + block[11] + AC(t);
 
-				if (0 != (Q[offset + 35] & (1 << 15)))
-					continue;
-                 Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + 34];
+                if (0 != (Q[offset + 35] & (1 << 15))) 
+                    continue;
+
+                Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + t]; // RL(16) bzw RR(16)
 
                 //doing steps for t \in {35,...,47}
                 Q[offset + 36] = step_foward(offset + 35,W(block,35));
@@ -782,7 +700,7 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
                 uint32 IV1[4];
                 uint32 IV2[4];
 
-                for(int i = 0; i < 4 ; i++)
+                for(int i = 0; i < 4 ; ++i)
                 {
                     IV1[i] = IHV[i];
                     IV2[i] = IHV[i] + (1 << 31);
@@ -793,7 +711,7 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 				IV2[3] -= (1 << 25);
 
 
-                for(int i =0; i<16 ; i++)
+                for(int i =0; i<16 ; ++i)
                 {
                     block2[i] = block[i];
                 }                    
@@ -801,9 +719,13 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
                 block2[4] += 1<<31;
                 block2[11] += 1<<15;
                 block2[14] += 1<<31;
+           
 
                 md5_compress_f(block,IV1);      //changes the given IV1
                 md5_compress_f(block2,IV2);     //changes the given IV2
+/*          
+                std::cout << "IV1[0]" << bitset<32>(IV1[0]) <<  std::endl;
+                std::cout << "IV2[0]" << bitset<32>(IV2[0]) <<  std::endl; */
 /*                 std::cout << bitset<32>(IV1[0])<<std::endl;
                 std::cout << bitset<32>(IV2[0])<<std::endl; */
 
@@ -895,7 +817,7 @@ void find_block1_01 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 		const uint32 t_0 = f_t(Q[offset + 0], Q[offset - 1], Q[offset - 2],0) + Q[offset - 3] + AC(0);
 		const uint32 t_1 = Q[offset - 2] + AC(1);		
 
-		const uint32 q_a = 0x02020801 | (Q[offset + 0] & 0x80000000);
+		const uint32 q_a = 0x02020801 ^ (Q[offset + 0] & 0x80000000);
 		
 	    unsigned int counter = 0;
 		while (counter < (1 << 12))
@@ -1247,7 +1169,7 @@ void find_block1_10 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 		const uint32 t_0 = f_t(Q[offset + 0], Q[offset - 1], Q[offset - 2],0) + Q[offset - 3] + AC(0);
 		const uint32 t_1 = Q[offset - 2] + AC(1);		
 
-		const uint32 q_a = 0x02000941  | (Q[offset + 0] & 0x80000000);
+		const uint32 q_a = 0x02000941  ^ (Q[offset + 0] & 0x80000000);
 		
 	    unsigned int counter = 0;
 		while (counter < (1 << 12))
@@ -1277,7 +1199,7 @@ void find_block1_10 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
             uint32 q_19 = f_t( q_18, q_17,q_16, 18) + t_19;
             q_19 = RL(q_19, RC(18));
             q_19 += q_18;
-			if (0x80000000 != (q_19 & 0x80020000)) continue;
+			if (0 != (q_19 & 0x80020000)) continue;
 
             uint32 m_0 = q_1 - Q[0 + offset];
             m_0 = RR(m_0, RC(0)) - t_0;
@@ -1338,25 +1260,25 @@ void find_block1_10 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
             uint32 help_21 = Q[offset + 21];//aa
             uint32 help_22 = t_22 + m_10; //dd
             help_22 = RL(help_22, RC(21)) + help_21;//dd
-            if (0 == (help_22 & 0x80000000)) continue;			
+            if (0 != (help_22 & 0x80000000)) continue;			
 
             uint32 help_20 = Q[offset + 20];//bb
             uint32 help_23 = t_23 + f_t(help_22, help_21, help_20,22);//cc 
 
             if (0 != (help_23 & 0x20000)) continue;
-
             help_23 = RL(help_23, RC(22)) + help_22;
+
             if (0 != (help_23 & 0x80000000)) continue;
 
             uint32 help_24 = t_24 + f_t(help_23, help_22, help_21,23);//bb 
-            help_24 = RL(help_24, RC(23)) + help_23;
+            help_24 = RL(help_24, RC(23)) + help_23;//RC(23) =20
 
             if (0 == (help_24 & 0x80000000)) continue;
 
             block[10] = m_10;
             Q[offset + 9] = q_9;
             Q[offset + 10] = q_10;
-            block[13] = reverse_md5(block, 13, AC(13), RC(13));
+            block[13] = reverse_md5(block, 13, AC(13), RC(13)); //RC(13) = 12
 
             for (unsigned k9 = 0; k9 < (1<<9); ++k9)
             {                         
@@ -1389,11 +1311,13 @@ void find_block1_10 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
                 Q[offset + 33] = step_foward(offset + 32,W(block,32));
                 Q[offset + 34] = step_foward(offset + 33,W(block,33));
 
-                //t=34
-                Q[offset + 35] = Q[offset + 31] + f_t(Q[offset + 34],Q[offset + 33],Q[offset + 32],34) + AC(34) + W(block,34); 
+                t=34;    
+                Q[offset + 35] = Q[offset + t-3] + f_t(Q[offset + 34], Q[offset + 33], Q[offset + 32],t) + block[11] + AC(t);
 
-                if(( Q[offset + 35] & (1 << 15)) != 0) continue; // if bit at pos 15 is zero
-                Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + 34];
+                if (0 != (Q[offset + 35] & (1 << 15))) 
+                    continue;
+
+                Q[offset + 35] = ((Q[offset + 35] << 16) | (Q[offset + 35] >> 16)) + Q[offset + t]; // RL(16) bzw RR(16)
 
                 //doing steps for t \in {35,...,47}
                 Q[offset + 36] = step_foward(offset + 35,W(block,35));
@@ -1487,7 +1411,7 @@ void find_block1_10 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
                 uint32 IV1[4];
                 uint32 IV2[4];
 
-                for(int i = 0; i < 4 ; i++)
+                for(int i = 0; i < 4 ; ++i)
                 {
                     IV1[i] = IHV[i];
                     IV2[i] = IHV[i] + (1 << 31);
@@ -1498,7 +1422,7 @@ void find_block1_10 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 				IV2[3] -= (1 << 25);
 
 
-                for(int i =0; i<16 ; i++)
+                for(int i =0; i<16 ; ++i)
                 {
                     block2[i] = block[i];
                 }                    
