@@ -143,8 +143,6 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
         const uint32 q_10b = Q[offset + 10];
         const uint32 t_21 = f_t(Q[offset + 20], Q[offset + 19], Q[offset + 18],20) + Q[offset + 17] + AC(20);
 
-
-
         // In original equivalent to the following code we Steven's works a lot wit htemp and helper values to minimize the amount of calcuations (I guess), but it also helps to keep an overvie
         // so we try to find a good midling way, which is quite compact but also understandable without messing up the entire performance.
         // Some easy understandable helper values were mentioned before (e.g. q_4). Without these the clacuation wouldn't be possible or wrong results were givien as an output.
@@ -368,7 +366,7 @@ uint32* find_block1_Wang(uint32 block[16], uint32 IHV[4]) //does not work
                     md5_compress_f(block2,IV2);     //changes the given IV2
                     
                     std::cout << bitset<32>(IV1[0]) << std::endl;
-                    std::cout << bitset<32>(IV2[0]) << std::endl; 
+                    std::cout << bitset<32>(IV2[0]) << std::endl;  
 
                     if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
                     {
@@ -452,7 +450,7 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
  */
         // prerparing next values for active work
 
-		const uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14],16) + Q[offset + 13] + AC(16);
+		const uint32 t_17 = f_t(Q[offset + 16], Q[offset + 15], Q[offset + 14],16) + Q[offset + 13] + AC(16); // 16 f61e2562 5 m1
 		const uint32 t_18 = Q[offset + 14] + AC(17) + block[6];
 		const uint32 t_19 = Q[offset + 15] + AC(18) + block[11];
 
@@ -723,9 +721,9 @@ uint32* find_block1_00 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 
                 md5_compress_f(block,IV1);      //changes the given IV1
                 md5_compress_f(block2,IV2);     //changes the given IV2
-/*          
+      
                 std::cout << "IV1[0]" << bitset<32>(IV1[0]) <<  std::endl;
-                std::cout << "IV2[0]" << bitset<32>(IV2[0]) <<  std::endl; */
+                std::cout << "IV2[0]" << bitset<32>(IV2[0]) <<  std::endl; 
 /*                 std::cout << bitset<32>(IV1[0])<<std::endl;
                 std::cout << bitset<32>(IV2[0])<<std::endl; */
 
@@ -1079,8 +1077,8 @@ void find_block1_01 (uint32 block [16], uint32 IHV[4] ) // Stevens Style
 
                 md5_compress_f(block,IV1);      //changes the given IV1
                 md5_compress_f(block2,IV2);     //changes the given IV2
-/*                 std::cout << bitset<32>(IV1[0])<<std::endl;
-                std::cout << bitset<32>(IV2[0])<<std::endl; */
+                std::cout << bitset<32>(IV1[0])<<std::endl;
+                std::cout << bitset<32>(IV2[0])<<std::endl; 
 
                 if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
                 {

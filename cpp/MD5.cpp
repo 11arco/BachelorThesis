@@ -27,7 +27,6 @@ void show_bits(uint32 * block, int len) // uese carefully
     {
         if (i > 0 && (i % 4) == 0) cout << " | " << endl;
 
-
         cout << " | ";
         cout << bitset<32> (block[i]);
         
@@ -213,6 +212,12 @@ uint32 f_t(uint32 X, uint32 Y, uint32 Z, int t )
 
 uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
 { 
+        if (t <= -1 || t >= 64)
+        {
+             cout << "something went wrong in W. t is:" + to_string(t)<< endl;
+            return -1;     
+        }
+
     //int pos=-1;
     /*
     if (t < 16) pos = t ;
@@ -228,10 +233,12 @@ uint32 W ( uint32 m [16], int t) // 16 blocks each 32bit uints
     */
 
     //easy speed up
-    int t_pos[64] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1,6,11,0,5,10,15,4,9,14,3,8,13,2,7,12,5,8,11,14,1,4,7,10,13,0,3,6,9,12,15,2,0,7,14,5,12,3,10,1,8,15,6,13,4,11,2,9};
+    int t_pos[64] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+                     1,6,11,0,5,10,15,4,9,14,3,8,13,2,7,12,
+                     5,8,11,14,1,4,7,10,13,0,3,6,9,12,15,2,
+                     0,7,14,5,12,3,10,1,8,15,6,13,4,11,2,9};
 
 
-    if (t <= -1 || t >= 64) cout << "something went wrong un W. t is:" + to_string(t)<< endl;
 
     return m[t_pos[t]]; 
 
@@ -312,10 +319,10 @@ uint32 reverse_md5(uint32 block [16], uint32 t, uint32 AC, uint32 RC )
 {  
     uint32 offset = 3;
 
-    block[t] = Q[offset + t + 1] - Q[offset + t];
-	block[t] = RR(block[t], RC) - f_t(Q[offset + t], Q[offset + t - 1], Q[offset + t - 2], t) - Q[offset + t - 3] - AC ;
+    uint32 help = Q[offset + t + 1] - Q[offset + t];
+	help = RR(help, RC) - f_t(Q[offset + t], Q[offset + t - 1], Q[offset + t - 2], t) - Q[offset + t - 3] - AC ;
 
-    return block[t];
+    return help;
 }
 
 
@@ -380,7 +387,7 @@ string process( string input)
     cout << "starting" << endl;
     string output;
     uint32 l = input.length();
-    bool stv = false; // enable padding like it is in Steven's code
+    bool stv = true; // enable padding like it is in Steven's code
     string padded_input;
     if(stv)
     {

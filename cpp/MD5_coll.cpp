@@ -195,7 +195,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
             // more helper values (for know) 
             // notation close to Stevens
 
-			for (int counter3 = 0; counter3 < (1<<3);)
+			for (unsigned counter3 = 0; counter3 < (1<<3);)
 			{
 
             // block[0] is initial corrcet (line 89), but gets wrong over the code. My version does not change at all, Steven's does.
@@ -412,13 +412,13 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
 					uint32 IV1[4];
                     uint32 IV2[4];
 
-                    for(int i = 0; i < 4 ; i++)
+                    for(int i = 0; i < 4 ; ++i)
                     {
 						IV1[i] = IHV[i];
                         IV2[i] = IHV[i];
                     }
 
-                    for(int i =0; i<16 ; i++)
+                    for(int i =0; i<16 ; ++i)
                     {
 						block2[i] = block[i];
                     }                    
@@ -431,7 +431,7 @@ uint32* find_block0(uint32 block[16], const uint32 IHV[4])
                     md5_compress_f(block2,IV2);     //changes the given IV2
 
 
-                    if ((IV2[0] == IV1[0] + (1<<31)) && (IV2[1] == IV1[1] + (1<<31) + (1<<25)) && (IV2[2] == IV1[2] + (1<<31) + (1<<25))	&& (IV2[3] == IV1[3] + (1<<31) + (1<<25)))
+                    if ((IV2[0] == IV1[0] + (1<<31)) && (IV2[1] == IV1[1] + (1<<31) + (1<<25)) && (IV2[2] == IV1[2] + (1<<31) + (1<<25)) && (IV2[3] == IV1[3] + (1<<31) + (1<<25)))
                     {       
 /*                         std::cout << std::endl;
                         std::cout << bitset<32>(ihv[0]) << std::endl;
@@ -472,22 +472,21 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
     Q[3] = IHV[1];
 
 	std::vector<uint32> q9q10mask(1<<5);
-
 	for (unsigned k = 0; k < q9q10mask.size(); ++k)
     {
-		q9q10mask[k] = ((k<<5) ^ (k<<6) ^ (k<<7) ^ (k<<24) ^ (k<<27)) & 0x880002a0;	
+		q9q10mask[k] = ((k<<5) ^ (k<<6) ^ (k<<7) ^ (k<<24) ^ (k<<27)) & 0x880002a0;
     }
-	std::vector<uint32> q9mask(1<<9);
 
+	std::vector<uint32> q9mask(1<<9);
 	for (unsigned k = 0; k < q9mask.size(); ++k)
     {
 		q9mask[k] = ((k<<1) ^ (k<<3) ^ (k<<8) ^ (k<<12) ^ (k<<15) ^ (k<<18)) & 0x04710c12;
     }
 	while (true) 
 	{
-		uint32 aa = Q[offset] & 0x80000000;
+		uint32 help_0 = Q[offset + 0] & 0x80000000;
 
-		Q[offset + 2] = (randX() & 0x75bef63e) | 0x0a410041 | aa;
+		Q[offset + 2] = (randX() & 0x75bef63e) | 0x0a410041 | help_0;
 		Q[offset + 3] = (randX() & 0x10345614) | 0x0202a9e1 | (Q[offset + 2] & 0x84000002);
 		Q[offset + 4] = (randX() & 0x00145400) | 0xe84ba909 | (Q[offset + 3] & 0x00000014);
 		Q[offset + 5] = (randX() & 0x80000000) | 0x75e90b1d | (Q[offset + 4] & 0x00145400);
@@ -537,22 +536,25 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 			const uint32 q16 = Q[offset+16];
 			uint32 q17 = t_17 + m1;
 			q17 = RL(q17, 5) + q16;
-			if (0x40000000 != ((q17^q16) & 0xc0008008)) continue;
+			if (0x40000000 != ((q17^q16) & 0xc0008008)) continue; // debends on algo
 			if (0 != (q17 & 0x00020000)) continue;
 
 			uint32 q18 = f_t(q17, q16, Q[offset+15],17) + t_18;
-			q18 = RL(q18, 9); q18 += q17;
+			q18 = RL(q18, 9); 
+            q18 += q17;
 			if (0x80020000 != ((q18^q17) & 0xa0020000)) continue;
 
 			uint32 q19 = f_t(q18, q17, q16,18) + t_19;
-			q19 = RL(q19, 14); q19 += q18;
+			q19 = RL(q19, 14); 
+            q19 += q18;
 			if (0x80000000 != (q19 & 0x80020000)) continue;
 
 			uint32 m0 = q1 - Q[offset + 0];
 			m0 = RR(m0, 7) - t_0;
 
 			uint32 q20 = f_t(q19, q18, q17,19) + q16 + 0xe9b6c7aa + m0;
-			q20 = RL(q20, 20); q20 += q19;
+			q20 = RL(q20, RC(19)); // RC(19) =20
+            q20 += q19;
 			if (0x00040000 != ((q20^q19) & 0x80040000))	continue;
 			
 			Q[offset + 1] = q1;
@@ -628,7 +630,7 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 
             for (unsigned k9 = 0; k9 < (1<<9); ++k9) //tunnel
             {   
-               // fill_n(Q,68,0); // !!!!!!!!!!!!
+                //fill_n(Q,68,0); // !!!!!!!!!!!!
 
                 Q[offset + 21] = help_21;
                 Q[offset + 22] = help_22;
@@ -751,10 +753,10 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 				uint32 block2[16];
 				uint32 IV1[4];
                 uint32 IV2[4];
-				for (int t = 0; t < 4; ++t)
+				for (int i = 0; i < 4; ++i)
 				{
-					IV1[t] =IHV[t];
-					IV2[t] =IHV[t] + (1 << 31);
+					IV1[i] =IHV[i];
+					IV2[i] =IHV[i] + (1 << 31);
 				}
 
 				IV2[1] -= (1 << 25);
@@ -773,9 +775,9 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 				md5_compress_f(block,IV1);
 				md5_compress_f(block2,IV2);
 
-/*                 std::cout << bitset<32>(IV1[0]) << std::endl;
+                std::cout << bitset<32>(IV1[0]) << std::endl;
                 std::cout << bitset<32>(IV2[0]) << std::endl; 
-  */
+  
 
 				if (IV2[0]==IV1[0] && IV2[1]==IV1[1] && IV2[2]==IV1[2] && IV2[3]==IV1[3])
                 {
@@ -793,7 +795,7 @@ void find_block1_11(uint32 block[16], uint32 IHV[4])
 }
 
 
-void find_block1(uint32 block[], const uint32 IV[])
+void find_block1(uint32* block, const uint32* IV)
 {    
 
 	if ( ((IV[1]^IV[2])&(1<<31))==0 && ((IV[1]^IV[3])&(1<<31))==0 && (IV[3]&(1<<25))==0 && (IV[2]&(1<<25))==0 && (IV[1]&(1<<25))==0 && ((IV[2]^IV[1])&1)==0 )
